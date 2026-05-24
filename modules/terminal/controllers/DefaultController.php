@@ -138,6 +138,9 @@ class DefaultController extends Controller
 
         } catch (\Throwable $e) {
             $msg = $e->getMessage();
+            // Log do erro real no framework Yii para auditoria interna
+            Yii::error("Erro real na conexão SSH via SSE: " . $msg . "\n" . $e->getTraceAsString(), 'terminal');
+
             // Converte avisos internos do phpseclib causados por sockets fechadas ou falhas de pacotes em avisos claros de rede
             if (strpos($msg, 'Undefined array key') !== false || strpos($msg, 'Connection closed') !== false) {
                 $msg = 'Conexão rejeitada ou encerrada de forma prematura pelo servidor SSH de destino. Verifique se o usuário/senha estão corretos ou se o firewall bloqueou o IP do servidor web.';
