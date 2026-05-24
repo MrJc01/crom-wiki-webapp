@@ -237,15 +237,32 @@ $dailyQuoterandomDayTitle = $dailyQuotersTitle[date('d') % count($dailyQuotersTi
 
 // --- CONFIGURAÇÃO GLOBAL DO DASHBOARD ---
 // Centralização de dados da infra, rituais, camadas e soluções da CROM.
+// Carrega as configurações do SQLite (com mocks como fallback de deploy)
+$settingsMap = [];
+try {
+    $settingsList = Yii::$app->db->createCommand("SELECT * FROM core_settings")->queryAll();
+    foreach ($settingsList as $s) {
+        $settingsMap[$s['key']] = $s['value'];
+    }
+} catch (\Exception $e) {
+    // Silencia se a tabela não existir
+}
+
+$dashboardBadge = $settingsMap['dashboard_badge'] ?? 'Soberania';
+$dashboardTitle = $settingsMap['dashboard_title'] ?? 'CROM';
+$dashboardDesc = $settingsMap['dashboard_desc'] ?? 'Crie e colabore em documentações locais em Markdown com autonomia radical e controle de governança direto na base.';
+$dashboardBtnText = $settingsMap['dashboard_btn_text'] ?? 'Consultar Documentos Internos';
+$dashboardBtnTab = $settingsMap['dashboard_btn_tab'] ?? 'page_crud';
+
 $dashboard = [
     'banners' => [
         [
-            'badge'            => 'Soberania',
-            'titulo_principal' => 'CROM',
+            'badge'            => $dashboardBadge,
+            'titulo_principal' => $dashboardTitle,
             'titulo_accent'    => '',
-            'descricao'        => 'Crie e colabore em documentações locais em Markdown com autonomia radical e controle de governança direto na base.',
-            'btn_texto'        => 'Consultar Documentos Internos',
-            'btn_tab'          => 'page_crud',
+            'descricao'        => $dashboardDesc,
+            'btn_texto'        => $dashboardBtnText,
+            'btn_tab'          => $dashboardBtnTab,
             'gradiente'        => 'from-sky-400/20 to-indigo-500/0'
         ]
     ],
