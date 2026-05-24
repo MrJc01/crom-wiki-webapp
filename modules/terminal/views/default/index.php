@@ -164,6 +164,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
     let term = null;
     let fitAddon = null;
     let eventSource = null;
+    let pingInterval = null;
 
     function base64ToUtf8(str) {
         try {
@@ -258,6 +259,19 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
                       '&data=' + encodeURIComponent(data)
             });
         });
+
+        // Batimento cardíaco do frontend (ping a cada 15 segundos) para manter conexão viva
+        pingInterval = setInterval(() => {
+            if (alpine.connected) {
+                fetch('<?= Url::to(['/terminal/default/write']) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'id=' + encodeURIComponent(alpine.sessionId) + '&data='
+                });
+            }
+        }, 15000);
     }
 
     function disconnect(alpine) {
@@ -273,6 +287,11 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
         if (term) {
             term.dispose();
             term = null;
+        }
+
+        if (pingInterval) {
+            clearInterval(pingInterval);
+            pingInterval = null;
         }
 
         // Gera novo SessionID para a próxima conexão

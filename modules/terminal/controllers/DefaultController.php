@@ -111,6 +111,10 @@ class DefaultController extends Controller
         $lockFile = Yii::getAlias('@runtime/term_active_' . $id . '.lock');
         @file_put_contents($lockFile, (string)$myPid);
 
+        // Determina o arquivo de atividade para monitorar inatividade do frontend
+        $activityFile = Yii::getAlias('@runtime/term_activity_' . $id . '.txt');
+        @file_put_contents($activityFile, (string)time());
+
         // Determina o arquivo de buffer de entrada
         $inputBufferFile = Yii::getAlias('@runtime/ssh_input_' . $id . '.txt');
         if (file_exists($inputBufferFile)) {
@@ -149,6 +153,13 @@ class DefaultController extends Controller
             while (true) {
                 // Se a conexão foi fechada pelo cliente, encerra o loop para evitar processos órfãos
                 if (connection_aborted()) {
+                    break;
+                }
+
+                // Verifica timeout de atividade do frontend (caso cliente suma ou pare de mandar batimento cardíaco)
+                $lastActivity = (int)@file_get_contents($activityFile);
+                if ($lastActivity > 0 && (time() - $lastActivity) > 45) {
+                    Yii::warning("Sessão terminal {$id} encerrada por inatividade de ping do frontend.", 'terminal');
                     break;
                 }
 
@@ -197,6 +208,10 @@ class DefaultController extends Controller
             if (isset($lockFile) && file_exists($lockFile)) {
                 @unlink($lockFile);
             }
+            // Limpa o arquivo de atividade correspondente
+            if (isset($activityFile) && file_exists($activityFile)) {
+                @unlink($activityFile);
+            }
         }
 
         // Encerra a execução do Yii2 de forma limpa para evitar HeadersAlreadySentException
@@ -213,8 +228,17 @@ class DefaultController extends Controller
         $id = Yii::$app->request->post('id');
         $data = Yii::$app->request->post('data');
 
-        if (empty($id) || $data === null || $data === '') {
-            return ['status' => 'error', 'message' => 'Parâmetros insuficientes.'];
+        if (empty($id)) {
+            return ['status' => 'error', 'message' => 'ID da sessão inválido.'];
+        }
+
+        // Atualiza o timestamp de atividade do frontend (provando que o cliente está vivo)
+        $activityFile = Yii::getAlias('@runtime/term_activity_' . $id . '.txt');
+        @file_put_contents($activityFile, (string)time());
+
+        // Se data for nulo ou vazio, é apenas o ping de batimento cardíaco periódico do frontend
+        if ($data === null || $data === '') {
+            return ['status' => 'success'];
         }
 
         $inputBufferFile = Yii::getAlias('@runtime/ssh_input_' . $id . '.txt');
