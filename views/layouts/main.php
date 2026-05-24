@@ -21,6 +21,19 @@ if ($currentRoute === 'site/discover') {
     $initialTab = 'wiki';
 }
 
+// Consulta de usuários online ativa nos últimos 15 minutos (Otimização SRE)
+$timeThreshold = time() - 900;
+$onlineCount = 0;
+try {
+    $onlineCount = (int)Yii::$app->db->createCommand("
+        SELECT COUNT(user_id) 
+        FROM core_session_status 
+        WHERE last_activity >= :threshold AND is_online = 1
+    ", [':threshold' => $timeThreshold])->queryScalar();
+} catch (\Exception $e) {
+    // Silencia
+}
+
 echo $this->render('_head');
 ?>
 <?php $this->beginPage() ?>
@@ -82,7 +95,8 @@ echo $this->render('_head');
                  'beneficios': '<?= Url::to(['/site/beneficios']) ?>',
                  'page_crud': '<?= Url::to(['/page_crud/default/index']) ?>',
                  'wiki': '<?= Url::to(['/wiki/default/index']) ?>',
-                 'profile': '<?= Url::to(['/site/profile']) ?>'
+                 'profile': '<?= Url::to(['/site/profile']) ?>',
+                 'online_members': '<?= Url::to(['/site/online-members']) ?>'
              },
              openTab(id, push = true) {
                  this.activeTab = id;
@@ -148,12 +162,12 @@ echo $this->render('_head');
             <!-- Lado Direito: Alternador de Tema, Online Badge e Perfil -->
             <div class="flex items-center gap-4">
                 <!-- Contador e Lista de Usuários Online (HTMX Polling de 10s) -->
-                <div hx-get="<?= Url::to(['/site/index']) ?>"
-                     hx-select="#online-badge"
+                <!-- Contador e Lista de Usuários Online (Otimização SRE: swap innerHTML) -->
+                <div hx-get="<?= Url::to(['/site/online-badge']) ?>"
                      hx-trigger="every 10s"
-                     hx-swap="outerHTML"
+                     hx-swap="innerHTML"
                      id="online-badge-container">
-                     <!-- Será atualizado dinamicamente -->
+                     <?= $this->render('@app/views/site/_online_badge', ['onlineCount' => $onlineCount]) ?>
                 </div>
 
               
@@ -414,6 +428,34 @@ echo $this->render('_head');
                 <button id="btn-nav-profile"
                         hx-get="<?= Url::to(['/site/profile']) ?>"
                         hx-target="#container-profile"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba 5: Membros Online Premium (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
+                     x-show="activeTab === 'online_members'"
+                     id="container-online_members"
+                     <?= $initialTab === 'online_members' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'online_members'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Membros Online...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Membros Online -->
+                <button id="btn-nav-online_members"
+                        hx-get="<?= Url::to(['/site/online-members']) ?>"
+                        hx-target="#container-online_members"
                         hx-trigger="click once"
                         class="hidden">
                 </button>

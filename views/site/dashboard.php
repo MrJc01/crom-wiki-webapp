@@ -338,8 +338,8 @@ $dashboard = [
     ]
 ];
 
-// Consulta de usuários ativos nos últimos 5 minutos
-$timeThreshold = time() - 300;
+// Consulta de usuários ativos nos últimos 15 minutos (Otimização SRE)
+$timeThreshold = time() - 900;
 $onlineUsers = [];
 try {
     $onlineUsers = Yii::$app->db->createCommand("

@@ -23,7 +23,7 @@ class SiteController extends Controller
             $this->updateUserActivity();
             
             // Determina se deve carregar apenas parcial (HTMX) ou layout completo (acesso direto)
-            $ajaxActions = ['discover', 'beneficios', 'projetos', 'aprendizado', 'comunidades', 'profile'];
+            $ajaxActions = ['discover', 'beneficios', 'projetos', 'aprendizado', 'comunidades', 'profile', 'online-members', 'online-badge'];
             if (in_array($action->id, $ajaxActions)) {
                 if (Yii::$app->request->headers->has('HX-Request')) {
                     $this->layout = false;
@@ -313,6 +313,60 @@ class SiteController extends Controller
 
         return $this->render('profile', [
             'user' => $user
+        ]);
+    }
+
+    /**
+     * Lista de membros online no sistema (SPA compatible).
+     */
+    public function actionOnlineMembers(): string
+    {
+        if (Yii::$app->user->isGuest) {
+            return '';
+        }
+
+        $timeThreshold = time() - 900; // 15 minutos de tolerância
+        $onlineUsers = [];
+        try {
+            $onlineUsers = Yii::$app->db->createCommand("
+                SELECT u.id, u.username, s.last_activity
+                FROM core_session_status s
+                JOIN core_users u ON s.user_id = u.id
+                WHERE s.last_activity >= :threshold AND s.is_online = 1
+                ORDER BY u.username ASC
+            ", [':threshold' => $timeThreshold])->queryAll();
+        } catch (\Exception $e) {
+            // Silencia
+        }
+
+        return $this->render('online_members', [
+            'onlineUsers' => $onlineUsers
+        ]);
+    }
+
+    /**
+     * Retorna apenas a parcial HTML do badge online para o polling do HTMX (Otimização SRE).
+     */
+    public function actionOnlineBadge(): string
+    {
+        if (Yii::$app->user->isGuest) {
+            return '';
+        }
+
+        $timeThreshold = time() - 900; // 15 minutos de tolerância
+        $onlineCount = 0;
+        try {
+            $onlineCount = (int)Yii::$app->db->createCommand("
+                SELECT COUNT(user_id) 
+                FROM core_session_status 
+                WHERE last_activity >= :threshold AND is_online = 1
+            ", [':threshold' => $timeThreshold])->queryScalar();
+        } catch (\Exception $e) {
+            // Silencia
+        }
+
+        return $this->renderPartial('_online_badge', [
+            'onlineCount' => $onlineCount
         ]);
     }
 
