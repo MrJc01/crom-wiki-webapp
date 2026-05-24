@@ -86,7 +86,7 @@ class DefaultController extends Controller
         try {
             // Inicializa a conexão SSH
             $ssh = new SSH2($host, 22);
-            $ssh->setTimeout(0.02); // Timeout ultra baixo para leitura não-bloqueante
+            $ssh->setTimeout(10); // Timeout generoso para fase de negociação e login
 
             if (!$ssh->login($user, $pass)) {
                 echo "data: " . json_encode(['error' => 'Falha na autenticação SSH. Verifique o usuário e a chave de acesso.']) . "\n\n";
@@ -100,6 +100,9 @@ class DefaultController extends Controller
 
             echo "data: " . json_encode(['status' => 'connected', 'msg' => "\r\n=== Conectado com sucesso ao servidor {$host} via SSH ===\r\n\r\n"]) . "\n\n";
             flush();
+
+            // Configura o timeout ultra baixo de 20ms apenas para leitura não-bloqueante durante o loop de stream
+            $ssh->setTimeout(0.02);
 
             // Loop infinito de streaming bidirecional
             while (true) {
