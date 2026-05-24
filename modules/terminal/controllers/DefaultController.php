@@ -38,9 +38,9 @@ class DefaultController extends Controller
     public function actionIndex(): string
     {
         $servers = [
-            'crom.me' => 'crom.me (Guardiões)',
-            'vps1.crom.me' => 'vps1.crom.me (Pilares)',
-            'vps2.crom.me' => 'vps2.crom.me (Forja)',
+            '192.168.1.69' => 'Guardiões (CROM — Campinas-BR)',
+            '192.168.1.199' => 'Pilares (CROM — Ubuntu 24.04)',
+            '192.168.1.202' => 'Forja (CROM — Ubuntu 24.04)',
             'localhost' => 'localhost (Servidor Local)',
         ];
 

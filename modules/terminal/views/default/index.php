@@ -17,7 +17,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
      x-data="{
          connected: false,
          connecting: false,
-         serverMode: 'crom.me',
+         serverMode: '192.168.1.69',
          customHost: '',
          username: 'root',
          password: '',
