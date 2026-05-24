@@ -54,17 +54,22 @@ class DefaultController extends Controller
      */
     public function actionStream()
     {
-        Yii::$app->response->format = Response::FORMAT_RAW;
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_RAW;
+        
+        // Configura cabeçalhos através do objeto de resposta do Yii2 para compatibilidade total
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('Connection', 'keep-alive');
+        $response->headers->set('X-Accel-Buffering', 'no');
         
         // Evita bufferings do servidor
         if (function_exists('ob_end_clean')) {
             @ob_end_clean();
         }
         
-        header('Content-Type: text/event-stream');
-        header('Cache-Control: no-cache');
-        header('Connection: keep-alive');
-        header('X-Accel-Buffering: no'); // Importante para o Nginx não reter o stream!
+        // Envia cabeçalhos de forma limpa antes do início da transmissão
+        $response->send();
 
         $host = Yii::$app->request->get('host');
         $user = Yii::$app->request->get('user');
@@ -105,6 +110,11 @@ class DefaultController extends Controller
 
             // Loop infinito de streaming bidirecional
             while (true) {
+                // Se a conexão foi fechada pelo cliente, encerra o loop para evitar processos órfãos
+                if (connection_aborted()) {
+                    break;
+                }
+
                 // 1. Ler saída do SSH
                 $output = $ssh->read();
                 if ($output !== false && $output !== '') {
@@ -130,6 +140,9 @@ class DefaultController extends Controller
             echo "data: " . json_encode(['error' => 'Erro interno na sessão SSH: ' . $e->getMessage()]) . "\n\n";
             flush();
         }
+
+        // Encerra a execução do Yii2 de forma limpa para evitar HeadersAlreadySentException
+        Yii::$app->end();
     }
 
     /**
