@@ -108,6 +108,7 @@ echo $this->render('_head');
                  'admin': '<?= Url::to(['/admin/default/index']) ?>'
              },
              openTab(id, push = true) {
+                 if (!id) return;
                  this.activeTab = id;
                  if (push) {
                      const path = this.routes[id] || ('/' + id);

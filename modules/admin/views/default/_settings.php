@@ -111,6 +111,7 @@ use yii\helpers\Html;
                         <option value="discover" class="bg-slate-950 text-white">Discover (Aplicativos)</option>
                         <option value="beneficios" class="bg-slate-950 text-white">Benefícios</option>
                         <option value="page_crud" class="bg-slate-950 text-white">Páginas Dinâmicas</option>
+                        <option value="json_store" class="bg-slate-950 text-white">JSON Store</option>
                         <option value="wiki" class="bg-slate-950 text-white">Wiki Documentações</option>
                         <option value="chat" class="bg-slate-950 text-white">Chat Integrado</option>
                     </select>
@@ -217,6 +218,7 @@ use yii\helpers\Html;
                                     <option value="discover" class="bg-slate-950 text-white">Discover (Aplicativos)</option>
                                     <option value="beneficios" class="bg-slate-950 text-white">Benefícios</option>
                                     <option value="page_crud" class="bg-slate-950 text-white">Páginas Dinâmicas</option>
+                                    <option value="json_store" class="bg-slate-950 text-white">JSON Store</option>
                                     <option value="wiki" class="bg-slate-950 text-white">Wiki Documentações</option>
                                     <option value="chat" class="bg-slate-950 text-white">Chat Integrado</option>
                                 </select>
@@ -345,6 +347,7 @@ use yii\helpers\Html;
                                     <option value="discover" class="bg-slate-950 text-white">Discover (Aplicativos)</option>
                                     <option value="beneficios" class="bg-slate-950 text-white">Benefícios</option>
                                     <option value="page_crud" class="bg-slate-950 text-white">Páginas Dinâmicas</option>
+                                    <option value="json_store" class="bg-slate-950 text-white">JSON Store</option>
                                     <option value="wiki" class="bg-slate-950 text-white">Wiki Documentações</option>
                                     <option value="chat" class="bg-slate-950 text-white">Chat Integrado</option>
                                 </select>

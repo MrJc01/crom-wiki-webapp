@@ -512,7 +512,7 @@ $onlineCount = count($onlineUsers);
                                     </button>
                                 <?php else: 
                                 
-                                if (isset($card['tab'])): ?>
+                                if (!empty($card['tab'])): ?>
                                     <button @click="openTab('<?= $card['tab'] ?>')" class="w-full py-2.5 px-4 text-center rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md <?= $card['btn_style'] ?>">
                                         <?= htmlspecialchars($card['btn_texto']) ?>
                                     </button>
@@ -591,7 +591,7 @@ $onlineCount = count($onlineUsers);
                         </div>
                         
                         <div>
-                            <?php if (isset($previewItem['tab'])): ?>
+                            <?php if (!empty($previewItem['tab'])): ?>
                                 <button @click="openTab('<?= $previewItem['tab'] ?>')" class="py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition">
                                     <?= htmlspecialchars($previewItem['btn_texto']) ?>
                                 </button>
