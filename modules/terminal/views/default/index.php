@@ -17,7 +17,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
      x-data="{
          connected: false,
          connecting: false,
-         serverMode: 'vps1.crom.me',
+         serverMode: '<?= array_key_first($servers) ?? 'custom' ?>',
          customHost: '',
          username: 'root',
          password: '',
@@ -98,7 +98,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
                 </div>
 
                 <!-- Usuário SSH -->
-                <div class="space-y-1.5">
+                <div x-show="serverMode === 'custom'" x-transition class="space-y-1.5">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Usuário SSH</label>
                     <input type="text" 
                            x-model="username"
@@ -107,7 +107,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
                 </div>
 
                 <!-- Senha SSH -->
-                <div class="space-y-1.5">
+                <div x-show="serverMode === 'custom'" x-transition class="space-y-1.5">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Senha SSH</label>
                     <input type="password" 
                            x-model="password"
@@ -178,11 +178,12 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
     }
 
     function startConnection(alpine) {
+        const serverMode = alpine.serverMode;
         const host = alpine.getHost();
         const user = alpine.username;
         const pass = alpine.password;
         
-        if (!host || !user) {
+        if (serverMode === 'custom' && (!host || !user)) {
             alert('Por favor, preencha o host do servidor e o usuário SSH.');
             return;
         }
@@ -208,9 +209,9 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
 
         // Abre a stream de eventos SSE
         const streamUrl = '<?= Url::to(['/terminal/default/stream']) ?>' + 
-                          '?host=' + encodeURIComponent(host) + 
-                          '&user=' + encodeURIComponent(user) + 
-                          '&pass=' + encodeURIComponent(pass) + 
+                          '?host=' + encodeURIComponent(serverMode === 'custom' ? host : serverMode) + 
+                          '&user=' + encodeURIComponent(serverMode === 'custom' ? user : '') + 
+                          '&pass=' + encodeURIComponent(serverMode === 'custom' ? pass : '') + 
                           '&id=' + encodeURIComponent(alpine.sessionId);
 
         eventSource = new EventSource(streamUrl);
