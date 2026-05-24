@@ -58,6 +58,16 @@ if (!function_exists('renderWikiTree')) {
 
 <div class="flex flex-col md:flex-row h-full w-full bg-slate-950 text-slate-100 border border-slate-800/40 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm"
      x-data="{
+        currentUser: {
+            id: <?= (int)Yii::$app->user->id ?>,
+            username: <?= json_encode(Yii::$app->user->identity->username) ?>,
+            isAdmin: <?= Yii::$app->user->can('admin-access') ? 'true' : 'false' ?>
+        },
+        canManage() {
+            if (this.currentUser.isAdmin) return true;
+            if (this.createdBy === this.currentUser.username) return true;
+            return this.adminId !== null && parseInt(this.adminId) === this.currentUser.id;
+        },
         activeFile: '',
         fileTitle: '',
         fileContent: '',
@@ -127,6 +137,9 @@ if (!function_exists('renderWikiTree')) {
             const el = document.getElementById('markdown-preview');
             if (el) {
                 el.innerHTML = marked.parse(this.fileContent || '');
+                if (window.addCopyButtonsToPreElements) {
+                    window.addCopyButtonsToPreElements(el);
+                }
             }
         },
         
@@ -392,6 +405,7 @@ if (!function_exists('renderWikiTree')) {
                 <div class="flex items-center gap-2 select-none">
                     <!-- Alternador Editar / Visualizar -->
                     <button @click="editing = !editing; if(!editing) { renderMarkdown(); }" 
+                            x-show="canManage()"
                             class="py-1.5 px-3.5 bg-slate-900/60 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-slate-100 text-xs rounded-xl font-bold transition flex items-center gap-1.5 shadow-md shadow-black/20"
                             :class="editing ? 'bg-sky-600/10 border-sky-500/20 text-sky-400 hover:bg-sky-500/10' : ''">
                         <span x-text="editing ? '👁️ Visualizar' : '📝 Editar Página'"></span>
@@ -470,7 +484,7 @@ if (!function_exists('renderWikiTree')) {
                 <!-- MODO VISUALIZAÇÃO (Prose Markdown Renderizado) -->
                 <div x-show="!editing" class="h-full flex flex-col justify-between">
                     <div class="flex-grow">
-                        <article id="markdown-preview" class="prose prose-invert max-w-none text-slate-300 prose-sm sm:prose-base prose-headings:text-slate-100 prose-a:text-sky-400 hover:prose-a:text-sky-300 prose-code:text-sky-400 prose-code:font-mono prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800/80 prose-hr:border-slate-800/60 font-sans leading-relaxed">
+                        <article id="markdown-preview" class="prose prose-invert max-w-none select-text">
                             <!-- Injetado pelo Marked.js -->
                         </article>
                     </div>

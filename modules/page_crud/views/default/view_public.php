@@ -9,12 +9,23 @@ use yii\helpers\Html;
 $this->title = $page->title . ' — CROM Documentação Pública';
 ?>
 
-<div class="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8 select-none font-sans"
+<script id="page-content-data" type="application/json">
+    <?= json_encode($page->content, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>
+</script>
+
+<div class="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8 select-text font-sans"
      x-data="{
-        content: <?= json_encode($page->content) ?>,
+        content: '',
         init() {
+            const dataEl = document.getElementById('page-content-data');
+            if (dataEl) {
+                this.content = JSON.parse(dataEl.textContent);
+            }
             // Renderiza o Markdown na div leitora
             this.$refs.reader.innerHTML = marked.parse(this.content || '');
+            if (window.addCopyButtonsToPreElements) {
+                window.addCopyButtonsToPreElements(this.$refs.reader);
+            }
         }
      }">
      
@@ -71,17 +82,9 @@ $this->title = $page->title . ' — CROM Documentação Pública';
              </div>
          </div>
 
-         <!-- Div do Markdown Renderizado -->
-         <article ref="reader" class="prose prose-invert max-w-none text-slate-300 font-sans leading-relaxed
-                      prose-headings:text-slate-100 prose-headings:font-extrabold prose-headings:tracking-tight
-                      prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg
-                      prose-a:text-sky-400 hover:prose-a:text-sky-300 prose-a:font-semibold prose-a:no-underline prose-a:border-b prose-a:border-sky-500/30 hover:prose-a:border-sky-400/80 prose-a:transition-all
-                      prose-strong:text-slate-200 prose-strong:font-bold
-                      prose-code:text-sky-300 prose-code:font-mono prose-code:text-xs prose-code:bg-slate-950 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
-                      prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-850 prose-pre:rounded-2xl prose-pre:p-4 prose-pre:shadow-inner
-                      prose-blockquote:border-l-4 prose-blockquote:border-sky-500 prose-blockquote:bg-sky-500/5 prose-blockquote:px-4 prose-blockquote:py-2 prose-blockquote:rounded-r-xl prose-blockquote:text-slate-400 prose-blockquote:italic">
-              <!-- Renderização em tempo real via AlpineJS + MarkedJS -->
-         </article>
+          <article x-ref="reader" class="prose prose-invert max-w-none select-text">
+               <!-- Renderização em tempo real via AlpineJS + MarkedJS -->
+          </article>
      </main>
 
      <!-- 3. Footer de Conversão Premium -->

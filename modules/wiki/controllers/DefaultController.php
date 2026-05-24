@@ -142,6 +142,16 @@ class DefaultController extends Controller
         // Se a página já existe, verifica se outra pessoa tem o lock de EDITING ativo
         if (!$isNew) {
             $this->cleanExpiredSessions();
+
+            // Validação fina de segurança (BOLA) para a Wiki
+            $isAdmin = Yii::$app->user->can('admin-access');
+            $isCreator = ($page->created_by === Yii::$app->user->identity->username);
+            $isAuthorizedAdmin = ($page->admin_id !== null && (int)$page->admin_id === (int)Yii::$app->user->id);
+
+            if (!$isAdmin && !$isCreator && !$isAuthorizedAdmin) {
+                return ['success' => false, 'message' => 'Você não tem permissão para editar esta página wiki.'];
+            }
+
             $activeEditor = WikiLiveSessions::find()
                 ->where(['path' => $path, 'status' => 'EDITING'])
                 ->andWhere(['!=', 'user_id', Yii::$app->user->id])

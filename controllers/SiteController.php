@@ -32,7 +32,7 @@ class SiteController extends Controller
             $this->updateUserActivity();
             
             // Determina se deve carregar apenas parcial (HTMX) ou layout completo (acesso direto)
-            $ajaxActions = ['index', 'discover', 'beneficios', 'projetos', 'aprendizado', 'comunidades', 'profile', 'online-members', 'online-badge', 'chat-drawer', 'chat'];
+            $ajaxActions = ['index', 'discover', 'beneficios', 'projetos', 'aprendizado', 'comunidades', 'profile', 'online-members', 'online-badge', 'chat-drawer', 'chat', 'error'];
             if (in_array($action->id, $ajaxActions)) {
                 if (Yii::$app->request->headers->has('HX-Request')) {
                     $this->layout = false;

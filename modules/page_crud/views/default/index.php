@@ -12,6 +12,17 @@ $this->title = 'Páginas Documentadas — Central Modular';
 
 <div class="flex flex-col w-full bg-slate-950 text-slate-100 border border-slate-800/40 rounded-2xl shadow-2xl backdrop-blur-sm relative"
      x-data='{
+        currentUser: {
+            id: <?= (int)Yii::$app->user->id ?>,
+            username: <?= json_encode(Yii::$app->user->identity->username) ?>,
+            isAdmin: <?= Yii::$app->user->can("admin-access") ? "true" : "false" ?>
+        },
+        canManage(page) {
+            if (!page) return false;
+            if (this.currentUser.isAdmin) return true;
+            if (page.created_by === this.currentUser.username) return true;
+            return page.admin_ids && page.admin_ids.map(Number).includes(this.currentUser.id);
+        },
         activePageId: <?= $selectedPageId !== null ? json_encode((int)$selectedPageId) : "null" ?>,
         activePage: <?= $selectedPage !== null ? json_encode([
             "id" => $selectedPage->id,
@@ -469,11 +480,11 @@ $this->title = 'Páginas Documentadas — Central Modular';
                                 class="py-1.5 px-3.5 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 text-xs rounded-xl font-bold transition flex items-center gap-1.5 shadow-sm">
                             🏠 Voltar
                         </button>
-                        <button @click="openEditForm()" 
+                        <button @click="openEditForm()" x-show="canManage(activePage)"
                                 class="py-1.5 px-3.5 bg-indigo-500/5 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/10 text-xs rounded-xl font-bold transition flex items-center gap-1 shadow-sm">
                             📝 Editar
                         </button>
-                        <button @click="deletePage()" 
+                        <button @click="deletePage()" x-show="canManage(activePage)"
                                 class="py-1.5 px-3.5 bg-rose-500/5 border border-rose-500/20 text-rose-400 hover:bg-rose-500/10 text-xs rounded-xl font-bold transition flex items-center shadow-sm">
                             🗑️ Excluir
                         </button>

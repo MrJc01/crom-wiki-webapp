@@ -51,7 +51,7 @@ $this->registerLinkTag(
 ?>
 
 <!-- CDNs Globais de Alta Performance para Visual Premium SPA -->
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -70,7 +70,68 @@ $this->registerLinkTag(
             extend: {
                 fontFamily: {
                     sans: ['Outfit', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'monospace'],
                 },
+                typography: (theme) => ({
+                    DEFAULT: {
+                        css: {
+                            '--tw-prose-body': '#cbd5e1', // slate-300
+                            '--tw-prose-headings': '#f1f5f9', // slate-100
+                            '--tw-prose-links': '#38bdf8', // sky-400
+                            '--tw-prose-bold': '#ffffff',
+                            '--tw-prose-quotes': '#94a3b8', // slate-400
+                            '--tw-prose-quote-borders': '#0ea5e9', // sky-500
+                            '--tw-prose-hr': '#1e293b',
+                            '--tw-prose-th-borders': '#334155',
+                            '--tw-prose-td-borders': '#1e293b',
+                            a: {
+                                textDecoration: 'none',
+                                borderBottomWidth: '1px',
+                                borderBottomColor: 'rgba(14, 165, 233, 0.2)',
+                                transition: 'all 0.2s',
+                                '&:hover': {
+                                    color: '#7dd3fc',
+                                    borderBottomColor: '#38bdf8',
+                                }
+                            },
+                            blockquote: {
+                                fontStyle: 'italic',
+                                backgroundColor: 'rgba(14, 165, 233, 0.05)',
+                                padding: '0.75rem 1.25rem',
+                                borderRadius: '0 1rem 1rem 0',
+                            },
+                            code: {
+                                color: '#7dd3fc',
+                                backgroundColor: '#020617',
+                                padding: '0.125rem 0.375rem',
+                                borderRadius: '0.375rem',
+                                borderWidth: '1px',
+                                borderColor: 'rgba(30, 41, 59, 0.6)',
+                                '&::before': { content: '""' },
+                                '&::after': { content: '""' },
+                            },
+                            pre: {
+                                backgroundColor: '#020617',
+                                borderWidth: '1px',
+                                borderColor: 'rgba(30, 41, 59, 0.8)',
+                                borderRadius: '1rem',
+                                padding: '1.25rem',
+                                boxShadow: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)',
+                            },
+                            h2: {
+                                borderBottomWidth: '1px',
+                                borderBottomColor: 'rgba(30, 41, 59, 0.6)',
+                                paddingBottom: '0.5rem',
+                                marginTop: '2rem',
+                                marginBottom: '1rem',
+                            },
+                            img: {
+                                borderRadius: '1rem',
+                                boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)',
+                            }
+                        }
+                    }
+                })
             }
         }
     }
@@ -137,4 +198,74 @@ $this->registerLinkTag(
         pointer-events: none;
     }
 </style>
+
+<script>
+    // Função utilitária global para adicionar botões premium de cópia em todos os elementos <pre>
+    window.addCopyButtonsToPreElements = function(container) {
+        if (!container) return;
+        const preElements = container.querySelectorAll('pre');
+        preElements.forEach((pre) => {
+            // Evita adicionar o botão duplicadamente se já existir
+            if (pre.querySelector('.copy-code-btn')) return;
+
+            // Garante o posicionamento relativo para o botão absoluto
+            pre.classList.add('relative', 'group');
+
+            // Cria o botão de cópia
+            const button = document.createElement('button');
+            button.className = 'copy-code-btn absolute top-3 right-3 p-1.5 rounded-lg bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 transition duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none z-10 cursor-pointer flex items-center justify-center';
+            button.title = 'Copiar Código';
+            button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H5.25m11.25 2.25l3.375 3.375m0 0l-3.375 3.375m3.375-3.375H8.25m11.25-3.562v-1.012c0-.621-.504-1.125-1.125-1.125H9.75a1.125 1.125 0 00-1.125 1.125v10.125c0 .621.504 1.125 1.125 1.125h9.75a1.125 1.125 0 001.125-1.125V11m-4.5-5.25H12" />
+                </svg>
+            `;
+
+            // Adiciona o evento de clique para copiar
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Pega o código interno, limpando eventuais botões ou HTML espúrio
+                const codeEl = pre.querySelector('code');
+                const textToCopy = codeEl ? codeEl.textContent : pre.textContent;
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Feedback visual temporário de "Copiado!"
+                    button.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-emerald-400">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        <span class="text-[9px] font-bold font-mono text-emerald-400 ml-1">Copiado!</span>
+                    `;
+                    button.classList.add('border-emerald-500/30', 'bg-emerald-500/5');
+
+                    setTimeout(() => {
+                        button.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H5.25m11.25 2.25l3.375 3.375m0 0l-3.375 3.375m3.375-3.375H8.25m11.25-3.562v-1.012c0-.621-.504-1.125-1.125-1.125H9.75a1.125 1.125 0 00-1.125 1.125v10.125c0 .621.504 1.125 1.125 1.125h9.75a1.125 1.125 0 001.125-1.125V11m-4.5-5.25H12" />
+                            </svg>
+                        `;
+                        button.classList.remove('border-emerald-500/30', 'bg-emerald-500/5');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Falha ao copiar texto: ', err);
+                });
+            });
+
+            pre.appendChild(button);
+        });
+    };
+
+    // Listener para habilitar que o HTMX renderize erros (como 403, 404, 500) dentro dos containers alvo
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.addEventListener('htmx:beforeOnLoad', function (evt) {
+            const status = evt.detail.xhr.status;
+            if (status === 403 || status === 404 || status === 500) {
+                evt.detail.shouldSwap = true;
+                evt.detail.isError = false;
+            }
+        });
+    });
+</script>
 

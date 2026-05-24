@@ -182,6 +182,14 @@ class DefaultController extends Controller
             if (!$page) {
                 return ['success' => false, 'message' => 'Página não encontrada para edição.'];
             }
+            // Validação fina de segurança (BOLA)
+            $isAdmin = Yii::$app->user->can('admin-access');
+            $isCreator = ($page->created_by === Yii::$app->user->identity->username);
+            $isAuthorizedAdmin = in_array((int)Yii::$app->user->id, $page->adminIds);
+
+            if (!$isAdmin && !$isCreator && !$isAuthorizedAdmin) {
+                return ['success' => false, 'message' => 'Você não tem permissão para editar esta página.'];
+            }
         } else {
             $isNew = true;
             $page = new PageDocumented();
@@ -224,6 +232,15 @@ class DefaultController extends Controller
         $page = PageDocumented::findOne($id);
         if (!$page) {
             return ['success' => false, 'message' => 'Página não encontrada para exclusão.'];
+        }
+
+        // Validação fina de segurança (BOLA)
+        $isAdmin = Yii::$app->user->can('admin-access');
+        $isCreator = ($page->created_by === Yii::$app->user->identity->username);
+        $isAuthorizedAdmin = in_array((int)Yii::$app->user->id, $page->adminIds);
+
+        if (!$isAdmin && !$isCreator && !$isAuthorizedAdmin) {
+            return ['success' => false, 'message' => 'Você não tem permissão para excluir esta página.'];
         }
 
         if ($page->delete()) {
