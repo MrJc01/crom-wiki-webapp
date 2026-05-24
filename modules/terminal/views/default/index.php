@@ -117,7 +117,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
 
                 <!-- Botão de Conexão -->
                 <button type="button" 
-                        @click="startConnection()"
+                        @click="startConnection($data)"
                         class="w-full py-3 mt-2 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-600/10 hover:shadow-sky-500/25 transition duration-300 cursor-pointer">
                     Iniciar Sessão Terminal
                 </button>
@@ -149,7 +149,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
         <div id="terminal-container" class="w-full h-full"></div>
 
         <!-- Botão Flutuante de Desconexão -->
-        <button @click="disconnect()"
+        <button @click="disconnect($data)"
                 class="absolute right-4 top-4 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500 hover:text-white text-rose-400 rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-pointer shadow-lg transition duration-200">
             Encerrar Conexão
         </button>
@@ -177,8 +177,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
         }
     }
 
-    function startConnection() {
-        const alpine = document.querySelector('[x-data]').__x.$data;
+    function startConnection(alpine) {
         const host = alpine.getHost();
         const user = alpine.username;
         const pass = alpine.password;
@@ -221,7 +220,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
 
             if (data.error) {
                 alert(data.error);
-                disconnect();
+                disconnect(alpine);
                 return;
             }
 
@@ -246,7 +245,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
 
         eventSource.onerror = function() {
             term.write('\r\n\r\n[Conexão encerrada pelo servidor]\r\n');
-            disconnect();
+            disconnect(alpine);
         };
 
         // Captura o input do usuário e envia para a VPS via POST assíncrono
@@ -262,8 +261,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
         });
     }
 
-    function disconnect() {
-        const alpine = document.querySelector('[x-data]').__x.$data;
+    function disconnect(alpine) {
         alpine.connected = false;
         alpine.connecting = false;
         alpine.password = ''; // Limpa a senha por segurança
