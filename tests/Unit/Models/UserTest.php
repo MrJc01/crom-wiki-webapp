@@ -11,7 +11,7 @@ final class UserTest extends \Codeception\Test\Unit
     public function testFindUserById()
     {
         /** @var User $user */
-        $user = User::findIdentity(100);
+        $user = User::findIdentity(1);
 
         verify($user)->notEmpty();
         verify($user->username)->equals('admin');
@@ -21,7 +21,7 @@ final class UserTest extends \Codeception\Test\Unit
     public function testFindUserByAccessToken()
     {
         /** @var User $user */
-        $user = User::findIdentityByAccessToken('100-token');
+        $user = User::findIdentityByAccessToken('xS224BNfcMoqZYRmcwksgI39igIQ7NnK');
 
         verify($user)->notEmpty();
         verify($user->username)->equals('admin');
@@ -45,7 +45,7 @@ final class UserTest extends \Codeception\Test\Unit
         /** @var User $user */
         $user = User::findByUsername('admin');
 
-        verify($user->validateAuthKey('test100key'))->notEmpty();
-        verify($user->validateAuthKey('test102key'))->empty();
+        verify($user->validateAuthKey('xS224BNfcMoqZYRmcwksgI39igIQ7NnK'))->notEmpty();
+        verify($user->validateAuthKey('invalid-key'))->empty();
     }
 }

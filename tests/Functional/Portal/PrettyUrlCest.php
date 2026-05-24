@@ -40,7 +40,7 @@ class PrettyUrlCest
         $I->amOnPage('/dashboard');
         $I->seeResponseCodeIs(200);
         $I->see('CROM', 'h1');
-        $I->see('Crie e colabore em documentos Markdown locais', 'p');
+        $I->see('Crie e colabore em documentações locais em Markdown com autonomia radical e controle de governança direto na base.', 'p');
     }
 
     /**

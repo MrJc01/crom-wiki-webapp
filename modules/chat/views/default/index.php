@@ -22,7 +22,7 @@ $initialRoomId = Yii::$app->request->get('room_id');
          showGroupModal: false,
          showContactModal: false,
          selectedRoomId: <?= $initialRoomId ? (int)$initialRoomId : 'null' ?>,
-         contacts: <?= json_encode($contacts) ?>,
+         contacts: <?= Html::encode(json_encode($contacts)) ?>,
          
          init() {
              // Se tiver um room_id inicial, força o clique no chat correspondente
@@ -253,7 +253,7 @@ $initialRoomId = Yii::$app->request->get('room_id');
                 <template x-for="contact in filteredContacts()" :key="contact.id">
                     <button @click="showContactModal = false; selectedRoomId = -1;"
                             hx-get="<?= Url::to(['/chat/default/open-private-chat']) ?>"
-                            hx-vals="js:{contactId: contact.id}"
+                            :hx-vals="JSON.stringify({contactId: contact.id})"
                             hx-target="#chat-active-window"
                             hx-swap="innerHTML"
                             class="w-full text-left p-3 rounded-lg hover:bg-slate-800/40 flex items-center gap-3 transition cursor-pointer">

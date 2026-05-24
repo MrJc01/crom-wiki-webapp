@@ -80,6 +80,10 @@ class SiteController extends Controller
             'error' => [
                 'class' => ErrorAction::class,
             ],
+            'captcha' => [
+                'class' => 'yii\captcha\CaptchaAction',
+                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+            ],
         ];
     }
 

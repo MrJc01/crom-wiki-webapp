@@ -65,7 +65,7 @@ class PortalPagesCest
 
         // Verifica elementos estruturais do Workspace SPA estilizado em TailwindCSS
         $I->see('CROM', 'h1');
-        $I->see('Crie e colabore em documentos Markdown locais com governança de membros direto na base.', 'p');
+        $I->see('Crie e colabore em documentações locais em Markdown com autonomia radical e controle de governança direto na base.', 'p');
 
         // Verifica a presença do Dock lateral (Sidebar)
         $I->seeElement('aside');
