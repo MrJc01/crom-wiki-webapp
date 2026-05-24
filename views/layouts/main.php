@@ -490,6 +490,14 @@ echo $this->render('_head');
                         class="hidden">
                 </button>
 
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Chat -->
+                <button id="btn-nav-chat"
+                        hx-get="<?= Url::to(['/chat/default/index']) ?>"
+                        hx-target="#container-chat"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
                 <!-- Aba 6: Módulo de Chat Premium (Injeção SPA) -->
                 <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-4 md:p-6 bg-slate-950" 
                      x-show="activeTab === 'chat'"
