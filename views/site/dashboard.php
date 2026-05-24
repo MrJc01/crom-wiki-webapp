@@ -409,6 +409,11 @@ $onlineCount = count($onlineUsers);
     .swiper-button-disabled { opacity: 0.25; cursor: not-allowed !important; }
     .swiper-pagination-banner .swiper-pagination-bullet { background: #0f172a; opacity: 0.2; width: 8px; height: 8px; transition: all 0.2s; }
     .swiper-pagination-banner .swiper-pagination-bullet-active { background: #0284c7; opacity: 1; height: 20px; border-radius: 4px; }
+    
+    /* Ajuste de altura auto para os slides do ecossistema */
+    .cromSwiperEcosystem .swiper-slide {
+        height: auto !important;
+    }
 </style>
 
 <div class="space-y-10 pb-16 selection:bg-sky-500/20">
@@ -465,7 +470,7 @@ $onlineCount = count($onlineUsers);
         </div>
     </section>
 
-    <section class="space-y-5 min-h-[380px] pb-6">
+    <section class="space-y-5 pb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none">
             <h2 class="text-xl font-bold text-slate-100 tracking-tight">Construa usando o ecossistema CROM</h2>
             
