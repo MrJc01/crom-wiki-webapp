@@ -23,7 +23,7 @@ class SiteController extends Controller
             $this->updateUserActivity();
             
             // Determina se deve carregar apenas parcial (HTMX) ou layout completo (acesso direto)
-            $ajaxActions = ['discover', 'beneficios', 'projetos', 'aprendizado', 'comunidades'];
+            $ajaxActions = ['discover', 'beneficios', 'projetos', 'aprendizado', 'comunidades', 'profile'];
             if (in_array($action->id, $ajaxActions)) {
                 if (Yii::$app->request->headers->has('HX-Request')) {
                     $this->layout = false;
@@ -211,6 +211,109 @@ class SiteController extends Controller
             return '';
         }
         return $this->render('comunidades');
+    }
+
+    /**
+     * Profile and settings action (SPA compatible).
+     */
+    public function actionProfile()
+    {
+        if (Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $user = \app\models\User::findOne(Yii::$app->user->id);
+        if (!$user) {
+            return $this->goHome();
+        }
+
+        $request = Yii::$app->request;
+
+        if ($request->isPost) {
+            $actionType = $request->post('action_type');
+            if ($actionType === 'update_profile') {
+                $username = trim((string)$request->post('username'));
+                if ($username === '') {
+                    return $this->renderPartial('_profile_alert', [
+                        'type' => 'error',
+                        'message' => 'O nome de usuário não pode estar em branco.'
+                    ]);
+                }
+                if ($username !== $user->username) {
+                    $existing = \app\models\User::find()->where(['username' => $username])->andWhere(['!=', 'id', $user->id])->one();
+                    if ($existing) {
+                        return $this->renderPartial('_profile_alert', [
+                            'type' => 'error',
+                            'message' => 'Este nome de usuário já está em uso.'
+                        ]);
+                    }
+                    $user->username = $username;
+                    $user->updated_at = time();
+                    if ($user->save(false)) {
+                        // Envia trigger HTMX para atualizar elementos do DOM que usam o username
+                        Yii::$app->response->headers->set('HX-Trigger', 'usernameUpdated');
+                        return $this->renderPartial('_profile_alert', [
+                            'type' => 'success',
+                            'message' => 'Perfil atualizado com sucesso!'
+                        ]);
+                    }
+                } else {
+                    return $this->renderPartial('_profile_alert', [
+                        'type' => 'info',
+                        'message' => 'Nenhuma alteração detectada.'
+                    ]);
+                }
+            } elseif ($actionType === 'change_password') {
+                $currentPassword = (string)$request->post('current_password');
+                $newPassword = (string)$request->post('new_password');
+                $confirmPassword = (string)$request->post('confirm_password');
+
+                if ($currentPassword === '' || $newPassword === '' || $confirmPassword === '') {
+                    return $this->renderPartial('_profile_alert', [
+                        'type' => 'error',
+                        'message' => 'Todos os campos de senha são obrigatórios.'
+                    ]);
+                }
+
+                if (!$user->validatePassword($currentPassword)) {
+                    return $this->renderPartial('_profile_alert', [
+                        'type' => 'error',
+                        'message' => 'A senha atual está incorreta.'
+                    ]);
+                }
+
+                if ($newPassword !== $confirmPassword) {
+                    return $this->renderPartial('_profile_alert', [
+                        'type' => 'error',
+                        'message' => 'A nova senha e a confirmação de senha não coincidem.'
+                    ]);
+                }
+
+                if (strlen($newPassword) < 6) {
+                    return $this->renderPartial('_profile_alert', [
+                        'type' => 'error',
+                        'message' => 'A nova senha deve ter pelo menos 6 caracteres.'
+                    ]);
+                }
+
+                $user->password_hash = Yii::$app->security->generatePasswordHash($newPassword);
+                $user->updated_at = time();
+                if ($user->save(false)) {
+                    return $this->renderPartial('_profile_alert', [
+                        'type' => 'success',
+                        'message' => 'Senha alterada com sucesso!'
+                    ]);
+                }
+            }
+            return $this->renderPartial('_profile_alert', [
+                'type' => 'error',
+                'message' => 'Ação inválida.'
+            ]);
+        }
+
+        return $this->render('profile', [
+            'user' => $user
+        ]);
     }
 
     /**
