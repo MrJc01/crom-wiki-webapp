@@ -71,6 +71,18 @@ $config = [
                 'p/save' => 'page_crud/default/save',
                 'p/users' => 'page_crud/default/users-list',
                 'p/<slug:.*>' => 'page_crud/default/view-by-slug',
+
+                // Módulo json_store
+                'json' => 'json_store/default/index',
+                'json/save' => 'json_store/default/save',
+                'json/delete/<id:\d+>' => 'json_store/default/delete',
+                'json/generate-token' => 'json_store/default/generate-token',
+                'json/revoke-token/<id:\d+>' => 'json_store/default/revoke-token',
+                'json/tokens-list' => 'json_store/default/tokens-list',
+                'json/users' => 'json_store/default/users-list',
+                
+                // API REST pública — JSON Store
+                'api/json/<slug:[\w\-]+>' => 'json_store/api/serve',
             ],
         ],
     ],

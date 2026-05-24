@@ -21,6 +21,8 @@ if ($currentRoute === 'site/discover') {
     $initialTab = 'wiki';
 } elseif (strpos($currentRoute, 'chat') !== false) {
     $initialTab = 'chat';
+} elseif (strpos($currentRoute, 'json_store') !== false) {
+    $initialTab = 'json_store';
 } elseif (strpos($currentRoute, 'admin') !== false) {
     $initialTab = 'admin';
 }
@@ -102,6 +104,7 @@ echo $this->render('_head');
                  'profile': '<?= Url::to(['/site/profile']) ?>',
                  'online_members': '<?= Url::to(['/site/online-members']) ?>',
                  'chat': '<?= Url::to(['/chat/default/index']) ?>',
+                 'json_store': '<?= Url::to(['/json_store/default/index']) ?>',
                  'admin': '<?= Url::to(['/admin/default/index']) ?>'
              },
              openTab(id, push = true) {
@@ -296,6 +299,26 @@ echo $this->render('_head');
                         <span class="text-[9px] font-bold text-center mt-1.5 tracking-wide transition-all"
                               :class="activeTab === 'beneficios' ? 'text-sky-400 font-extrabold' : 'text-slate-500 group-hover:text-slate-300'">
                             Benefícios
+                        </span>
+                    </button>
+
+                    <!-- Aba JSON Store: API REST CRUD -->
+                    <button @click="openTab('json_store')"
+                            hx-get="<?= Url::to(['/json_store/default/index']) ?>"
+                            hx-target="#container-json_store"
+                            hx-trigger="click once"
+                            id="btn-nav-json_store"
+                            class="w-full flex flex-col items-center group cursor-pointer border border-transparent"
+                            title="JSON Store">
+                        <div class="w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-200"
+                             :class="activeTab === 'json_store' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                            </svg>
+                        </div>
+                        <span class="text-[9px] font-bold text-center mt-1.5 tracking-wide transition-all"
+                              :class="activeTab === 'json_store' ? 'text-sky-400 font-extrabold' : 'text-slate-500 group-hover:text-slate-300'">
+                            JSON
                         </span>
                     </button>
 
@@ -565,6 +588,26 @@ echo $this->render('_head');
                         hx-trigger="click once"
                         class="hidden">
                 </button>
+
+                <!-- Aba JSON Store: API REST CRUD (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
+                     x-show="activeTab === 'json_store'"
+                     id="container-json_store"
+                     <?= $initialTab === 'json_store' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'json_store'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando JSON Store...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
 
             </main>
         </div>
