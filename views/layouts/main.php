@@ -121,6 +121,13 @@ echo $this->render('_head');
                      btn.click();
                      btn.setAttribute('hx-loaded', 'true');
                  }
+                 if (id === 'paravoce') {
+                     setTimeout(() => {
+                         if (typeof window.initDashboardSwipers === 'function') {
+                             window.initDashboardSwipers();
+                         }
+                     }, 50);
+                 }
              },
              init() {
                  // Trata o botão de Voltar/Avançar do navegador
@@ -160,6 +167,15 @@ echo $this->render('_head');
                  });
                  document.body.addEventListener('portalModulesUpdated', () => {
                      window.location.reload();
+                 });
+
+                 // Escuta respostas HTMX para reinicializar os Swipers da home
+                 document.body.addEventListener('htmx:afterSwap', (evt) => {
+                     if (evt.detail.target.id === 'container-paravoce') {
+                         if (typeof window.initDashboardSwipers === 'function') {
+                             window.initDashboardSwipers();
+                         }
+                     }
                  });
              }
          }">
@@ -302,25 +318,7 @@ echo $this->render('_head');
                         </span>
                     </button>
 
-                    <!-- Aba JSON Store: API REST CRUD -->
-                    <button @click="openTab('json_store')"
-                            hx-get="<?= Url::to(['/json_store/default/index']) ?>"
-                            hx-target="#container-json_store"
-                            hx-trigger="click once"
-                            id="btn-nav-json_store"
-                            class="w-full flex flex-col items-center group cursor-pointer border border-transparent"
-                            title="JSON Store">
-                        <div class="w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-200"
-                             :class="activeTab === 'json_store' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
-                            </svg>
-                        </div>
-                        <span class="text-[9px] font-bold text-center mt-1.5 tracking-wide transition-all"
-                              :class="activeTab === 'json_store' ? 'text-sky-400 font-extrabold' : 'text-slate-500 group-hover:text-slate-300'">
-                            JSON
-                        </span>
-                    </button>
+                   
 
                     <?php if (Yii::$app->user->can('admin-access')): ?>
                         <!-- Aba Admin: Painel Administrativo -->
@@ -585,6 +583,14 @@ echo $this->render('_head');
                 <button id="btn-nav-page_crud"
                         hx-get="<?= Url::to(['/page_crud/default/index']) ?>"
                         hx-target="#container-page_crud"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de JSON Store -->
+                <button id="btn-nav-json_store"
+                        hx-get="<?= Url::to(['/json_store/default/index']) ?>"
+                        hx-target="#container-json_store"
                         hx-trigger="click once"
                         class="hidden">
                 </button>

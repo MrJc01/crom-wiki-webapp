@@ -302,6 +302,18 @@ if (empty($ecosystemCards) || !is_array($ecosystemCards)) {
             'link'        => 'https://crom.run/ferramentas'
         ],
         [
+            'nome'        => 'JSON Store',
+            'tag'         => 'Desenvolvimento',
+            'tag_style'   => 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+            'bg_style'    => 'bg-gradient-to-br from-sky-950/40 to-slate-900 border-sky-900/60 hover:border-sky-500/40',
+            'icone'       => '⚡',
+            'descricao'   => 'Crie e gerencie endpoints JSON dinâmicos. Compartilhe dados públicos ou privados protegidos por tokens de API de forma rápida e segura.',
+            'btn_texto'   => 'Gerenciar JSONs',
+            'btn_style'   => 'bg-sky-600 hover:bg-sky-500 text-white',
+            'disabled'    => false,
+            'tab'         => 'json_store'
+        ],
+        [
             'nome'        => 'Cromva',
             'tag'         => 'IA',
             'tag_style'   => 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
@@ -390,10 +402,6 @@ try {
     // Silencia
 }
 $onlineCount = count($onlineUsers);
-
-// Injeta assets do Swiper.js limpos e sem duplicidade
-$this->registerCssFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css');
-$this->registerJsFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js');
 ?>
 
 <style>
@@ -459,7 +467,7 @@ $this->registerJsFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.
 
     <section class="space-y-5 min-h-[380px] pb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none">
-            <h2 class="text-xl font-bold text-slate-100 tracking-tight">Build using CROM's ecosystem</h2>
+            <h2 class="text-xl font-bold text-slate-100 tracking-tight">Construa usando o ecossistema CROM</h2>
             
             <div class="flex items-center gap-2">
                 <button class="swiper-pilar-prev w-9 h-9 border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-100 rounded-full flex items-center justify-center text-xs transition cursor-pointer">
@@ -602,65 +610,76 @@ $this->registerJsFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.
 </div>
 
 <script>
-    (function initDashboardSwipers() {
+    window.initDashboardSwipers = function() {
+        if (typeof Swiper === 'undefined') return;
+
+        // Remove instâncias antigas se houver para evitar vazamento ou duplicação de comportamentos
+        const bannerEl = document.querySelector('.cromSwiperBanner');
+        if (bannerEl && bannerEl.swiper) {
+            try { bannerEl.swiper.destroy(true, true); } catch(e) {}
+        }
+        const ecoEl = document.querySelector('.cromSwiperEcosystem');
+        if (ecoEl && ecoEl.swiper) {
+            try { ecoEl.swiper.destroy(true, true); } catch(e) {}
+        }
+
+        // 1. Inicializador do Banner em Modo Vertical
+        new Swiper('.cromSwiperBanner', {
+            direction: 'vertical',
+            loop: true,
+            grabCursor: true,
+            observer: true,
+            observeParents: true,
+            autoplay: {
+                delay: 6000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination-banner',
+                clickable: true,
+            }
+        });
+
+        // 2. Inicializador do Ecossistema em Modo Horizontal Responsivo
+        new Swiper('.cromSwiperEcosystem', {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            grabCursor: true,
+            loop: false,
+            observer: true,
+            observeParents: true,
+            navigation: {
+                nextEl: '.swiper-pilar-next',
+                prevEl: '.swiper-pilar-prev',
+            },
+            breakpoints: {
+                480: {
+                    slidesPerView: 1,
+                    slidesPerGroup: 1,
+                },
+                640: {
+                    slidesPerView: 2,
+                    slidesPerGroup: 2,
+                },
+                1024: {
+                    slidesPerView: 3,
+                    slidesPerGroup: 3,
+                },
+                1280: {
+                    slidesPerView: 4,
+                    slidesPerGroup: 4,
+                    spaceBetween: 24
+                }
+            }
+        });
+    };
+
+    // Auto-inicializa com retentativas caso carregado inicialmente
+    (function autoInit() {
         let retries = 0;
         function tryInit() {
             if (typeof Swiper !== 'undefined') {
-                // Remove instâncias antigas se houver
-                const bannerEl = document.querySelector('.cromSwiperBanner');
-                if (bannerEl && bannerEl.swiper) {
-                    try { bannerEl.swiper.destroy(true, true); } catch(e) {}
-                }
-                const ecoEl = document.querySelector('.cromSwiperEcosystem');
-                if (ecoEl && ecoEl.swiper) {
-                    try { ecoEl.swiper.destroy(true, true); } catch(e) {}
-                }
-
-                // 1. Inicializador do Banner em Modo Vertical
-                new Swiper('.cromSwiperBanner', {
-                    direction: 'vertical',
-                    loop: true,
-                    grabCursor: true,
-                    autoplay: {
-                        delay: 6000,
-                        disableOnInteraction: false,
-                    },
-                    pagination: {
-                        el: '.swiper-pagination-banner',
-                        clickable: true,
-                    }
-                });
-
-                // 2. Inicializador do Ecossistema em Modo Horizontal Responsivo
-                new Swiper('.cromSwiperEcosystem', {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    grabCursor: true,
-                    loop: false,
-                    navigation: {
-                        nextEl: '.swiper-pilar-next',
-                        prevEl: '.swiper-pilar-prev',
-                    },
-                    breakpoints: {
-                        480: {
-                            slidesPerView: 1,
-                            slidesPerGroup: 1,
-                        },
-                        640: {
-                            slidesPerView: 2,
-                            slidesPerGroup: 2,
-                        },
-                        1024: {
-                            slidesPerView: 3,
-                            slidesPerGroup: 3,
-                        },
-                        1280: {
-                            slidesPerView: 4,
-                            slidesPerGroup: 4,
-                            spaceBetween: 24
-                        }
-                    }
-                });
+                window.initDashboardSwipers();
             } else if (retries < 30) {
                 retries++;
                 setTimeout(tryInit, 100);
