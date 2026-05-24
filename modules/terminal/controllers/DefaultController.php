@@ -114,11 +114,21 @@ class DefaultController extends Controller
             // Configura o timeout ultra baixo de 20ms apenas para leitura não-bloqueante durante o loop de stream
             $ssh->setTimeout(0.02);
 
+            $lastPing = time();
+
             // Loop infinito de streaming bidirecional
             while (true) {
                 // Se a conexão foi fechada pelo cliente, encerra o loop para evitar processos órfãos
                 if (connection_aborted()) {
                     break;
+                }
+
+                // Envia ping de batimento cardíaco a cada 1 segundo para detecção ativa de desconexão do cliente
+                $now = time();
+                if ($now - $lastPing >= 1) {
+                    echo ": ping\n\n";
+                    flush();
+                    $lastPing = $now;
                 }
 
                 // 1. Ler saída do SSH
