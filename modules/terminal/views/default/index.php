@@ -140,8 +140,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
     </div>
 
     <!-- TELA DO TERMINAL ATIVO -->
-    <div x-show="connected" 
-         class="flex-1 bg-black p-4 relative"
+    <div class="flex-1 bg-black p-4 relative"
          :class="connected ? 'block' : 'hidden'"
          style="min-height: 400px;">
         
