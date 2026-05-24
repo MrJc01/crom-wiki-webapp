@@ -1,0 +1,65 @@
+# phpstorm project files
+.idea
+
+# visual studio code project files
+.vscode
+
+# netbeans project files
+nbproject
+
+# zend studio for eclipse project files
+.buildpath
+.project
+.settings
+
+# windows thumbnail cache
+Thumbs.db
+
+# composer vendor dir
+/vendor
+
+# composer itself is not needed
+composer.phar
+
+# Mac DS_Store Files
+.DS_Store
+
+# phpunit itself is not needed
+phpunit.phar
+# local phpunit config
+/phpunit.xml
+
+tests/_output/*
+tests/_support/_generated
+
+#vagrant folder
+/.vagrant
+
+# --- CROM Ecosystem SRE Security Rules ---
+# Arquivo de variáveis de ambiente com dados sensíveis
+.env
+
+# Bancos de dados locais SQLite de desenvolvimento e testes
+/data/*.db
+/data/*.db-wal
+/data/*.db-shm
+/data/*.db-journal
+
+# Pasta runtime do Yii2 (Logs, Caches temporários, debug dumps)
+/runtime/*
+!/runtime/.gitignore
+
+# Assets dinâmicos gerados no frontend web
+/web/assets/*
+!/web/assets/.gitignore
+
+# Logs locais e arquivos temporários de testes do Codeception
+/tests/Support/_generated
+/tests/Support/output/*
+/tests/_output/*
+
+# Dependências de Node.js e saídas de testes visuais (Puppeteer)
+**/node_modules/
+/tests/screenshots/node_modules/
+/tests/screenshots/output/*
+/tests/screenshots/output/

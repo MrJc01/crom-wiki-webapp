@@ -1,0 +1,14 @@
+{
+  "name": "crom-portal-screenshots",
+  "version": "1.0.0",
+  "description": "Automação de capturas de tela do Portal Crom usando Puppeteer-Core e o Google Chrome local",
+  "main": "take_screenshots.js",
+  "scripts": {
+    "screenshots": "node take_screenshots.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^22.6.0"
+  },
+  "author": "Antigravity SRE Team",
+  "license": "ISC"
+}
