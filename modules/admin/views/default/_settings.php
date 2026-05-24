@@ -3,9 +3,6 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 ?>
-<div class="space-y-6"
-     x-data="adminSettingsHandler(<?= Html::encode(json_encode($settings)) ?>)">
-
 <script>
 window.adminSettingsHandler = function(initialSettings) {
     return {
@@ -101,6 +98,9 @@ window.adminSettingsHandler = function(initialSettings) {
     };
 };
 </script>
+
+<div class="space-y-6"
+     x-data="adminSettingsHandler(<?= Html::encode(json_encode($settings)) ?>)">
 
     <!-- Alertas -->
     <div class="flex-shrink-0">

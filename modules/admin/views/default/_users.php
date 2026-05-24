@@ -5,9 +5,6 @@ use yii\helpers\Url;
 use yii\helpers\Html;
 ?>
 
-<div class="space-y-6"
-     x-data="adminUsersHandler(<?= Html::encode(json_encode($users)) ?>, <?= Html::encode(json_encode($allPermissions)) ?>)">
-
 <script>
 window.adminUsersHandler = function(initialUsers, allPermissions) {
     return {
@@ -158,6 +155,9 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
     };
 };
 </script>
+
+<div class="space-y-6"
+     x-data="adminUsersHandler(<?= Html::encode(json_encode($users)) ?>, <?= Html::encode(json_encode($allPermissions)) ?>)">
 
     <!-- Alertas -->
     <div class="flex-shrink-0">

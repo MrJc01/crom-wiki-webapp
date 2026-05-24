@@ -1,9 +1,6 @@
 <?php
 use yii\helpers\Url;
 ?>
-<div class="space-y-6"
-     x-data="adminLogsHandler()">
-
 <script>
 window.adminLogsHandler = function() {
     return {
@@ -41,6 +38,9 @@ window.adminLogsHandler = function() {
     };
 };
 </script>
+
+<div class="space-y-6"
+     x-data="adminLogsHandler()">
 
     <!-- Header -->
     <div class="flex justify-between items-center select-none">

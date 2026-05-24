@@ -3,9 +3,6 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 ?>
-<div class="space-y-6"
-     x-data="adminModulesHandler(<?= Html::encode(json_encode($modules)) ?>)">
-
 <script>
 window.adminModulesHandler = function(initialModules) {
     return {
@@ -45,6 +42,9 @@ window.adminModulesHandler = function(initialModules) {
     };
 };
 </script>
+
+<div class="space-y-6"
+     x-data="adminModulesHandler(<?= Html::encode(json_encode($modules)) ?>)">
 
     <!-- Alertas -->
     <div class="flex-shrink-0">
