@@ -94,9 +94,8 @@ class DefaultController extends Controller
                 return;
             }
 
-            // Ativa o Pseudo-Terminal (PTY) e inicia a shell interativa
+            // Ativa o Pseudo-Terminal (PTY) para a shell interativa
             $ssh->enablePTY();
-            $ssh->startShell();
 
             echo "data: " . json_encode(['status' => 'connected', 'msg' => "\r\n=== Conectado com sucesso ao servidor {$host} via SSH ===\r\n\r\n"]) . "\n\n";
             flush();
