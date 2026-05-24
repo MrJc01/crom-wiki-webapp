@@ -62,8 +62,7 @@ $this->title = 'Portal CROM — Autenticação';
 
     <div class="mt-6 text-center border-t border-slate-800/60 pt-4 w-full">
         <p class="text-[10px] text-slate-500 font-mono">
-            Ambiente Interno Restrito. Acesso criptografado.<br>
-            Credenciais padrão: <span class="text-sky-400/80 font-bold">admin</span> / <span class="text-sky-400/80 font-bold">admin123</span>
+            Ambiente Interno Restrito. Acesso criptografado.
         </p>
     </div>
 </div>
