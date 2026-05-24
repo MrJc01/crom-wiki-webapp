@@ -512,12 +512,24 @@ $onlineCount = count($onlineUsers);
                                     </button>
                                 <?php else: 
                                 
-                                if (!empty($card['tab'])): ?>
+                                $isExternal = false;
+                                if (!empty($card['link'])) {
+                                    $link = $card['link'];
+                                    if (strpos($link, 'http://') === 0 || strpos($link, 'https://') === 0 || strpos($link, '//') === 0) {
+                                        $isExternal = true;
+                                    }
+                                }
+                                
+                                if ($isExternal): ?>
+                                    <a href="<?= htmlspecialchars($card['link']) ?>" class="w-full py-2.5 px-4 text-center rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md <?= $card['btn_style'] ?>" target="_blank">
+                                        <?= htmlspecialchars($card['btn_texto']) ?>
+                                    </a>
+                                <?php elseif (!empty($card['tab'])): ?>
                                     <button @click="openTab('<?= $card['tab'] ?>')" class="w-full py-2.5 px-4 text-center rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md <?= $card['btn_style'] ?>">
                                         <?= htmlspecialchars($card['btn_texto']) ?>
                                     </button>
-                                <?php elseif (isset($card['link'])): ?>
-                                    <a href="<?= $card['link'] ?>" class="w-full py-2.5 px-4 text-center rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md <?= $card['btn_style'] ?>" target="_blank">
+                                <?php elseif (!empty($card['link'])): ?>
+                                    <a href="<?= htmlspecialchars($card['link']) ?>" class="w-full py-2.5 px-4 text-center rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md <?= $card['btn_style'] ?>" target="_blank">
                                         <?= htmlspecialchars($card['btn_texto']) ?>
                                     </a>
                                 <?php endif; ?>
@@ -591,12 +603,25 @@ $onlineCount = count($onlineUsers);
                         </div>
                         
                         <div>
-                            <?php if (!empty($previewItem['tab'])): ?>
+                            <?php 
+                            $isExternal = false;
+                            if (!empty($previewItem['link'])) {
+                                $link = $previewItem['link'];
+                                if (strpos($link, 'http://') === 0 || strpos($link, 'https://') === 0 || strpos($link, '//') === 0) {
+                                    $isExternal = true;
+                                }
+                            }
+                            
+                            if ($isExternal): ?>
+                                <a href="<?= htmlspecialchars($previewItem['link']) ?>" class="inline-block py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition" target="_blank">
+                                    <?= htmlspecialchars($previewItem['btn_texto']) ?> ↗
+                                </a>
+                            <?php elseif (!empty($previewItem['tab'])): ?>
                                 <button @click="openTab('<?= $previewItem['tab'] ?>')" class="py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition">
                                     <?= htmlspecialchars($previewItem['btn_texto']) ?>
                                 </button>
-                            <?php elseif (isset($previewItem['link'])): ?>
-                                <a href="<?= $previewItem['link'] ?>" class="inline-block py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition" target="_blank">
+                            <?php elseif (!empty($previewItem['link'])): ?>
+                                <a href="<?= htmlspecialchars($previewItem['link']) ?>" class="inline-block py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition" target="_blank">
                                     <?= htmlspecialchars($previewItem['btn_texto']) ?> ↗
                                 </a>
                             <?php endif; ?>
