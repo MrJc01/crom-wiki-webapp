@@ -61,6 +61,8 @@ $this->registerLinkTag(
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+<!-- material icons -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <script>
     // Customização do Tailwind para usar Outfit como fonte padrão e cores ricas
     tailwind.config = {

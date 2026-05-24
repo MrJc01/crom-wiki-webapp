@@ -15,10 +15,12 @@ if ($currentRoute === 'site/discover') {
     $initialTab = 'discover';
 } elseif ($currentRoute === 'site/beneficios') {
     $initialTab = 'beneficios';
-}  elseif (strpos($currentRoute, 'page_crud') !== false) {
+} elseif (strpos($currentRoute, 'page_crud') !== false) {
     $initialTab = 'page_crud';
 } elseif (strpos($currentRoute, 'wiki') !== false) {
     $initialTab = 'wiki';
+} elseif (strpos($currentRoute, 'chat') !== false) {
+    $initialTab = 'chat';
 }
 
 // Consulta de usuários online ativa nos últimos 15 minutos (Otimização SRE)
@@ -70,25 +72,13 @@ echo $this->render('_head');
         <?= $content ?>
     </main>
 <?php else: ?>
-    <?php
-    // Carrega módulos ativos do banco SQLite (para a Wiki)
-    $activeModules = [];
-    try {
-        $activeModules = Yii::$app->db->createCommand("
-            SELECT id, name, icon, entry_point, required_permission 
-            FROM core_modules 
-            WHERE is_active = 1 
-            ORDER BY sort_order ASC
-        ")->queryAll();
-    } catch (\Exception $e) {
-        // Silencia
-    }
-    ?>
+ 
 
     <!-- CASCA PRINCIPAL PREMIUM SPA (Estilo Google Developer Program) -->
     <div class="flex flex-col h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden" 
          x-data="{ 
              activeTab: '<?= $initialTab ?>',
+             showChatDrawer: false,
              routes: {
                  'paravoce': '<?= Url::to(['/site/index']) ?>',
                  'discover': '<?= Url::to(['/site/discover']) ?>',
@@ -96,7 +86,8 @@ echo $this->render('_head');
                  'page_crud': '<?= Url::to(['/page_crud/default/index']) ?>',
                  'wiki': '<?= Url::to(['/wiki/default/index']) ?>',
                  'profile': '<?= Url::to(['/site/profile']) ?>',
-                 'online_members': '<?= Url::to(['/site/online-members']) ?>'
+                 'online_members': '<?= Url::to(['/site/online-members']) ?>',
+                 'chat': '<?= Url::to(['/chat/default/index']) ?>'
              },
              openTab(id, push = true) {
                  this.activeTab = id;
@@ -170,6 +161,13 @@ echo $this->render('_head');
                      <?= $this->render('@app/views/site/_online_badge', ['onlineCount' => $onlineCount]) ?>
                 </div>
 
+                <!-- Botão de Chat Recentes (Abre Drawer) -->
+                <button @click="showChatDrawer = !showChatDrawer" 
+                        class="h-9 w-9 rounded-full bg-slate-900 border border-slate-800/80 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-850 hover:border-slate-700/80 transition-all duration-300 cursor-pointer relative focus:outline-none"
+                        title="Mensagens Recentes">
+                    <i class="material-icons text-xl">chat_bubble</i>
+                </button>
+
               
 
                 <!-- Avatar do Usuário com Borda & Dropdown Premium -->
@@ -220,6 +218,10 @@ echo $this->render('_head');
                     
                     <!-- Aba 1: Para Você (Dashboard) -->
                     <button @click="openTab('paravoce')"
+                            hx-get="<?= Url::to(['/site/index']) ?>"
+                            hx-target="#container-paravoce"
+                            hx-trigger="click once"
+                            id="btn-nav-paravoce"
                             class="w-full flex flex-col items-center group cursor-pointer border border-transparent"
                             title="Para você">
                         <div class="w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-200"
@@ -279,30 +281,7 @@ echo $this->render('_head');
                    
 
 
-                    <!-- Divisor e Módulo Wiki (Mapeamento RBAC) -->
-                    <?php foreach ($activeModules as $mod): ?>
-                        <?php if (empty($mod['required_permission']) || Yii::$app->user->can($mod['required_permission'])): ?>
-                            <div class="w-10 border-t border-slate-800/80 my-2"></div>
-                            <button @click="openTab('<?= Html::encode($mod['id']) ?>')"
-                                    hx-get="<?= Url::to([$mod['entry_point']]) ?>"
-                                    hx-target="#container-<?= Html::encode($mod['id']) ?>"
-                                    hx-trigger="click once"
-                                    id="btn-nav-<?= Html::encode($mod['id']) ?>"
-                                    class="w-full flex flex-col items-center group cursor-pointer border border-transparent"
-                                    title="<?= Html::encode($mod['name']) ?>">
-                                <div class="w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-200"
-                                     :class="activeTab === '<?= Html::encode($mod['id']) ?>' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-md' : 'text-slate-400 hover:text-sky-400 hover:bg-slate-800/40'">
-                                    <span class="w-5 h-5 flex items-center justify-center">
-                                        <?= $mod['icon'] ?>
-                                    </span>
-                                </div>
-                                <span class="text-[9px] font-bold text-center mt-1.5 tracking-wide transition-all"
-                                      :class="activeTab === '<?= Html::encode($mod['id']) ?>' ? 'text-sky-400 font-extrabold' : 'text-slate-500 group-hover:text-slate-300'">
-                                    <?= Html::encode($mod['id'] === 'page_crud' ? 'Páginas' : 'Wiki') ?>
-                                </span>
-                            </button>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
+                  
 
                 </div>
                 
@@ -331,11 +310,24 @@ echo $this->render('_head');
             <main class="flex-1 bg-slate-950 overflow-hidden relative">
                 
                 <!-- Aba 1: Para Você (Dashboard Central Yii2) -->
-                <div class="h-full w-full overflow-y-auto scrollbar-thin p-6 md:p-10" x-show="activeTab === 'paravoce'">
-                    <?php if ($initialTab === 'paravoce'): ?>
-                        <?= $content ?>
-                    <?php endif; ?>
-                </div>
+                 <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
+                      x-show="activeTab === 'paravoce'"
+                      id="container-paravoce"
+                      <?= $initialTab === 'paravoce' ? 'hx-isomorphic="true"' : '' ?>>
+                      <?php if ($initialTab === 'paravoce'): ?>
+                          <?= $content ?>
+                      <?php else: ?>
+                          <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                               <div class="flex flex-col items-center gap-2">
+                                   <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                   </svg>
+                                   <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Dashboard...</span>
+                               </div>
+                          </div>
+                      <?php endif; ?>
+                 </div>
 
                 <!-- Aba 2: Discover (Artigos) -->
                 <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
@@ -380,29 +372,6 @@ echo $this->render('_head');
               
 
 
-                <!-- Aba Módulo Wiki (Injeções HTMX Dinâmicas por Módulo) -->
-                <?php foreach ($activeModules as $mod): ?>
-                    <?php if (empty($mod['required_permission']) || Yii::$app->user->can($mod['required_permission'])): ?>
-                        <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-4 md:p-6 bg-slate-950" 
-                             x-show="activeTab === '<?= Html::encode($mod['id']) ?>'"
-                             id="container-<?= Html::encode($mod['id']) ?>"
-                             <?= $initialTab === $mod['id'] ? 'hx-isomorphic="true"' : '' ?>>
-                             <?php if ($initialTab === $mod['id']): ?>
-                                 <?= $content ?>
-                             <?php else: ?>
-                                 <div class="flex items-center justify-center h-full text-slate-500 text-sm">
-                                      <div class="flex flex-col items-center gap-2">
-                                          <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                          </svg>
-                                          <span class="font-mono text-xs text-slate-400 tracking-wider">carregando modulo...</span>
-                                      </div>
-                                 </div>
-                             <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
 
                 <!-- Aba 4: Perfil & Configurações Premium (Injeção SPA) -->
                 <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
@@ -460,7 +429,86 @@ echo $this->render('_head');
                         class="hidden">
                 </button>
 
+                <!-- Aba 6: Módulo de Chat Premium (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-4 md:p-6 bg-slate-950" 
+                     x-show="activeTab === 'chat'"
+                     id="container-chat"
+                     <?= $initialTab === 'chat' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'chat'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando módulo de chat...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
             </main>
+        </div>
+
+        <!-- Drawer Lateral Direito de Conversas Recentes (Premium) -->
+        <div x-show="showChatDrawer" 
+             class="fixed inset-0 z-[100] flex justify-end overflow-hidden" 
+             style="display: none;">
+            
+            <!-- Backdrop/Overlay -->
+            <div x-show="showChatDrawer"
+                 x-transition:enter="transition ease-in-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in-out duration-300"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click="showChatDrawer = false"
+                 class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"></div>
+
+            <!-- Painel Lateral -->
+            <div x-show="showChatDrawer"
+                 x-transition:enter="transform transition ease-in-out duration-300"
+                 x-transition:enter-start="translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transform transition ease-in-out duration-300"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="translate-x-full"
+                 class="w-full max-w-sm bg-slate-900 border-l border-slate-800 shadow-2xl h-full flex flex-col z-10 relative">
+                 
+                 <!-- Header do Drawer -->
+                 <div class="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-slate-900/60 flex-shrink-0 select-none">
+                     <div class="flex items-center gap-2">
+                         <span class="text-sm">💬</span>
+                         <h3 class="text-sm font-extrabold text-white tracking-wide">Conversas Recentes</h3>
+                     </div>
+                     <button @click="showChatDrawer = false" 
+                             class="h-8 w-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 flex items-center justify-center transition cursor-pointer">
+                         <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                         </svg>
+                     </button>
+                 </div>
+
+                 <!-- Lista de Conversas Recentes (Polling HTMX de 5s) -->
+                 <div class="flex-1 overflow-y-auto p-4 scrollbar-thin"
+                      id="chat-drawer-content"
+                      hx-get="<?= Url::to(['/site/chat-drawer']) ?>"
+                      hx-trigger="load, every 5s"
+                      hx-swap="innerHTML">
+                      
+                      <!-- Loader de Polling -->
+                      <div class="flex items-center justify-center h-40 text-slate-500 text-xs font-mono">
+                           <svg class="animate-spin h-4 w-4 text-sky-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                           </svg>
+                           <span>carregando conversas...</span>
+                      </div>
+                 </div>
+            </div>
         </div>
     </div>
 <?php endif; ?>

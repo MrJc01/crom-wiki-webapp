@@ -23,7 +23,7 @@ class SiteController extends Controller
             $this->updateUserActivity();
             
             // Determina se deve carregar apenas parcial (HTMX) ou layout completo (acesso direto)
-            $ajaxActions = ['discover', 'beneficios', 'projetos', 'aprendizado', 'comunidades', 'profile', 'online-members', 'online-badge'];
+            $ajaxActions = ['index', 'discover', 'beneficios', 'projetos', 'aprendizado', 'comunidades', 'profile', 'online-members', 'online-badge', 'chat-drawer', 'chat'];
             if (in_array($action->id, $ajaxActions)) {
                 if (Yii::$app->request->headers->has('HX-Request')) {
                     $this->layout = false;
@@ -367,6 +367,43 @@ class SiteController extends Controller
 
         return $this->renderPartial('_online_badge', [
             'onlineCount' => $onlineCount
+        ]);
+    }
+
+    /**
+     * Retorna a lista de conversas recentes do usuário autenticado para o Drawer da Topbar.
+     */
+    public function actionChatDrawer()
+    {
+        if (Yii::$app->user->isGuest) {
+            return '';
+        }
+
+        $userId = Yii::$app->user->id;
+        $db = Yii::$app->db;
+
+        // Resgatar as últimas 5 conversas com mensagens
+        $recentChats = [];
+        try {
+            $recentChats = $db->createCommand("
+                SELECT r.id, r.name, r.is_group,
+                       (SELECT m.message FROM chat_messages m WHERE m.room_id = r.id ORDER BY m.created_at DESC, m.id DESC LIMIT 1) as last_message,
+                       (SELECT m.created_at FROM chat_messages m WHERE m.room_id = r.id ORDER BY m.created_at DESC, m.id DESC LIMIT 1) as last_message_time,
+                       (SELECT u.username FROM chat_room_members rm2 JOIN core_users u ON rm2.user_id = u.id WHERE rm2.room_id = r.id AND rm2.user_id != :userId LIMIT 1) as direct_username
+                FROM chat_rooms r
+                JOIN chat_room_members rm ON r.id = rm.room_id
+                WHERE rm.user_id = :userId
+                GROUP BY r.id
+                HAVING last_message IS NOT NULL
+                ORDER BY last_message_time DESC
+                LIMIT 5
+            ", [':userId' => $userId])->queryAll();
+        } catch (\Exception $e) {
+            // Silencia
+        }
+
+        return $this->renderPartial('_chat_drawer', [
+            'recentChats' => $recentChats
         ]);
     }
 

@@ -16,13 +16,19 @@ use app\models\User;
 class DefaultController extends Controller
 {
     /**
-     * {@inheritdoc}
+     * Interceptador inteligente para desativar layouts em requisições assíncronas HTMX.
      */
-    public function init()
+    public function beforeAction($action)
     {
-        parent::init();
-        // Desativa o layout global para retornar apenas o HTML parcial SPA
-        $this->layout = false;
+        if (parent::beforeAction($action)) {
+            if (Yii::$app->request->headers->has('HX-Request')) {
+                $this->layout = false;
+            } else {
+                $this->layout = '@app/views/layouts/main';
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
