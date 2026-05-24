@@ -46,6 +46,8 @@ class LoginForm extends Model
 
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Nome de usuário ou senha incorretos.');
+            } elseif (isset($user->status) && (int)$user->status === 0) {
+                $this->addError($attribute, 'Esta conta está bloqueada por um administrador.');
             }
         }
     }

@@ -20,6 +20,15 @@ class SiteController extends Controller
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
+            // Ejetar usuários logados que foram bloqueados
+            if (!Yii::$app->user->isGuest) {
+                $user = Yii::$app->user->identity;
+                if (isset($user->status) && (int)$user->status === 0) {
+                    Yii::$app->user->logout();
+                    return $this->redirect(['/site/login'])->send();
+                }
+            }
+
             $this->updateUserActivity();
             
             // Determina se deve carregar apenas parcial (HTMX) ou layout completo (acesso direto)
