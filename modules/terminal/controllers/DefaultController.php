@@ -102,7 +102,13 @@ class DefaultController extends Controller
             // Ativa o Pseudo-Terminal (PTY) para a shell interativa
             $ssh->enablePTY();
 
-            echo "data: " . json_encode(['status' => 'connected', 'msg' => "\r\n=== Conectado com sucesso ao servidor {$host} via SSH ===\r\n\r\n"]) . "\n\n";
+            // Realiza a leitura inicial (abertura implícita do shell) usando o timeout longo (10s)
+            $initialOutput = $ssh->read();
+            if ($initialOutput === false) {
+                $initialOutput = '';
+            }
+
+            echo "data: " . json_encode(['status' => 'connected', 'msg' => "\r\n=== Conectado com sucesso ao servidor {$host} via SSH ===\r\n\r\n" . $initialOutput]) . "\n\n";
             flush();
 
             // Configura o timeout ultra baixo de 20ms apenas para leitura não-bloqueante durante o loop de stream
