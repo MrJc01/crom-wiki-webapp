@@ -83,6 +83,11 @@ $config = [
                 
                 // API REST pública — JSON Store
                 'api/json/<slug:[\w\-]+>' => 'json_store/api/serve',
+
+                // Módulo terminal SSH
+                'terminal' => 'terminal/default/index',
+                'terminal/stream' => 'terminal/default/stream',
+                'terminal/write' => 'terminal/default/write',
             ],
         ],
     ],

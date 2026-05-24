@@ -53,6 +53,11 @@ return [
                 'p/save' => 'page_crud/default/save',
                 'p/users' => 'page_crud/default/users-list',
                 'p/<slug:.*>' => 'page_crud/default/view-by-slug',
+
+                // Módulo terminal SSH
+                'terminal' => 'terminal/default/index',
+                'terminal/stream' => 'terminal/default/stream',
+                'terminal/write' => 'terminal/default/write',
             ],
         ],
         'user' => [
