@@ -137,7 +137,12 @@ class DefaultController extends Controller
             }
 
         } catch (\Throwable $e) {
-            echo "data: " . json_encode(['error' => 'Erro interno na sessão SSH: ' . $e->getMessage()]) . "\n\n";
+            $msg = $e->getMessage();
+            // Converte avisos internos do phpseclib causados por sockets fechadas ou falhas de pacotes em avisos claros de rede
+            if (strpos($msg, 'Undefined array key') !== false || strpos($msg, 'Connection closed') !== false) {
+                $msg = 'Conexão rejeitada ou encerrada de forma prematura pelo servidor SSH de destino. Verifique se o usuário/senha estão corretos ou se o firewall bloqueou o IP do servidor web.';
+            }
+            echo "data: " . json_encode(['error' => 'Erro na conexão SSH: ' . $msg]) . "\n\n";
             flush();
         }
 
