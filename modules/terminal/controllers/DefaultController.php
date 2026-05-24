@@ -82,6 +82,35 @@ class DefaultController extends Controller
             return;
         }
 
+        // 1. Limitar a quantidade de conexões simultâneas ao terminal para evitar exaustão do PHP-FPM
+        $maxConnections = 3; // Limite prudente reservando workers para o resto do site
+        $lockPattern = Yii::getAlias('@runtime/term_active_*.lock');
+        $lockFiles = glob($lockPattern);
+        
+        $activeCount = 0;
+        foreach ($lockFiles as $file) {
+            $pid = (int)@file_get_contents($file);
+            // Verifica se o PID está ativo no sistema operacional
+            if ($pid > 0 && file_exists("/proc/$pid")) {
+                $activeCount++;
+            } else {
+                // Remove lock file órfão de processo encerrado abruptamente
+                @unlink($file);
+            }
+        }
+
+        if ($activeCount >= $maxConnections) {
+            echo "data: " . json_encode(['error' => 'O terminal atingiu o limite de conexões simultâneas de usuários. Por favor, aguarde alguns instantes e tente novamente.']) . "\n\n";
+            flush();
+            Yii::$app->end();
+            return;
+        }
+
+        // Cria o lock file com o Process ID (PID) do worker PHP atual
+        $myPid = getmypid();
+        $lockFile = Yii::getAlias('@runtime/term_active_' . $id . '.lock');
+        @file_put_contents($lockFile, (string)$myPid);
+
         // Determina o arquivo de buffer de entrada
         $inputBufferFile = Yii::getAlias('@runtime/ssh_input_' . $id . '.txt');
         if (file_exists($inputBufferFile)) {
@@ -163,6 +192,11 @@ class DefaultController extends Controller
             }
             echo "data: " . json_encode(['error' => 'Erro na conexão SSH: ' . $msg]) . "\n\n";
             flush();
+        } finally {
+            // Garante a remoção do lock file para liberar o slot ao fechar a conexão
+            if (isset($lockFile) && file_exists($lockFile)) {
+                @unlink($lockFile);
+            }
         }
 
         // Encerra a execução do Yii2 de forma limpa para evitar HeadersAlreadySentException
