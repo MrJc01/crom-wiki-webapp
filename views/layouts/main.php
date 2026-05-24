@@ -750,6 +750,10 @@ echo $this->render('_head');
     setTimeout(hidePageLoader, 2500);
 </script>
 
+<?php if (Yii::$app->user->can('admin-access')): ?>
+    <?= $this->render('_admin_js') ?>
+<?php endif; ?>
+
 <?php $this->endBody() ?>
 </body>
 </html>
