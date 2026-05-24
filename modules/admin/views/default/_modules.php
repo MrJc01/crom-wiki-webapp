@@ -72,7 +72,7 @@ window.adminModulesHandler = function(initialModules) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <template x-for="mod in modules" :key="mod.id">
             <div class="border border-slate-800/80 rounded-2xl p-5 bg-slate-950/40 backdrop-blur-md flex flex-col justify-between hover:border-slate-700/60 transition duration-300 relative overflow-hidden group"
-                 :class="mod.is_active ? 'bg-slate-950/40' : 'bg-slate-950/10 opacity-70 border-slate-900'">
+                 :class="(mod.is_active == 1 || mod.is_active === true) ? 'bg-slate-950/40' : 'bg-slate-950/10 opacity-70 border-slate-900'">
                  
                 <!-- Glow decorativo discreto no canto superior direito -->
                 <div class="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-full blur-xl group-hover:scale-125 transition duration-300 pointer-events-none"></div>
@@ -84,8 +84,8 @@ window.adminModulesHandler = function(initialModules) {
                         </div>
                         <div class="flex flex-col gap-1 items-end">
                             <span class="px-2 py-0.5 rounded-full text-[8px] font-extrabold font-mono tracking-wide uppercase border"
-                                  :class="mod.is_active ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'"
-                                  x-text="mod.is_active ? 'Ativo' : 'Inativo'">
+                                  :class="(mod.is_active == 1 || mod.is_active === true) ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'"
+                                  x-text="(mod.is_active == 1 || mod.is_active === true) ? 'Ativo' : 'Inativo'">
                             </span>
                             <span class="text-[9px] text-slate-500 font-bold font-mono" x-text="'Ordem: ' + mod.sort_order"></span>
                         </div>
@@ -130,9 +130,9 @@ window.adminModulesHandler = function(initialModules) {
                         <button @click="toggleModule(mod)"
                                 :disabled="isToggling"
                                 class="px-4 py-1.5 rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-                                :class="mod.is_active ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400' : 'bg-sky-500/15 hover:bg-sky-500/25 text-sky-400'">
-                            <i class="material-icons text-xs" x-text="mod.is_active ? 'power_settings_new' : 'play_arrow'"></i>
-                            <span x-text="mod.is_active ? 'Desativar Módulo' : 'Ativar Módulo'"></span>
+                                :class="(mod.is_active == 1 || mod.is_active === true) ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400' : 'bg-sky-500/15 hover:bg-sky-500/25 text-sky-400'">
+                            <i class="material-icons text-xs" x-text="(mod.is_active == 1 || mod.is_active === true) ? 'power_settings_new' : 'play_arrow'"></i>
+                            <span x-text="(mod.is_active == 1 || mod.is_active === true) ? 'Desativar Módulo' : 'Ativar Módulo'"></span>
                         </button>
                     </template>
                 </div>

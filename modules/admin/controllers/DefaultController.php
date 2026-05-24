@@ -156,8 +156,11 @@ class DefaultController extends Controller
             $settingsMap[$s['key']] = $s['value'];
         }
 
-        // 4. Carregar Módulos do Sistema
+        // 4. Carregar Módulos do Sistema com coerção de tipos para booleans nativos (SQLite Fallback)
         $modules = $db->createCommand("SELECT * FROM core_modules ORDER BY sort_order ASC")->queryAll();
+        foreach ($modules as $k => $m) {
+            $modules[$k]['is_active'] = (bool)(int)$m['is_active'];
+        }
 
         return $this->render('index', [
             'users' => $usersData,
