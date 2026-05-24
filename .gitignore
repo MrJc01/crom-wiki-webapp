@@ -63,3 +63,6 @@ tests/_support/_generated
 /tests/screenshots/node_modules/
 /tests/screenshots/output/*
 /tests/screenshots/output/
+
+# Backups locais gerados pelo monitor.sh
+/backups/*
