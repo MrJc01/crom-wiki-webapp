@@ -1,6 +1,7 @@
 <?php
 /** @var array $modules */
 use yii\helpers\Url;
+use yii\helpers\Html;
 ?>
 <div class="space-y-6"
      x-data="adminModulesHandler(<?= Html::encode(json_encode($modules)) ?>)">
