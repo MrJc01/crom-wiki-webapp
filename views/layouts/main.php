@@ -105,6 +105,7 @@ echo $this->render('_head');
                  'online_members': '<?= Url::to(['/site/online-members']) ?>',
                  'chat': '<?= Url::to(['/chat/default/index']) ?>',
                  'json_store': '<?= Url::to(['/json_store/default/index']) ?>',
+                 'terminal': '<?= Url::to(['/terminal/default/index']) ?>',
                  'admin': '<?= Url::to(['/admin/default/index']) ?>'
              },
              openTab(id, push = true) {
@@ -623,6 +624,34 @@ echo $this->render('_head');
                          </div>
                      <?php endif; ?>
                 </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Terminal SSH -->
+                <button id="btn-nav-terminal"
+                        hx-get="<?= Url::to(['/terminal/default/index']) ?>"
+                        hx-target="#container-terminal"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba Terminal: SSH Multi-VPS (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-4 md:p-6 bg-slate-950" 
+                     x-show="activeTab === 'terminal'"
+                     id="container-terminal"
+                     <?= $initialTab === 'terminal' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'terminal'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando módulo de terminal...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                 </div>
 
             </main>
         </div>
