@@ -410,7 +410,9 @@ $onlineCount = count($onlineUsers);
     .swiper-pagination-banner .swiper-pagination-bullet { background: #0f172a; opacity: 0.2; width: 8px; height: 8px; transition: all 0.2s; }
     .swiper-pagination-banner .swiper-pagination-bullet-active { background: #0284c7; opacity: 1; height: 20px; border-radius: 4px; }
     
-    /* Ajuste de altura auto para os slides do ecossistema */
+    /* Ajuste de altura auto para impedir o estiramento 100% herdado do contêiner pai */
+    .cromSwiperEcosystem,
+    .cromSwiperEcosystem .swiper-wrapper,
     .cromSwiperEcosystem .swiper-slide {
         height: auto !important;
     }
