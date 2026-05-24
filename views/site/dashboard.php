@@ -254,19 +254,17 @@ $dashboardDesc = $settingsMap['dashboard_desc'] ?? 'Crie e colabore em documenta
 $dashboardBtnText = $settingsMap['dashboard_btn_text'] ?? 'Consultar Documentos Internos';
 $dashboardBtnTab = $settingsMap['dashboard_btn_tab'] ?? 'page_crud';
 
-$dashboard = [
-    'banners' => [
-        [
-            'badge'            => $dashboardBadge,
-            'titulo_principal' => $dashboardTitle,
-            'titulo_accent'    => '',
-            'descricao'        => $dashboardDesc,
-            'btn_texto'        => $dashboardBtnText,
-            'btn_tab'          => $dashboardBtnTab,
-            'gradiente'        => 'from-sky-400/20 to-indigo-500/0'
-        ]
-    ],
-    'ecossistema' => [
+// 1. Frases e palavra do dia
+$dailyQuoteTitle = $settingsMap['daily_quote_title'] ?? $dailyQuoterandomDayTitle;
+$dailyQuoteText = $settingsMap['daily_quote_text'] ?? $dailyQuoterandomDay;
+
+// 2. Ecossistema (JSON)
+$ecosystemCards = [];
+if (!empty($settingsMap['ecosystem_cards_json'])) {
+    $ecosystemCards = json_decode($settingsMap['ecosystem_cards_json'], true);
+}
+if (empty($ecosystemCards) || !is_array($ecosystemCards)) {
+    $ecosystemCards = [
         [
             'nome'        => 'CromIA Gateway',
             'tag'         => 'Inteligência',
@@ -315,26 +313,49 @@ $dashboard = [
             'disabled'    => false,
             'link'        => 'https://cromva.crom.run/'
         ],
-    ],
-    // --- SEÇÃO TRANSFORMADA EM ARRAY MUTIDIMENSIONAL EXPANSÍVEL ---
-    'beneficios_preview' => [
+    ];
+}
+
+// 3. Alinhamento Operacional (JSON)
+$alignmentCards = [];
+if (!empty($settingsMap['alignment_cards_json'])) {
+    $alignmentCards = json_decode($settingsMap['alignment_cards_json'], true);
+}
+if (empty($alignmentCards) || !is_array($alignmentCards)) {
+    $alignmentCards = [
         [
             'titulo'    => 'Contrato de Cuidado & Vesting',
             'descricao' => 'Seu histórico e impacto de contribuição técnico permanecem registrados em blockchain interna/wiki. Distribuição de proventos comerciais B2B prioritária para Pilares.',
             'btn_texto' => 'Ver benefícios',
-            'tab'       => 'beneficios' // Roteamento interno via openTab
+            'tab'       => 'beneficios'
         ],
         [
             'titulo'    => 'Manifesto do Ecossistema Local-First',
             'tag'       => 'Filosofia',
             'descricao' => 'Leia as diretrizes completas sobre Soberania Digital, infraestruturas resilientes offline e o porquê de rejeitarmos modelos centralizados.',
             'btn_texto' => 'Acessar Manifesto Externo',
-            'link'      => 'https://crom.me/manifesto' // Roteamento externo via tag <a>
+            'link'      => 'https://crom.me/manifesto'
+        ]
+    ];
+}
+
+$dashboard = [
+    'banners' => [
+        [
+            'badge'            => $dashboardBadge,
+            'titulo_principal' => $dashboardTitle,
+            'titulo_accent'    => '',
+            'descricao'        => $dashboardDesc,
+            'btn_texto'        => $dashboardBtnText,
+            'btn_tab'          => $dashboardBtnTab,
+            'gradiente'        => 'from-sky-400/20 to-indigo-500/0'
         ]
     ],
+    'ecossistema' => $ecosystemCards,
+    'beneficios_preview' => $alignmentCards,
     'projetos_hook' => [
-        'titulo'    => $dailyQuoterandomDayTitle,
-        'subtitulo' => $dailyQuoterandomDay
+        'titulo'    => $dailyQuoteTitle,
+        'subtitulo' => $dailyQuoteText
     ],
     'aprendizado' => [
         [
@@ -384,7 +405,7 @@ $this->registerJsFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.
 
 <div class="space-y-10 pb-16 selection:bg-sky-500/20">
     
-    <section class="bg-[#e8f0fe] rounded-[32px] border border-sky-200/50 shadow-lg relative overflow-hidden select-none h-[420px] md:h-[320px]">
+    <section class="bg-[#e8f0fe] rounded-[32px] border border-sky-200/50 shadow-lg relative overflow-hidden select-none min-h-[420px] md:min-h-0 md:h-[320px] py-4 md:py-0">
         <div class="swiper cromSwiperBanner h-full w-full">
             <div class="swiper-wrapper">
                 
@@ -436,7 +457,7 @@ $this->registerJsFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.
         </div>
     </section>
 
-    <section class="space-y-5 h-80 pb-10">
+    <section class="space-y-5 min-h-[380px] pb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none">
             <h2 class="text-xl font-bold text-slate-100 tracking-tight">Build using CROM's ecosystem</h2>
             
@@ -504,111 +525,74 @@ $this->registerJsFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.
         </div>
     </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        <div class="space-y-10">
-
-            <section class="space-y-4">
-                <div class="flex justify-between items-center select-none">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
-                            💬
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-200">Palavra e frase do dia</h3>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/60 transition duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="w-4 h-4 text-xs">🔥</span>
-                            <h4 class="text-sm font-bold text-slate-200"><?= htmlspecialchars($dashboard['projetos_hook']['titulo']) ?></h4>
-                        </div>
-                       
-                    </div>
-                    <div>
-                        <button class="py-2 px-5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl transition shadow-md shadow-sky-600/10 whitespace-nowrap">
-                            <?= htmlspecialchars($dashboard['projetos_hook']['subtitulo']) ?>
-                        </button>
-                    </div>
-                </div>
-            </section>
-            <section class="space-y-4">
-                <div class="flex justify-between items-center select-none">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
-                            ❤️
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-200">Alinhamento Operacional</h3>
-                    </div>
-                    <button @click="openTab('beneficios')" class="text-xs font-bold text-sky-400 hover:text-sky-300 transition">Ver tudo ></button>
-                </div>
-
-                <div class="space-y-4">
-                    <?php foreach ($dashboard['beneficios_preview'] as $index => $previewItem): ?>
-                        <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/60 transition duration-200 flex flex-col justify-between gap-4">
-                            <div class="space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <h4 class="text-base font-extrabold text-slate-100">
-                                        <?= htmlspecialchars($previewItem['titulo']) ?>
-                                    </h4>
-                                    <?php if (isset($previewItem['tag'])): ?>
-                                        <span class="text-[9px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">
-                                            <?= htmlspecialchars($previewItem['tag']) ?>
-                                        </span>
-                                    <?php endif; ?>
-                                </div>
-                                <p class="text-xs text-slate-400 leading-relaxed">
-                                    <?= htmlspecialchars($previewItem['descricao']) ?>
-                                </p>
-                            </div>
-                            
-                            <div>
-                                <?php if (isset($previewItem['tab'])): ?>
-                                    <button @click="openTab('<?= $previewItem['tab'] ?>')" class="py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition">
-                                        <?= htmlspecialchars($previewItem['btn_texto']) ?>
-                                    </button>
-                                <?php elseif (isset($previewItem['link'])): ?>
-                                    <a href="<?= $previewItem['link'] ?>" class="inline-block py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition" target="_blank">
-                                        <?= htmlspecialchars($previewItem['btn_texto']) ?> ↗
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-
-        </div>
-
-        <section class="space-y-4" style="display: none">
+        <section class="space-y-4">
             <div class="flex justify-between items-center select-none">
                 <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
-                        🎓
+                    <div class="w-7 h-7 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
+                        💬
                     </div>
-                    <h3 class="text-sm font-bold text-slate-200">Trilhas de Onboarding (3 Camadas)</h3>
+                    <h3 class="text-sm font-bold text-slate-200">Palavra e frase do dia</h3>
                 </div>
-                <button @click="openTab('aprendizado')" class="text-xs font-bold text-sky-400 hover:text-sky-300 transition">Ver tudo ></button>
             </div>
 
-            <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl divide-y divide-slate-800/60 overflow-hidden">
-                <?php foreach ($dashboard['aprendizado'] as $item): ?>
-                    <div class="p-5 flex items-center justify-between gap-4 hover:bg-slate-800/10 transition duration-200">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span class="text-xl flex-shrink-0 text-slate-500"><?= $item['icone'] ?></span>
-                            <div class="min-w-0">
-                                <h4 class="text-xs font-bold text-slate-300 truncate" title="<?= htmlspecialchars($item['titulo']) ?>">
-                                    <?= htmlspecialchars($item['titulo']) ?>
+            <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/60 transition duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 text-xs">🔥</span>
+                        <h4 class="text-sm font-bold text-slate-200"><?= htmlspecialchars($dashboard['projetos_hook']['titulo']) ?></h4>
+                    </div>
+                </div>
+                <div>
+                    <button class="py-2 px-5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl transition shadow-md shadow-sky-600/10 whitespace-nowrap">
+                        <?= htmlspecialchars($dashboard['projetos_hook']['subtitulo']) ?>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="flex justify-between items-center select-none">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
+                        ❤️
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-200">Alinhamento Operacional</h3>
+                </div>
+                <button @click="openTab('beneficios')" class="text-xs font-bold text-sky-400 hover:text-sky-300 transition">Ver tudo ></button>
+            </div>
+
+            <div class="space-y-4">
+                <?php foreach ($dashboard['beneficios_preview'] as $index => $previewItem): ?>
+                    <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/60 transition duration-200 flex flex-col justify-between gap-4">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-extrabold text-slate-100">
+                                    <?= htmlspecialchars($previewItem['titulo']) ?>
                                 </h4>
-                                <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">
-                                    <?= htmlspecialchars($item['tag']) ?>
-                                </span>
+                                <?php if (isset($previewItem['tag'])): ?>
+                                    <span class="text-[9px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">
+                                        <?= htmlspecialchars($previewItem['tag']) ?>
+                                    </span>
+                                <?php endif; ?>
                             </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                <?= htmlspecialchars($previewItem['descricao']) ?>
+                            </p>
                         </div>
-                        <button @click="openTab('aprendizado')" class="py-1.5 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-slate-100 text-[10px] font-bold rounded-lg transition flex items-center gap-1 whitespace-nowrap">
-                            Iniciar Trilha
-                        </button>
+                        
+                        <div>
+                            <?php if (isset($previewItem['tab'])): ?>
+                                <button @click="openTab('<?= $previewItem['tab'] ?>')" class="py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition">
+                                    <?= htmlspecialchars($previewItem['btn_texto']) ?>
+                                </button>
+                            <?php elseif (isset($previewItem['link'])): ?>
+                                <a href="<?= $previewItem['link'] ?>" class="inline-block py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition" target="_blank">
+                                    <?= htmlspecialchars($previewItem['btn_texto']) ?> ↗
+                                </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -618,54 +602,70 @@ $this->registerJsFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        if (typeof Swiper !== 'undefined') {
-            
-            // 1. Inicializador do Banner em Modo Vertical
-            new Swiper('.cromSwiperBanner', {
-                direction: 'vertical',
-                loop: true,
-                grabCursor: true,
-                autoplay: {
-                    delay: 6000,
-                    disableOnInteraction: false,
-                },
-                pagination: {
-                    el: '.swiper-pagination-banner',
-                    clickable: true,
+    (function initDashboardSwipers() {
+        let retries = 0;
+        function tryInit() {
+            if (typeof Swiper !== 'undefined') {
+                // Remove instâncias antigas se houver
+                const bannerEl = document.querySelector('.cromSwiperBanner');
+                if (bannerEl && bannerEl.swiper) {
+                    try { bannerEl.swiper.destroy(true, true); } catch(e) {}
                 }
-            });
+                const ecoEl = document.querySelector('.cromSwiperEcosystem');
+                if (ecoEl && ecoEl.swiper) {
+                    try { ecoEl.swiper.destroy(true, true); } catch(e) {}
+                }
 
-            // 2. Inicializador do Ecossistema em Modo Horizontal Responsivo
-            new Swiper('.cromSwiperEcosystem', {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                grabCursor: true,
-                loop: false,
-                navigation: {
-                    nextEl: '.swiper-pilar-next',
-                    prevEl: '.swiper-pilar-prev',
-                },
-                breakpoints: {
-                    480: {
-                        slidesPerView: 1,
-                        slidesPerGroup: 1,
+                // 1. Inicializador do Banner em Modo Vertical
+                new Swiper('.cromSwiperBanner', {
+                    direction: 'vertical',
+                    loop: true,
+                    grabCursor: true,
+                    autoplay: {
+                        delay: 6000,
+                        disableOnInteraction: false,
                     },
-                    640: {
-                        slidesPerView: 2,
-                        slidesPerGroup: 2,
-                    },
-                    1024: {
-                        slidesPerView: 3,
-                        slidesPerGroup: 3,
-                    },
-                    1280: {
-                        slidesPerView: 4,
-                        slidesPerGroup: 4,
-                        spaceBetween: 24
+                    pagination: {
+                        el: '.swiper-pagination-banner',
+                        clickable: true,
                     }
-                }
-            });
+                });
+
+                // 2. Inicializador do Ecossistema em Modo Horizontal Responsivo
+                new Swiper('.cromSwiperEcosystem', {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    grabCursor: true,
+                    loop: false,
+                    navigation: {
+                        nextEl: '.swiper-pilar-next',
+                        prevEl: '.swiper-pilar-prev',
+                    },
+                    breakpoints: {
+                        480: {
+                            slidesPerView: 1,
+                            slidesPerGroup: 1,
+                        },
+                        640: {
+                            slidesPerView: 2,
+                            slidesPerGroup: 2,
+                        },
+                        1024: {
+                            slidesPerView: 3,
+                            slidesPerGroup: 3,
+                        },
+                        1280: {
+                            slidesPerView: 4,
+                            slidesPerGroup: 4,
+                            spaceBetween: 24
+                        }
+                    }
+                });
+            } else if (retries < 30) {
+                retries++;
+                setTimeout(tryInit, 100);
+            }
         }
-    });
+        tryInit();
+    })();
 </script>

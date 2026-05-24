@@ -68,6 +68,87 @@ class DefaultController extends Controller
             SELECT name, description FROM auth_item WHERE type = 2 ORDER BY name ASC
         ")->queryAll();
 
+        // 3. Garantir inserção de configurações padrões adicionais do Dashboard (Auto-healing / Deploy seguro)
+        $defaultExtraSettings = [
+            'daily_quote_title' => 'Entusiasmo',
+            'daily_quote_text' => 'O entusiasmo é a maior força da alma.',
+            'ecosystem_cards_json' => json_encode([
+                [
+                    'nome' => 'CromIA Gateway',
+                    'tag' => 'Inteligência',
+                    'tag_style' => 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                    'bg_style' => 'bg-gradient-to-br from-purple-950/40 to-slate-900 border-purple-900/60 hover:border-purple-500/40',
+                    'icone' => '🤖',
+                    'descricao' => 'Acesso unificado via chaves privadas a modelos avançados (Deepseek V4, Gemma 4, GLM) sem vazamento de escopo corporativo.',
+                    'btn_texto' => 'Acessar Token Privado',
+                    'btn_style' => 'bg-purple-600 hover:bg-purple-500 text-white',
+                    'disabled' => false,
+                    'tab' => 'beneficios'
+                ],
+                [
+                    'nome' => 'P2P Secure Share',
+                    'tag' => 'Privacidade',
+                    'tag_style' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                    'bg_style' => 'bg-gradient-to-br from-emerald-950/40 to-slate-900 border-emerald-900/60 hover:border-emerald-500/40',
+                    'icone' => '🔒',
+                    'descricao' => 'Transferência direta de arquivos de dispositivo para dispositivo via WebRTC, rodando sem backend centralizado.',
+                    'btn_texto' => 'Abrir P2PFile',
+                    'btn_style' => 'bg-emerald-600 hover:bg-emerald-500 text-white',
+                    'disabled' => false,
+                    'tab' => 'projetos'
+                ],
+                [
+                    'nome' => 'Ferramentas',
+                    'tag' => 'Infraestrutura',
+                    'tag_style' => 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+                    'bg_style' => 'bg-gradient-to-br from-indigo-950/40 to-slate-900 border-indigo-900/60 hover:border-indigo-500/40',
+                    'icone' => '🗜️',
+                    'descricao' => 'Coleção de ferramentas web essenciais, gratuitas e 100% privadas. Inclui conversores, geradores e utilitários para desenvolvedores e criadores.',
+                    'btn_texto' => 'Acessar Ferramentas',
+                    'btn_style' => 'bg-indigo-600 hover:bg-indigo-500 text-white',
+                    'disabled' => false,
+                    'link' => 'https://crom.run/ferramentas'
+                ],
+                [
+                    'nome' => 'Cromva',
+                    'tag' => 'IA',
+                    'tag_style' => 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+                    'bg_style' => 'bg-gradient-to-br from-indigo-950/40 to-slate-900 border-indigo-900/60 hover:border-indigo-500/40',
+                    'icone' => '🤖',
+                    'descricao' => 'Focado na privacidade, o Cromva é uma plataforma voltada para o consumo e organization de conteúdo em markdown. Com uma interface intuitiva, serve como um hub central para anotações.',
+                    'btn_texto' => 'Acessar Cromva',
+                    'btn_style' => 'bg-indigo-600 hover:bg-indigo-500 text-white',
+                    'disabled' => false,
+                    'link' => 'https://cromva.crom.run/'
+                ]
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            'alignment_cards_json' => json_encode([
+                [
+                    'titulo' => 'Contrato de Cuidado & Vesting',
+                    'descricao' => 'Seu histórico e impacto de contribuição técnico permanecem registrados em blockchain interna/wiki. Distribuição de proventos comerciais B2B prioritária para Pilares.',
+                    'btn_texto' => 'Ver benefícios',
+                    'tab' => 'beneficios'
+                ],
+                [
+                    'titulo' => 'Manifesto do Ecossistema Local-First',
+                    'tag' => 'Filosofia',
+                    'descricao' => 'Leia as diretrizes completas sobre Soberania Digital, infraestruturas resilientes offline e o porquê de rejeitarmos modelos centralizados.',
+                    'btn_texto' => 'Acessar Manifesto Externo',
+                    'link' => 'https://crom.me/manifesto'
+                ]
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+        ];
+
+        foreach ($defaultExtraSettings as $key => $val) {
+            $exists = $db->createCommand("SELECT COUNT(*) FROM core_settings WHERE key = :key", [':key' => $key])->queryScalar();
+            if (!$exists) {
+                $db->createCommand()->insert('core_settings', [
+                    'key' => $key,
+                    'value' => $val
+                ])->execute();
+            }
+        }
+
         // 3. Carregar Configurações Globais do Portal
         $settings = $db->createCommand("SELECT * FROM core_settings")->queryAll();
         $settingsMap = [];

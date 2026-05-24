@@ -510,6 +510,62 @@ echo $this->render('_head');
                     </div>
                 <?php endif; ?>
 
+                <!-- Aba Wiki: Wiki Documentações (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
+                     x-show="activeTab === 'wiki'"
+                     id="container-wiki"
+                     <?= $initialTab === 'wiki' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'wiki'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Wiki...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Wiki -->
+                <button id="btn-nav-wiki"
+                        hx-get="<?= Url::to(['/wiki/default/index']) ?>"
+                        hx-target="#container-wiki"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba Page Crud: Páginas Dinâmicas (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
+                     x-show="activeTab === 'page_crud'"
+                     id="container-page_crud"
+                     <?= $initialTab === 'page_crud' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'page_crud'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Páginas...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Page Crud -->
+                <button id="btn-nav-page_crud"
+                        hx-get="<?= Url::to(['/page_crud/default/index']) ?>"
+                        hx-target="#container-page_crud"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
             </main>
         </div>
 

@@ -83,8 +83,32 @@ $roadmapApps = [
     ]
 ];
 
+// Obter IDs de todos os módulos cadastrados no banco para evitar duplicados ou ocultar desativados
+$registeredModuleIds = [];
+$inactiveModuleIds = [];
+try {
+    $allModules = Yii::$app->db->createCommand("SELECT id, is_active FROM core_modules")->queryAll();
+    foreach ($allModules as $modRow) {
+        $registeredModuleIds[] = $modRow['id'];
+        if (!(int)$modRow['is_active']) {
+            $inactiveModuleIds[] = $modRow['id'];
+        }
+    }
+} catch (\Exception $e) {}
+
+// Filtra a lista de roadmap para não incluir duplicados de módulos reais nem módulos explicitamente inativados
+$roadmapAppsFiltered = [];
+foreach ($roadmapApps as $app) {
+    if (in_array($app['id'], $inactiveModuleIds) || in_array($app['alpineId'], $inactiveModuleIds)) {
+        continue; // Oculta completamente módulos que foram desativados no painel admin
+    }
+    if (!in_array($app['id'], $registeredModuleIds) && !in_array($app['alpineId'], $registeredModuleIds)) {
+        $roadmapAppsFiltered[] = $app;
+    }
+}
+
 // Mescla as listas
-$allApps = array_merge($activeAppsJson, $roadmapApps);
+$allApps = array_merge($activeAppsJson, $roadmapAppsFiltered);
 ?>
 
 <div class="space-y-8 select-none max-w-6xl mx-auto pb-16 animate-fade-in"
