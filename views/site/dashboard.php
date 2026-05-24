@@ -7,6 +7,337 @@ use yii\helpers\Url;
 
 $this->title = 'Portal CROM — Painel';
 
+$dailyQuoters = [
+    // --- PERSEVERANÇA & RESILIÊNCIA ---
+    "O sucesso é a soma de pequenos esforços repetidos dia após dia.",
+    "A queda não é o fim, mas o convite para um recomeço mais forte.",
+    "Grandes batalhas só são dadas a grandes guerreiros.",
+    "O único lugar onde o sucesso vem antes do trabalho é no dicionário.",
+    "Não importa o quão devagar você vá, desde que não pare.",
+    "A persistência é o caminho do êxito.",
+    "Obstáculos são as coisas assustadoras que você vê quando tira os olhos do alvo.",
+    "É no meio da dificuldade que se encontra a oportunidade.",
+    "O que não me mata, me torna mais forte.",
+    "Se você está atravessando um inferno, continue caminhando.",
+    "A maior glória não é nunca cair, mas levantar-se a cada queda.",
+    "A força não vem da capacidade física, vem de uma vontade indomável.",
+    "O rio atinge seus objetivos porque aprendeu a contornar os obstáculos.",
+    "Calmaria nunca fez bom marinheiro.",
+    "A paciência é amarga, mas seus frutos são doces.",
+    "Continue. Tudo o que você precisa virá no momento perfeito.",
+    "Quem tem um 'porquê' enfrenta qualquer 'como'.",
+    "Não desanime se a vitória demorar; o que se constrói rápido, desmorona fácil.",
+    "A dor é temporária, mas o orgulho de ter vencido é para sempre.",
+    "Tudo parece impossível até que seja feito.",
+
+    // --- MOTIVAÇÃO & ATITUDE ---
+    "O que você decide fazer agora pode mudar o resto da sua vida.",
+    "Acredite que você pode e você já está no meio do caminho.",
+    "A melhor maneira de prever o futuro é criá-lo.",
+    "Você é do tamanho dos seus sonhos.",
+    "O entusiasmo é a maior força da alma.",
+    "Não espere por circunstâncias ideais, crie-as.",
+    "Sua única limitação é aquela que você impõe em sua própria mente.",
+    "Comece onde você está, use o que você tem e faça o que você pode.",
+    "A vida começa onde termina a sua zona de conforto.",
+    "Seja a mudança que você deseja ver no mundo.",
+    "O otimismo é a fé que leva à realização.",
+    "Se você pode sonhar, você pode realizar.",
+    "A motivação é o que te faz começar. O hábito é o que te faz continuar.",
+    "Sua mente é um jardim. Seus pensamentos são as sementes.",
+    "Acredite em si mesmo e o universo conspirará a seu favor.",
+    "Fazer o que você gosta é liberdade. Gostar do que você faz é felicidade.",
+    "Cada dia é uma nova página na sua história. Escreva-a bem.",
+    "Se a oportunidade não bater, construa uma porta.",
+    "O destino não é uma questão de sorte, é uma questão de escolha.",
+    "Descubra o que te acende e ilumine o mundo.",
+
+    // --- FOCO & DISCIPLINA ---
+    "O sucesso não é o resultado de um acerto, mas de uma rotina de acertos.",
+    "Foco é dizer não para centenas de outras boas ideias.",
+    "A disciplina é a ponte entre metas e realizações.",
+    "Não olhe para o topo da montanha, foque no próximo passo.",
+    "Quem quer fazer algo encontra um meio, quem não quer encontra uma desculpa.",
+    "A consistência supera o talento quando o talento não tem consistência.",
+    "Produtividade nunca é um acidente; é o resultado de compromisso com a excelência.",
+    "Sua energia flui para onde sua atenção está direcionada.",
+    "Simplifique a sua vida e foque no que realmente importa.",
+    "O segredo do seu futuro está escondido na sua rotina diária.",
+    "Menos distração, mais ação.",
+    "O preço da disciplina é sempre menor que o preço do arrependimento.",
+    "Grandes realizações são construídas com pequenos tijolos diários.",
+    "Não se distraia com o barulho dos outros. Siga o seu plano.",
+    "Foco absoluto no processo, desapego total do resultado imediato.",
+    "A maestria exige paciência e repetição.",
+    "Seja senhor da sua mente e escravo dos seus bons hábitos.",
+    "O sucesso ama a preparação e detesta a procrastinação.",
+    "Organize sua mente, dite o seu ritmo e domine o seu dia.",
+    "Saber o que deixar de fazer é tão importante quanto saber o que fazer.",
+
+    // --- VISÃO & CRESCIMENTO ---
+    "Não compita com os outros, compita com quem você era ontem.",
+    "O conhecimento fala, mas a sabedoria escuta.",
+    "Erros são provas de que você está tentando.",
+    "Seja grato pelo que tem enquanto luta pelo que deseja.",
+    "O maior erro que você pode cometer é o medo de cometer erros.",
+    "A sabedoria começa na reflexão.",
+    "Mude seus pensamentos e você mudará seu mundo.",
+    "Investir em conhecimento rende sempre os melhores juros.",
+    "O aprendizado é um tesouro que seguirá seu dono por toda parte.",
+    "A mente que se abre a uma nova ideia jamais voltará ao seu tamanho original.",
+    "As crises não criam o caráter, apenas o revelam.",
+    "Crescer dói, mas permanecer preso onde você não pertence dói muito mais.",
+    "A vida é 10% o que acontece com você e 90% como você reage a isso.",
+    "O segredo da mudança é focar toda a sua energia não na luta contra o velho, mas na construção do novo.",
+    "Nenhum obstáculo é grande demais se a sua vontade de crescer for maior.",
+    "A evolução pessoal é um processo contínuo, não um destino final.",
+    "Quem teme o julgamento dos outros nunca conhecerá o próprio potencial.",
+    "A humildade é o primeiro passo para o verdadeiro aprendizado.",
+    "Permita-se ser um iniciante. Ninguém começa sabendo tudo.",
+    "O sucesso sem gratidão é apenas um ego inflado.",
+
+    // --- INSPIRAÇÃO & LIDERANÇA ---
+    "A coragem não é a ausência do medo, mas o triunfo sobre ele.",
+    "A melhor liderança é o exemplo.",
+    "Grandes mentes discutem ideias; mentes médias discutem eventos; mentes pequenas discutem pessoas.",
+    "Gentileza gera gentileza.",
+    "O que fazemos por nós mesmos morre conosco. O que fazemos pelos outros permanece.",
+    "Seja a luz na escuridão de alguém.",
+    "O sucesso é mais gratificante quando compartilhado.",
+    "Não siga o caminho que a vida te impõe; vá por onde não há caminho e deixe uma trilha.",
+    "A integridade é fazer o certo mesmo quando ninguém está olhando.",
+    "Para liderar a si mesmo, use a cabeça; para liderar os outros, use o coração.",
+    "O valor de um homem é medido pelo que ele dá, não pelo que ele é capaz de receber.",
+    "Nenhum de nós é tão inteligente quanto todos nós juntos.",
+    "Inspire pelo caráter, lidere pela atitude.",
+    "O respeito se conquista, a confiança se adquire e a lealdade se retribui.",
+    "Grandes líderes não criam seguidores, criam novos líderes.",
+    "A verdadeira grandeza consiste em fazer com que todos ao seu redor se sintam grandes.",
+    "Um dia sem rir é um dia desperdiçado.",
+    "A generosidade enriquece quem a pratica.",
+    "Sua marca no mundo é o impacto positivo que você deixa nas pessoas.",
+    "Viva de forma que sua presença faça a diferença e sua ausência seja sentida."
+];
+
+$dailyQuotersTitle = [
+    // --- PERSEVERANÇA & RESILIÊNCIA ---
+    "Perseverança",
+    "Resiliência",
+    "Superação",
+    "Trabalho",
+    "Constância",
+    "Persistência",
+    "Determinação",
+    "Oportunidade",
+    "Fortaleza",
+    "Continuidade",
+    "Superação",
+    "Vontade",
+    "Adaptação",
+    "Experiência",
+    "Paciência",
+    "Confiança",
+    "Propósito",
+    "Construção",
+    "Resistência",
+    "Possibilidade",
+
+    // --- MOTIVAÇÃO & ATITUDE ---
+    "Motivação",
+    "Autoestima",
+    "Visão",
+    "Sonhos",
+    "Entusiasmo",
+    "Iniciativa",
+    "Atitude",
+    "Ação",
+    "Coragem",
+    "Transformação",
+    "Otimismo",
+    "Realização",
+    "Hábito",
+    "Mentalidade",
+    "Fé",
+    "Liberdade",
+    "Renovação",
+    "Oportunidade",
+    "Escolhas",
+    "Inspiração",
+
+    // --- FOCO & DISCIPLINA ---
+    "Foco",
+    "Prioridade",
+    "Disciplina",
+    "Progresso",
+    "Compromisso",
+    "Consistência",
+    "Produtividade",
+    "Atenção",
+    "Simplicidade",
+    "Rotina",
+    "Execução",
+    "Responsabilidade",
+    "Base",
+    "Blindagem",
+    "Processo",
+    "Maestria",
+    "Autocontrole",
+    "Preparação",
+    "Ritmo",
+    "Estratégia",
+
+    // --- VISÃO & CRESCIMENTO ---
+    "Evolução",
+    "Sabedoria",
+    "Aprendizado",
+    "Gratidão",
+    "Experiência",
+    "Reflexão",
+    "Mudança",
+    "Conhecimento",
+    "Crescimento",
+    "Expansão",
+    "Caráter",
+    "Amadurecimento",
+    "Reação",
+    "Renovação",
+    "Vontade",
+    "Jornada",
+    "Autonomia",
+    "Humildade",
+    "Início",
+    "Reconhecimento",
+
+    // --- INSPIRAÇÃO & LIDERANÇA ---
+    "Coragem",
+    "Exemplo",
+    "Grandeza",
+    "Gentileza",
+    "Legado",
+    "Altruísmo",
+    "Compartilhar",
+    "Liderança",
+    "Integridade",
+    "Empatia",
+    "Valor",
+    "União",
+    "Caráter",
+    "Confiança",
+    "Legado",
+    "Influência",
+    "Alegria",
+    "Generosidade",
+    "Impacto",
+    "Presença"
+];
+$dailyQuoterandomDay = $dailyQuoters[date('d') % count($dailyQuoters)]; 
+$dailyQuoterandomDayTitle = $dailyQuotersTitle[date('d') % count($dailyQuotersTitle)];
+
+
+
+// --- CONFIGURAÇÃO GLOBAL DO DASHBOARD ---
+// Centralização de dados da infra, rituais, camadas e soluções da CROM.
+$dashboard = [
+    'banners' => [
+        [
+            'badge'            => 'Soberania',
+            'titulo_principal' => 'CROM',
+            'titulo_accent'    => '',
+            'descricao'        => 'Crie e colabore em documentações locais em Markdown com autonomia radical e controle de governança direto na base.',
+            'btn_texto'        => 'Consultar Documentos Internos',
+            'btn_tab'          => 'page_crud',
+            'gradiente'        => 'from-sky-400/20 to-indigo-500/0'
+        ]
+    ],
+    'ecossistema' => [
+        [
+            'nome'        => 'CromIA Gateway',
+            'tag'         => 'Inteligência',
+            'tag_style'   => 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+            'bg_style'    => 'bg-gradient-to-br from-purple-950/40 to-slate-900 border-purple-900/60 hover:border-purple-500/40',
+            'icone'       => '🤖',
+            'descricao'   => 'Acesso unificado via chaves privadas a modelos avançados (Deepseek V4, Gemma 4, GLM) sem vazamento de escopo corporativo.',
+            'btn_texto'   => 'Acessar Token Privado',
+            'btn_style'   => 'bg-purple-600 hover:bg-purple-500 text-white',
+            'disabled'    => false,
+            'tab'         => 'beneficios'
+        ],
+        [
+            'nome'        => 'P2P Secure Share',
+            'tag'         => 'Privacidade',
+            'tag_style'   => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+            'bg_style'    => 'bg-gradient-to-br from-emerald-950/40 to-slate-900 border-emerald-900/60 hover:border-emerald-500/40',
+            'icone'       => '🔒',
+            'descricao'   => 'Transferência direta de arquivos de dispositivo para dispositivo via WebRTC, rodando sem backend centralizado.',
+            'btn_texto'   => 'Abrir P2PFile',
+            'btn_style'   => 'bg-emerald-600 hover:bg-emerald-500 text-white',
+            'disabled'    => false,
+            'tab'         => 'projetos'
+        ],
+        [
+            'nome'        => 'Ferramentas',
+            'tag'         => 'Infraestrutura',
+            'tag_style'   => 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+            'bg_style'    => 'bg-gradient-to-br from-indigo-950/40 to-slate-900 border-indigo-900/60 hover:border-indigo-500/40',
+            'icone'       => '🗜️',
+            'descricao'   => 'Coleção de ferramentas web essenciais, gratuitas e 100% privadas. Inclui conversores, geradores e utilitários para desenvolvedores e criadores.',
+            'btn_texto'   => 'Acessar Ferramentas',
+            'btn_style'   => 'bg-indigo-600 hover:bg-indigo-500 text-white',
+            'disabled'    => false,
+            'link'        => 'https://crom.run/ferramentas'
+        ],
+        [
+            'nome'        => 'Cromva',
+            'tag'         => 'IA',
+            'tag_style'   => 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+            'bg_style'    => 'bg-gradient-to-br from-indigo-950/40 to-slate-900 border-indigo-900/60 hover:border-indigo-500/40',
+            'icone'       => '🤖',
+            'descricao'   => 'Focado na privacidade, o Cromva é uma plataforma voltada para o consumo e organização de conteúdo em markdown. Com uma interface intuitiva, serve como um hub central para anotações.',
+            'btn_texto'   => 'Acessar Cromva',
+            'btn_style'   => 'bg-indigo-600 hover:bg-indigo-500 text-white',
+            'disabled'    => false,
+            'link'        => 'https://cromva.crom.run/'
+        ],
+    ],
+    // --- SEÇÃO TRANSFORMADA EM ARRAY MUTIDIMENSIONAL EXPANSÍVEL ---
+    'beneficios_preview' => [
+        [
+            'titulo'    => 'Contrato de Cuidado & Vesting',
+            'descricao' => 'Seu histórico e impacto de contribuição técnico permanecem registrados em blockchain interna/wiki. Distribuição de proventos comerciais B2B prioritária para Pilares.',
+            'btn_texto' => 'Ver benefícios',
+            'tab'       => 'beneficios' // Roteamento interno via openTab
+        ],
+        [
+            'titulo'    => 'Manifesto do Ecossistema Local-First',
+            'tag'       => 'Filosofia',
+            'descricao' => 'Leia as diretrizes completas sobre Soberania Digital, infraestruturas resilientes offline e o porquê de rejeitarmos modelos centralizados.',
+            'btn_texto' => 'Acessar Manifesto Externo',
+            'link'      => 'https://crom.me/manifesto' // Roteamento externo via tag <a>
+        ]
+    ],
+    'projetos_hook' => [
+        'titulo'    => $dailyQuoterandomDayTitle,
+        'subtitulo' => $dailyQuoterandomDay
+    ],
+    'aprendizado' => [
+        [
+            'titulo' => 'Escrita de Processos na Wiki GitOps',
+            'tag'    => 'Governança',
+            'icone'  => '🏛️'
+        ],
+        [
+            'titulo' => 'Provisionamento de VPS e Acesso com Chave Pública',
+            'tag'    => 'Infraestrutura',
+            'icone'  => '🖥️'
+        ],
+        [
+            'titulo' => 'Gerenciamento Rootless via Podman e Isolamento',
+            'tag'    => 'Segurança',
+            'icone'  => '🐳'
+        ]
+    ]
+];
+
 // Consulta de usuários ativos nos últimos 5 minutos
 $timeThreshold = time() - 300;
 $onlineUsers = [];
@@ -21,310 +352,303 @@ try {
     // Silencia
 }
 $onlineCount = count($onlineUsers);
+
+// Injeta assets do Swiper.js limpos e sem duplicidade
+$this->registerCssFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css');
+$this->registerJsFile('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js');
 ?>
 
-<!-- Elemento invisível/visível capturado pelo HTMX Polling para atualizar o Topbar -->
-<div id="online-badge" class="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-mono text-[10px] tracking-wide animate-pulse" title="Membros online nos últimos 5 minutos">
-    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-    <span><?= $onlineCount ?> ONLINE</span>
-</div>
+<style>
+    /* Customização dos bullets do Swiper Vertical e desabilitados */
+    .swiper-button-disabled { opacity: 0.25; cursor: not-allowed !important; }
+    .swiper-pagination-banner .swiper-pagination-bullet { background: #0f172a; opacity: 0.2; width: 8px; height: 8px; transition: all 0.2s; }
+    .swiper-pagination-banner .swiper-pagination-bullet-active { background: #0284c7; opacity: 1; height: 20px; border-radius: 4px; }
+</style>
 
-<div class="space-y-10 pb-16">
-    <!-- 1. BANNER PRINCIPAL ARREDONDADO "CROM I/O" (Google Style) -->
-    <section class="bg-[#e8f0fe] rounded-[32px] p-8 md:p-12 flex flex-col md:flex-row justify-between items-center relative overflow-hidden text-slate-900 border border-sky-200/50 shadow-lg select-none">
-        <!-- Detalhes de Grafismos Geométricos Coloridos em Absoluto -->
-        <div class="absolute top-0 left-0 w-24 h-full bg-gradient-to-br from-sky-400/20 to-indigo-500/0 rounded-r-full blur-2xl"></div>
-        <div class="absolute bottom-0 right-0 w-64 h-full bg-gradient-to-tl from-emerald-500/10 to-amber-500/0 rounded-l-full blur-3xl"></div>
-        
-        <!-- Botão Hide no Topo Esquerdo -->
-        <div class="absolute top-4 left-4">
-            <button class="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-full transition flex items-center gap-1 shadow-sm">
-                Hide
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                </svg>
-            </button>
+<div class="space-y-10 pb-16 selection:bg-sky-500/20">
+    
+    <section class="bg-[#e8f0fe] rounded-[32px] border border-sky-200/50 shadow-lg relative overflow-hidden select-none h-[420px] md:h-[320px]">
+        <div class="swiper cromSwiperBanner h-full w-full">
+            <div class="swiper-wrapper">
+                
+                <?php foreach ($dashboard['banners'] as $banner): ?>
+                    <div class="swiper-slide h-full w-full flex flex-col md:flex-row justify-between items-center p-8 md:p-12 relative overflow-hidden">
+                        
+                        <div class="absolute top-0 left-0 w-24 h-full bg-gradient-to-br <?= $banner['gradiente'] ?> rounded-r-full blur-2xl pointer-events-none"></div>
+                        
+                        <div class="max-w-xl space-y-3 md:space-y-4 text-center md:text-left pt-4 md:pt-0 z-10">
+                            <span class="inline-block px-3 py-1 bg-sky-600/10 border border-sky-600/20 text-sky-700 font-mono font-bold text-[10px] tracking-wide uppercase rounded-full">
+                                <?= htmlspecialchars($banner['badge']) ?>
+                            </span>
+                            
+                            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 font-sans flex items-center justify-center md:justify-start gap-1">
+                                <?= htmlspecialchars($banner['titulo_principal']) ?> 
+                                <span class="font-black text-slate-800"><?= htmlspecialchars($banner['titulo_accent']) ?></span>
+                                <span class="inline-block w-3.5 h-3.5 bg-slate-900 rounded-full ml-1"></span>
+                            </h1>
+                            
+                            <p class="text-xs md:text-sm text-slate-600 font-medium leading-relaxed max-w-lg">
+                                <?= htmlspecialchars($banner['descricao']) ?>
+                            </p>
+                            
+                            <div class="flex justify-center md:justify-start pt-1">
+                                <button @click="openTab('<?= $banner['btn_tab'] ?>')"
+                                        class="py-2.5 px-6 bg-sky-600 hover:bg-sky-500 text-white rounded-full text-xs font-bold shadow-md shadow-sky-600/20 transition-all duration-200 transform active:scale-95">
+                                    <?= htmlspecialchars($banner['btn_texto']) ?>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative w-full md:w-72 h-36 md:h-48 flex items-center justify-center z-10 mt-4 md:mt-0">
+                            <div class="w-28 h-28 bg-gradient-to-tr from-sky-400 via-indigo-500 to-rose-500 rounded-full blur-sm opacity-15 animate-pulse absolute"></div>
+                            <div class="absolute left-6 w-16 h-16 bg-gradient-to-br from-amber-400 via-rose-500 to-sky-400 rounded-tl-[28px] rounded-br-[28px] shadow-md flex items-center justify-center transform -rotate-12 border border-white/20">
+                                <span class="text-white text-xl font-black">Ω</span>
+                            </div>
+                            <div class="absolute right-6 w-20 h-20 bg-gradient-to-tr from-sky-500 via-emerald-400 to-amber-300 rounded-full shadow-xl flex items-center justify-center transform rotate-12 border border-white/20">
+                                <div class="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center shadow-inner">
+                                    <span class="w-2 h-2 bg-sky-400 rounded-full"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                <?php endforeach; ?>
+
+            </div>
+            <div class="swiper-pagination-banner absolute right-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2"></div>
         </div>
+    </section>
 
-        <!-- Conteúdo do Banner (Esquerda) -->
-        <div class="max-w-xl space-y-4 md:space-y-6 text-center md:text-left pt-6 md:pt-0 z-10">
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 font-sans flex items-center justify-center md:justify-start gap-1">
-                CROM <span class="font-black text-slate-800">I/O</span>
-                <span class="inline-block w-4 h-4 bg-slate-900 rounded-full ml-1"></span>
-            </h1>
-            <p class="text-sm md:text-base text-slate-600 font-medium leading-relaxed">
-                Crie e colabore em documentos Markdown locais com governança de membros direto na base.
-            </p>
-            <div class="flex justify-center md:justify-start pt-2">
-                <!-- Abre a aba de Páginas via Alpine -->
-                <button @click="openTab('page_crud')"
-                        class="py-3 px-8 bg-sky-600 hover:bg-sky-500 text-white rounded-full text-sm font-bold shadow-lg shadow-sky-600/30 transition-all duration-200 transform active:scale-95">
-                    Consultar Documentos Internos
+    <section class="space-y-5 h-80 pb-10">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none">
+            <h2 class="text-xl font-bold text-slate-100 tracking-tight">Build using CROM's ecosystem</h2>
+            
+            <div class="flex items-center gap-2">
+                <button class="swiper-pilar-prev w-9 h-9 border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-100 rounded-full flex items-center justify-center text-xs transition cursor-pointer">
+                    ◀
+                </button>
+                <button class="swiper-pilar-next w-9 h-9 border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-100 rounded-full flex items-center justify-center text-xs transition cursor-pointer">
+                    ▶
                 </button>
             </div>
         </div>
-
-        <!-- Ilustrações Coloridas Premium (Direita) -->
-        <div class="relative w-full md:w-80 h-48 md:h-56 mt-6 md:mt-0 flex items-center justify-center z-10">
-            <!-- Robô Android / Gota de Gradientes Google -->
-            <div class="w-36 h-36 bg-gradient-to-tr from-sky-400 via-indigo-500 to-rose-500 rounded-full blur-sm opacity-20 animate-pulse absolute"></div>
-            
-            <!-- Desenho colorido abstrato do Android à esquerda -->
-            <div class="absolute left-4 w-20 h-20 bg-gradient-to-br from-amber-400 via-rose-500 to-sky-400 rounded-tl-[40px] rounded-br-[40px] shadow-lg flex items-center justify-center transform -rotate-12 border border-white/20">
-                <span class="text-white text-3xl font-black">Ω</span>
-            </div>
-            
-            <!-- Símbolo da Gota Google Maps à direita -->
-            <div class="absolute right-4 w-24 h-24 bg-gradient-to-tr from-sky-500 via-emerald-400 to-amber-300 rounded-full shadow-2xl flex items-center justify-center transform rotate-12 border border-white/20">
-                <div class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center shadow-inner">
-                    <span class="w-3 h-3 bg-sky-400 rounded-full"></span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 2. SEÇÃO DE CARDS DO ECOSSISTEMA "Build using CROM's ecosystem" -->
-    <section class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-100 tracking-tight select-none">Build using CROM's ecosystem</h2>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            
-            <!-- Card 1 (Azul): Páginas Documentadas -->
-            <div class="bg-[#1a73e8] rounded-[28px] p-6 flex flex-col justify-between text-white border border-blue-400/20 hover:shadow-2xl hover:shadow-blue-500/10 transition duration-300 relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/20 rounded-full blur-xl group-hover:scale-125 transition duration-300"></div>
-                <div>
-                    <div class="flex justify-between items-start">
-                        <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-xl shadow-inner border border-white/10">
-                            📄
-                        </div>
-                        <span class="px-2.5 py-0.5 bg-white/20 text-white rounded-full text-[9px] font-bold font-mono tracking-wide uppercase border border-white/10">Produtividade local</span>
-                    </div>
-                    <h3 class="text-base font-extrabold mt-6 leading-tight">Criação & Edição de Páginas em Banco</h3>
-                    <p class="text-[11px] text-blue-100 mt-2 leading-relaxed font-medium">
-                        Crie e gerencie artigos organizacionais em Markdown salvos diretamente no SQLite, com controle de membros e administradores.
-                    </p>
-                </div>
-                <div class="mt-8">
-                    <!-- Abre a aba de page_crud -->
-                    <button @click="openTab('page_crud')"
-                            class="w-full py-2.5 px-4 bg-white hover:bg-slate-50 text-blue-600 rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                        </svg>
-                        Acessar Páginas Documentadas
-                    </button>
-                </div>
-            </div>
-
-            <!-- Card 2 (Roxo): Terminal Integrado -->
-            <div class="bg-[#ab47bc] rounded-[28px] p-6 flex flex-col justify-between text-white border border-purple-400/20 hover:shadow-2xl hover:shadow-purple-500/10 transition duration-300 relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-xl group-hover:scale-125 transition duration-300"></div>
-                <div>
-                    <div class="flex justify-between items-start">
-                        <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-xl shadow-inner border border-white/10">
-                            💻
-                        </div>
-                        <span class="px-2.5 py-0.5 bg-white/20 text-white rounded-full text-[9px] font-bold font-mono tracking-wide uppercase border border-white/10">Advanced development</span>
-                    </div>
-                    <h3 class="text-base font-extrabold mt-6 leading-tight">CLI do CROM & Terminal VPS</h3>
-                    <p class="text-[11px] text-purple-100 mt-2 leading-relaxed font-medium">
-                        Query and edit large codebases, generate apps from images or PDFs, all from your secure console.
-                    </p>
-                </div>
-                <div class="mt-8">
-                    <button disabled class="w-full py-2.5 px-4 bg-white/20 text-purple-200 border border-white/10 rounded-full text-xs font-bold cursor-not-allowed flex items-center justify-center gap-1.5">
-                        Ver opções de instalação
-                    </button>
-                </div>
-            </div>
-
-            <!-- Card 3 (Preto Gradiente): Antigravity para Linux -->
-            <div class="bg-[#0f172a] rounded-[28px] p-6 flex flex-col justify-between text-slate-100 border border-slate-800 hover:border-sky-500/40 hover:shadow-2xl hover:shadow-sky-500/10 transition duration-300 relative overflow-hidden group">
-                <!-- Borda em Gradiente Neon -->
-                <div class="absolute inset-0 border border-transparent rounded-[28px] bg-gradient-to-r from-sky-400 via-emerald-400 to-indigo-500 opacity-20 pointer-events-none group-hover:opacity-40 transition duration-300"></div>
-                <div>
-                    <div class="flex justify-between items-start">
-                        <div class="w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center text-xl shadow-inner border border-slate-700">
-                            🚀
-                        </div>
-                        <span class="px-2.5 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-[9px] font-bold font-mono tracking-wide uppercase">AI agents</span>
-                    </div>
-                    <h3 class="text-base font-extrabold mt-6 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-100 to-sky-400">CROM Antigravity para Linux</h3>
-                    <p class="text-[11px] text-slate-400 mt-2 leading-relaxed font-medium">
-                        CROM Antigravity is our agentic development platform, evolving the IDE into the agent-first era.
-                    </p>
-                </div>
-                <div class="mt-8 z-10">
-                    <button class="w-full py-2.5 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg>
-                        Baixar para Linux
-                    </button>
-                </div>
-            </div>
-
-            <!-- Card 4 (Preto com Órbitas): Bate-Papo / Chat -->
-            <div class="bg-[#0f172a] rounded-[28px] p-6 flex flex-col justify-between text-slate-100 border border-slate-800/80 hover:shadow-2xl hover:shadow-black/40 transition duration-300 relative overflow-hidden group">
-                <!-- Órbitas e Círculos Geométricos Decorativos de Fundo -->
-                <div class="absolute bottom-[-20px] right-[-20px] w-36 h-36 border border-slate-800/60 rounded-full pointer-events-none group-hover:scale-110 transition duration-300"></div>
-                <div class="absolute bottom-[-10px] right-[-10px] w-24 h-24 border border-slate-800/40 rounded-full pointer-events-none"></div>
+        <div class="swiper cromSwiperEcosystem overflow-hidden rounded-[28px] px-1">
+            <div class="swiper-wrapper">
                 
-                <div>
-                    <div class="flex justify-between items-start">
-                        <div class="w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center text-xl shadow-inner border border-slate-700">
-                            💬
+                <?php foreach ($dashboard['ecossistema'] as $card): ?>
+                    <div class="swiper-slide h-auto flex pb-4">
+                        
+                        <div class="w-full rounded-[28px] p-6 flex flex-col justify-between text-slate-100 border transition duration-300 relative overflow-hidden group <?= $card['bg_style'] ?>">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-xl group-hover:scale-125 transition duration-300"></div>
+                            
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <div class="w-9 h-9 bg-slate-800/80 rounded-xl flex items-center justify-center text-xl shadow-inner border border-slate-700/60">
+                                        <?= $card['icone'] ?>
+                                    </div>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold font-mono tracking-wide uppercase border <?= $card['tag_style'] ?>">
+                                        <?= $card['tag'] ?>
+                                    </span>
+                                </div>
+                                <h3 class="text-base font-extrabold mt-6 leading-tight tracking-tight text-slate-100">
+                                    <?= htmlspecialchars($card['nome']) ?>
+                                </h3>
+                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed font-medium">
+                                    <?= htmlspecialchars($card['descricao']) ?>
+                                </p>
+                            </div>
+                            
+                            <div class="mt-8 z-10">
+                                <?php if ($card['disabled']): ?>
+                                    <button disabled class="w-full py-2.5 px-4 bg-slate-900/50 text-slate-500 border border-slate-800/80 rounded-full text-xs font-bold cursor-not-allowed text-center">
+                                        Em Estágio Skunkworks
+                                    </button>
+                                <?php else: 
+                                
+                                if (isset($card['tab'])): ?>
+                                    <button @click="openTab('<?= $card['tab'] ?>')" class="w-full py-2.5 px-4 text-center rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md <?= $card['btn_style'] ?>">
+                                        <?= htmlspecialchars($card['btn_texto']) ?>
+                                    </button>
+                                <?php elseif (isset($card['link'])): ?>
+                                    <a href="<?= $card['link'] ?>" class="w-full py-2.5 px-4 text-center rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md <?= $card['btn_style'] ?>" target="_blank">
+                                        <?= htmlspecialchars($card['btn_texto']) ?>
+                                    </a>
+                                <?php endif; ?>
+                                <?php endif; ?>
+                                
+                            </div>
                         </div>
-                        <span class="px-2.5 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-[9px] font-bold font-mono tracking-wide uppercase">Vibecode with Gen AI</span>
-                    </div>
-                    <h3 class="text-base font-extrabold mt-6 leading-tight">CROM AI Studio</h3>
-                    <p class="text-[11px] text-slate-400 mt-2 leading-relaxed font-medium">
-                        The fastest path from prompt to production with Gemini APIs and collaborative tools.
-                    </p>
-                </div>
-                <div class="mt-8 z-10">
-                    <button class="w-full py-2.5 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                        </svg>
-                        Inscrição e primeiros passos
-                    </button>
-                </div>
-            </div>
 
+                    </div>
+                <?php endforeach; ?>
+
+            </div>
         </div>
     </section>
 
-    <!-- 3. SEÇÕES INFERIORES: BENEFÍCIOS, PROJETOS E APRENDIZADO -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <!-- COLUNA ESQUERDA: BENEFÍCIOS E PROJETOS -->
         <div class="space-y-10">
-            <!-- Seção Benefícios -->
+
+            <section class="space-y-4">
+                <div class="flex justify-between items-center select-none">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
+                            💬
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-200">Palavra e frase do dia</h3>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/60 transition duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 text-xs">🔥</span>
+                            <h4 class="text-sm font-bold text-slate-200"><?= htmlspecialchars($dashboard['projetos_hook']['titulo']) ?></h4>
+                        </div>
+                       
+                    </div>
+                    <div>
+                        <button class="py-2 px-5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl transition shadow-md shadow-sky-600/10 whitespace-nowrap">
+                            <?= htmlspecialchars($dashboard['projetos_hook']['subtitulo']) ?>
+                        </button>
+                    </div>
+                </div>
+            </section>
             <section class="space-y-4">
                 <div class="flex justify-between items-center select-none">
                     <div class="flex items-center gap-2">
                         <div class="w-7 h-7 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
                             ❤️
                         </div>
-                        <h3 class="text-sm font-bold text-slate-200">Benefícios</h3>
+                        <h3 class="text-sm font-bold text-slate-200">Alinhamento Operacional</h3>
                     </div>
-                    <!-- Link do Alpine para ir à aba de Benefícios -->
                     <button @click="openTab('beneficios')" class="text-xs font-bold text-sky-400 hover:text-sky-300 transition">Ver tudo ></button>
                 </div>
 
-                <!-- Card de Benefício -->
-                <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/60 transition duration-200">
-                    <h4 class="text-base font-extrabold text-slate-100">$ 10 monthly Gen AI & Cloud credits</h4>
-                    <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-                        Start building in CROM AI Studio and CROM Vertex AI or any CROM Cloud product with complimentary monthly credits.
-                    </p>
-                    <button @click="openTab('beneficios')" class="mt-4 py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition">
-                        See all benefits
-                    </button>
+                <div class="space-y-4">
+                    <?php foreach ($dashboard['beneficios_preview'] as $index => $previewItem): ?>
+                        <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/60 transition duration-200 flex flex-col justify-between gap-4">
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-base font-extrabold text-slate-100">
+                                        <?= htmlspecialchars($previewItem['titulo']) ?>
+                                    </h4>
+                                    <?php if (isset($previewItem['tag'])): ?>
+                                        <span class="text-[9px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">
+                                            <?= htmlspecialchars($previewItem['tag']) ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <p class="text-xs text-slate-400 leading-relaxed">
+                                    <?= htmlspecialchars($previewItem['descricao']) ?>
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <?php if (isset($previewItem['tab'])): ?>
+                                    <button @click="openTab('<?= $previewItem['tab'] ?>')" class="py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition">
+                                        <?= htmlspecialchars($previewItem['btn_texto']) ?>
+                                    </button>
+                                <?php elseif (isset($previewItem['link'])): ?>
+                                    <a href="<?= $previewItem['link'] ?>" class="inline-block py-2 px-5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold rounded-xl transition" target="_blank">
+                                        <?= htmlspecialchars($previewItem['btn_texto']) ?> ↗
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </section>
 
-            <!-- Seção Projetos -->
-            <section class="space-y-4">
-                <div class="flex justify-between items-center select-none">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
-                            📋
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-200">Projetos</h3>
-                    </div>
-                    <button @click="openTab('projetos')" class="text-xs font-bold text-sky-400 hover:text-sky-300 transition">Ver tudo ></button>
-                </div>
-
-                <!-- Card de Projetos -->
-                <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/60 transition duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="w-4 h-4 text-xs">🔥</span>
-                            <h4 class="text-sm font-bold text-slate-200">CROM Cloud e Firebase</h4>
-                        </div>
-                        <p class="text-[10px] text-slate-500 leading-relaxed max-w-sm">
-                            Permitir que o CROM Developer Program leia os dados dos seus projetos do Cloud e do Firebase.
-                        </p>
-                    </div>
-                    <div>
-                        <button class="py-2 px-5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl transition shadow-md shadow-sky-600/10 whitespace-nowrap">
-                            Ativar para o CROM Cloud e Firebase
-                        </button>
-                    </div>
-                </div>
-            </section>
         </div>
 
-        <!-- COLUNA DIREITA: APRENDIZADO / CODELABS -->
-        <section class="space-y-4">
+        <section class="space-y-4" style="display: none">
             <div class="flex justify-between items-center select-none">
                 <div class="flex items-center gap-2">
                     <div class="w-7 h-7 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full flex items-center justify-center text-xs shadow-inner">
                         🎓
                     </div>
-                    <h3 class="text-sm font-bold text-slate-200">Aprendizado</h3>
+                    <h3 class="text-sm font-bold text-slate-200">Trilhas de Onboarding (3 Camadas)</h3>
                 </div>
                 <button @click="openTab('aprendizado')" class="text-xs font-bold text-sky-400 hover:text-sky-300 transition">Ver tudo ></button>
             </div>
 
-            <!-- Lista Vertical de Codelabs -->
             <div class="bg-slate-900/30 border border-slate-800/80 rounded-2xl divide-y divide-slate-800/60 overflow-hidden">
-                
-                <!-- Item 1 -->
-                <div class="p-5 flex items-center justify-between gap-4 hover:bg-slate-800/10 transition duration-200">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <span class="text-xl flex-shrink-0 text-slate-500">⌚</span>
-                        <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-300 truncate" title="(Descontinuado) Como adicionar complementos ao mostrador de um relógio Wear OS">(Descontinuado) Como adicionar complementos ao mostrador de um relógio Wear OS</h4>
-                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Wear OS</span>
+                <?php foreach ($dashboard['aprendizado'] as $item): ?>
+                    <div class="p-5 flex items-center justify-between gap-4 hover:bg-slate-800/10 transition duration-200">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="text-xl flex-shrink-0 text-slate-500"><?= $item['icone'] ?></span>
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-bold text-slate-300 truncate" title="<?= htmlspecialchars($item['titulo']) ?>">
+                                    <?= htmlspecialchars($item['titulo']) ?>
+                                </h4>
+                                <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">
+                                    <?= htmlspecialchars($item['tag']) ?>
+                                </span>
+                            </div>
                         </div>
+                        <button @click="openTab('aprendizado')" class="py-1.5 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-slate-100 text-[10px] font-bold rounded-lg transition flex items-center gap-1 whitespace-nowrap">
+                            Iniciar Trilha
+                        </button>
                     </div>
-                    <button @click="openTab('aprendizado')" class="py-1.5 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-slate-100 text-[10px] font-bold rounded-lg transition flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                        </svg>
-                        Iniciar
-                    </button>
-                </div>
-
-                <!-- Item 2 -->
-                <div class="p-5 flex items-center justify-between gap-4 hover:bg-slate-800/10 transition duration-200">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <span class="text-xl flex-shrink-0 text-slate-500">📁</span>
-                        <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-300 truncate" title="A Vertex AI acessa endpoints de previsão on-line de forma particular usando o PSC">A Vertex AI acessa endpoints de previsão on-line de forma particular usando o PSC</h4>
-                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">Completion: Approx 140 minutes</span>
-                        </div>
-                    </div>
-                    <button @click="openTab('aprendizado')" class="py-1.5 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-slate-100 text-[10px] font-bold rounded-lg transition flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                        </svg>
-                        Iniciar
-                    </button>
-                </div>
-
-                <!-- Item 3 -->
-                <div class="p-5 flex items-center justify-between gap-4 hover:bg-slate-800/10 transition duration-200">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <span class="text-xl flex-shrink-0 text-slate-500">📁</span>
-                        <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-300 truncate" title="A pilha de agentes da CROM em ação: ADK, A2A e MCP no CROM Cloud">A pilha de agentes da CROM em ação: ADK, A2A e MCP no CROM Cloud</h4>
-                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider font-mono">CROM Cloud Agentic</span>
-                        </div>
-                    </div>
-                    <button @click="openTab('aprendizado')" class="py-1.5 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-slate-100 text-[10px] font-bold rounded-lg transition flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                        </svg>
-                        Iniciar
-                    </button>
-                </div>
-
+                <?php endforeach; ?>
             </div>
         </section>
 
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof Swiper !== 'undefined') {
+            
+            // 1. Inicializador do Banner em Modo Vertical
+            new Swiper('.cromSwiperBanner', {
+                direction: 'vertical',
+                loop: true,
+                grabCursor: true,
+                autoplay: {
+                    delay: 6000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination-banner',
+                    clickable: true,
+                }
+            });
+
+            // 2. Inicializador do Ecossistema em Modo Horizontal Responsivo
+            new Swiper('.cromSwiperEcosystem', {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                grabCursor: true,
+                loop: false,
+                navigation: {
+                    nextEl: '.swiper-pilar-next',
+                    prevEl: '.swiper-pilar-prev',
+                },
+                breakpoints: {
+                    480: {
+                        slidesPerView: 1,
+                        slidesPerGroup: 1,
+                    },
+                    640: {
+                        slidesPerView: 2,
+                        slidesPerGroup: 2,
+                    },
+                    1024: {
+                        slidesPerView: 3,
+                        slidesPerGroup: 3,
+                    },
+                    1280: {
+                        slidesPerView: 4,
+                        slidesPerGroup: 4,
+                        spaceBetween: 24
+                    }
+                }
+            });
+        }
+    });
+</script>

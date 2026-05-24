@@ -15,13 +15,7 @@ if ($currentRoute === 'site/discover') {
     $initialTab = 'discover';
 } elseif ($currentRoute === 'site/beneficios') {
     $initialTab = 'beneficios';
-} elseif ($currentRoute === 'site/projetos') {
-    $initialTab = 'projetos';
-} elseif ($currentRoute === 'site/comunidades') {
-    $initialTab = 'comunidades';
-} elseif ($currentRoute === 'site/aprendizado') {
-    $initialTab = 'aprendizado';
-} elseif (strpos($currentRoute, 'page_crud') !== false) {
+}  elseif (strpos($currentRoute, 'page_crud') !== false) {
     $initialTab = 'page_crud';
 } elseif (strpos($currentRoute, 'wiki') !== false) {
     $initialTab = 'wiki';
@@ -37,6 +31,25 @@ echo $this->render('_head');
     <title><?= Html::encode($this->title) ?></title>
 <body class="h-full text-slate-100 <?= Yii::$app->user->isGuest ? 'overflow-y-auto' : 'overflow-hidden' ?>">
 <?php $this->beginBody() ?>
+
+<!-- Barra de Progresso Superior Dinâmica (YouTube/GitHub Style) -->
+<div id="top-progress-bar"></div>
+
+<!-- Loader Principal Premium de Página Inteira -->
+<div id="page-loader-root">
+    <div class="loader-logo-glow">
+        <div class="loader-glow-ring"></div>
+        <!-- Logotipo CROM Oficial (favicon de crom.run) -->
+        <img src="<?= Yii::getAlias('@web/crom-logo.png') ?>" alt="CROM" class="w-20 h-20 z-10 drop-shadow-[0_0_25px_rgba(255,255,255,0.15)]" />
+    </div>
+    <div class="mt-6 flex flex-col items-center gap-1 z-10">
+        <div class="flex items-center gap-1.5">
+            <span class="text-sm font-extrabold tracking-wider text-slate-100 font-sans">CROM</span>
+            <span class="text-xs font-semibold text-slate-400 font-sans">Developer Program</span>
+        </div>
+        <span class="text-[10px] font-semibold text-slate-500 font-mono tracking-wider animate-pulse uppercase mt-1">inicializando ambiente...</span>
+    </div>
+</div>
 
 <?php if (Yii::$app->user->isGuest): ?>
     <!-- Layout Limpo para Convidados (Tela de Login) -->
@@ -67,9 +80,6 @@ echo $this->render('_head');
                  'paravoce': '<?= Url::to(['/site/index']) ?>',
                  'discover': '<?= Url::to(['/site/discover']) ?>',
                  'beneficios': '<?= Url::to(['/site/beneficios']) ?>',
-                 'projetos': '<?= Url::to(['/site/projetos']) ?>',
-                 'comunidades': '<?= Url::to(['/site/comunidades']) ?>',
-                 'aprendizado': '<?= Url::to(['/site/aprendizado']) ?>',
                  'page_crud': '<?= Url::to(['/page_crud/default/index']) ?>',
                  'wiki': '<?= Url::to(['/wiki/default/index']) ?>'
              },
@@ -126,12 +136,8 @@ echo $this->render('_head');
         <header class="h-16 bg-slate-900 border-b border-slate-800/80 flex items-center justify-between px-6 flex-shrink-0 select-none z-50 shadow-md">
             <!-- Lado Esquerdo: Logotipo CROM Program -->
             <div class="flex items-center gap-3 cursor-pointer" @click="openTab('paravoce')">
-                <!-- Logotipo do Infinito Colorido (Estilo Google) -->
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7 9C5.34315 9 4 10.3431 4 12C4 13.6569 5.34315 15 7 15C8.65685 15 10 13.6569 10 12C10 10.3431 8.65685 9 7 9Z" stroke="#4285F4" stroke-width="2.5"/>
-                    <path d="M17 9C15.3431 9 14 10.3431 14 12C14 13.6569 15.3431 15 17 15C18.6569 15 20 13.6569 20 12C20 10.3431 18.6569 9 17 9Z" stroke="#34A853" stroke-width="2.5"/>
-                    <path d="M10 12C10 12.8 11.2 14.2 12 15C12.8 14.2 14 12.8 14 12C14 11.2 12.8 9.8 12 9C11.2 9.8 10 11.2 10 12Z" fill="#EA4335" stroke="#FBBC05" stroke-width="1.5"/>
-                </svg>
+                <!-- Logotipo Oficial CROM (favicon de crom.run) -->
+                <img src="<?= Yii::getAlias('@web/crom-logo.png') ?>" alt="CROM" class="w-8 h-8 rounded-md drop-shadow-md" />
                 <div class="flex flex-col sm:flex-row sm:items-center gap-1">
                     <span class="text-sm font-extrabold tracking-wider text-slate-100 font-sans">CROM</span>
                     <span class="text-xs font-semibold text-slate-400 font-sans">Developer Program</span>
@@ -149,12 +155,7 @@ echo $this->render('_head');
                      <!-- Será atualizado dinamicamente -->
                 </div>
 
-                <!-- Botão de Alternar Modo Escuro/Claro (Visual) -->
-                <button class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition duration-200" title="Alternar tema">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 18.75V21m-8.25-9.75h1.5m16.5 0h1.5m-15.188-7.062l1.062 1.062m12.728 12.727l1.063 1.062M4.5 19.5l1.062-1.06m12.728-12.728l1.063-1.06M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" />
-                    </svg>
-                </button>
+              
 
                 <!-- Avatar do Usuário com Borda -->
                 <div class="w-9 h-9 rounded-full ring-2 ring-sky-500/20 bg-sky-500/10 flex items-center justify-center font-bold text-xs text-sky-400 cursor-pointer hover:bg-sky-500/20 transition-all duration-300">
@@ -226,65 +227,10 @@ echo $this->render('_head');
                         </span>
                     </button>
 
-                    <!-- Aba 4: Projetos -->
-                    <button @click="openTab('projetos')"
-                            hx-get="<?= Url::to(['/site/projetos']) ?>"
-                            hx-target="#container-projetos"
-                            hx-trigger="click once"
-                            id="btn-nav-projetos"
-                            class="w-full flex flex-col items-center group cursor-pointer border border-transparent"
-                            title="Projetos">
-                        <div class="w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-200"
-                             :class="activeTab === 'projetos' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 0A48.536 48.536 0 0112 3m0 0c2.917 0 5.747.294 8.5.862m-21 1.402a48.536 48.536 0 013-.862m0 0c.266-.945 1.136-1.638 2.166-1.638h1.5c1.03 0 1.9.693 2.166 1.638M4.5 5.25a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 20.25h15a2.25 2.25 0 002.25-2.25V7.5a2.25 2.25 0 00-2.25-2.25M6.75 20.25v-1.5a2.25 2.25 0 00-2.25-2.25h-1.5" />
-                            </svg>
-                        </div>
-                        <span class="text-[9px] font-bold text-center mt-1.5 tracking-wide transition-all"
-                              :class="activeTab === 'projetos' ? 'text-sky-400 font-extrabold' : 'text-slate-500 group-hover:text-slate-300'">
-                            Projetos
-                        </span>
-                    </button>
+                  
 
-                    <!-- Aba 5: Comunidades -->
-                    <button @click="openTab('comunidades')"
-                            hx-get="<?= Url::to(['/site/comunidades']) ?>"
-                            hx-target="#container-comunidades"
-                            hx-trigger="click once"
-                            id="btn-nav-comunidades"
-                            class="w-full flex flex-col items-center group cursor-pointer border border-transparent"
-                            title="Comunidades">
-                        <div class="w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-200"
-                             :class="activeTab === 'comunidades' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94-3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                            </svg>
-                        </div>
-                        <span class="text-[9px] font-bold text-center mt-1.5 tracking-wide transition-all"
-                              :class="activeTab === 'comunidades' ? 'text-sky-400 font-extrabold' : 'text-slate-500 group-hover:text-slate-300'">
-                            Comunidades
-                        </span>
-                    </button>
+                   
 
-                    <!-- Aba 6: Aprendizado -->
-                    <button @click="openTab('aprendizado')"
-                            hx-get="<?= Url::to(['/site/aprendizado']) ?>"
-                            hx-target="#container-aprendizado"
-                            hx-trigger="click once"
-                            id="btn-nav-aprendizado"
-                            class="w-full flex flex-col items-center group cursor-pointer border border-transparent"
-                            title="Aprendizado">
-                        <div class="w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-200"
-                             :class="activeTab === 'aprendizado' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.9c2.79 0 5.428-.465 7.9-1.324.253-.088.465-.269.601-.51a60.43 60.43 0 00-.49-6.346m-15.76 0a48.39 48.39 0 0115.76 0m-15.76 0L12 3l8.76 4.75a60.603 60.603 0 00-15.76 2.397m15.76 0l-1.468 6.13a48.652 48.652 0 01-12.824 0l-1.468-6.13M12 13.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" />
-                            </svg>
-                        </div>
-                        <span class="text-[9px] font-bold text-center mt-1.5 tracking-wide transition-all"
-                              :class="activeTab === 'aprendizado' ? 'text-sky-400 font-extrabold' : 'text-slate-500 group-hover:text-slate-300'">
-                            Aprendizado
-                        </span>
-                    </button>
 
                     <!-- Divisor e Módulo Wiki (Mapeamento RBAC) -->
                     <?php foreach ($activeModules as $mod): ?>
@@ -320,8 +266,6 @@ echo $this->render('_head');
                         <div class="w-7 h-7 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 flex items-center justify-center text-[10px] font-bold text-white shadow-md">
                             Ω
                         </div>
-                        <span class="text-[8px] font-extrabold text-amber-400 tracking-tighter uppercase leading-none mt-1">mrj.crom</span>
-                        <span class="text-[7px] text-slate-500 font-bold uppercase tracking-tight">Plano Premium</span>
                     </div>
 
                     <!-- Botão de Sair -->
@@ -386,65 +330,8 @@ echo $this->render('_head');
                      <?php endif; ?>
                 </div>
 
-                <!-- Aba 4: Projetos -->
-                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
-                     x-show="activeTab === 'projetos'"
-                     id="container-projetos"
-                     <?= $initialTab === 'projetos' ? 'hx-isomorphic="true"' : '' ?>>
-                     <?php if ($initialTab === 'projetos'): ?>
-                         <?= $content ?>
-                     <?php else: ?>
-                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
-                              <div class="flex flex-col items-center gap-2">
-                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Projetos...</span>
-                              </div>
-                         </div>
-                     <?php endif; ?>
-                </div>
+              
 
-                <!-- Aba 5: Comunidades -->
-                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
-                     x-show="activeTab === 'comunidades'"
-                     id="container-comunidades"
-                     <?= $initialTab === 'comunidades' ? 'hx-isomorphic="true"' : '' ?>>
-                     <?php if ($initialTab === 'comunidades'): ?>
-                         <?= $content ?>
-                     <?php else: ?>
-                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
-                              <div class="flex flex-col items-center gap-2">
-                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Comunidades...</span>
-                              </div>
-                         </div>
-                     <?php endif; ?>
-                </div>
-
-                <!-- Aba 6: Aprendizado -->
-                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
-                     x-show="activeTab === 'aprendizado'"
-                     id="container-aprendizado"
-                     <?= $initialTab === 'aprendizado' ? 'hx-isomorphic="true"' : '' ?>>
-                     <?php if ($initialTab === 'aprendizado'): ?>
-                         <?= $content ?>
-                     <?php else: ?>
-                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
-                              <div class="flex flex-col items-center gap-2">
-                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Aprendizado...</span>
-                              </div>
-                         </div>
-                     <?php endif; ?>
-                </div>
 
                 <!-- Aba Módulo Wiki (Injeções HTMX Dinâmicas por Módulo) -->
                 <?php foreach ($activeModules as $mod): ?>
@@ -474,6 +361,77 @@ echo $this->render('_head');
         </div>
     </div>
 <?php endif; ?>
+
+<script>
+    // Objeto Controlador da Barra de Progresso Superior (YouTube/GitHub Style)
+    const ProgressBar = {
+        el: null,
+        timer: null,
+        width: 0,
+        init() {
+            this.el = document.getElementById('top-progress-bar');
+        },
+        start() {
+            if (!this.el) this.init();
+            if (!this.el) return;
+            clearInterval(this.timer);
+            this.width = 0;
+            this.el.style.width = '0%';
+            this.el.style.opacity = '1';
+            this.timer = setInterval(() => {
+                if (this.width < 85) {
+                    // Avanço dinâmico simulando carregamento real
+                    this.width += Math.random() * 7 + 2;
+                    this.el.style.width = this.width + '%';
+                }
+            }, 120);
+        },
+        finish() {
+            if (!this.el) this.init();
+            if (!this.el) return;
+            clearInterval(this.timer);
+            this.el.style.width = '100%';
+            setTimeout(() => {
+                this.el.style.opacity = '0';
+                setTimeout(() => {
+                    this.el.style.width = '0%';
+                }, 300);
+            }, 220);
+        }
+    };
+
+    // Função de ocultação do Loader Principal
+    function hidePageLoader() {
+        const loader = document.getElementById('page-loader-root');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+                loader.remove(); // Remove completamente do DOM para economizar recursos
+            }, 450);
+        }
+    }
+
+    // Inicializa listeners assim que o DOM for lido
+    document.addEventListener('DOMContentLoaded', () => {
+        // Vincula eventos do HTMX globalmente
+        document.body.addEventListener('htmx:beforeRequest', () => {
+            ProgressBar.start();
+        });
+        document.body.addEventListener('htmx:afterRequest', () => {
+            ProgressBar.finish();
+        });
+        document.body.addEventListener('htmx:requestError', () => {
+            ProgressBar.finish();
+        });
+    });
+
+    // Oculta o loader no evento de carregamento completo
+    window.addEventListener('load', hidePageLoader);
+
+    // Fallback preventivo de SRE: oculta em 2.5s se algum recurso externo falhar
+    setTimeout(hidePageLoader, 2500);
+</script>
 
 <?php $this->endBody() ?>
 </body>
