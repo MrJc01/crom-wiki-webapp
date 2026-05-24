@@ -3,44 +3,50 @@
 use yii\helpers\Url;
 ?>
 <div class="space-y-6"
-     x-data="{
-         settings: <?= json_encode($settings) ?>,
-         successMsg: '',
-         errorMsg: '',
-         isSaving: false,
-         
-         saveSettings() {
-             this.successMsg = '';
-             this.errorMsg = '';
-             this.isSaving = true;
-             
-             const formData = new FormData();
-             for (const [key, val] of Object.entries(this.settings)) {
-                 formData.append('settings[' + key + ']', val);
-             }
-             formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
-             
-             fetch('<?= Url::to(['/admin/default/save-settings']) ?>', {
-                 method: 'POST',
-                 body: formData
-             })
-             .then(res => res.json())
-             .then(data => {
-                 this.isSaving = false;
-                 if (data.success) {
-                     this.successMsg = data.message;
-                     // Dispara evento global para o portal saber que as configuracoes foram salvas
-                     document.body.dispatchEvent(new CustomEvent('portalSettingsUpdated'));
-                 } else {
-                     this.errorMsg = data.message;
-                 }
-             })
-             .catch(err => {
-                 this.isSaving = false;
-                 this.errorMsg = 'Erro de rede ao salvar as configurações.';
-             });
-         }
-     }">
+     x-data="adminSettingsHandler(<?= Html::encode(json_encode($settings)) ?>)">
+
+<script>
+window.adminSettingsHandler = function(initialSettings) {
+    return {
+        settings: initialSettings,
+        successMsg: '',
+        errorMsg: '',
+        isSaving: false,
+        
+        saveSettings() {
+            this.successMsg = '';
+            this.errorMsg = '';
+            this.isSaving = true;
+            
+            const formData = new FormData();
+            for (const [key, val] of Object.entries(this.settings)) {
+                formData.append('settings[' + key + ']', val);
+            }
+            formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
+            
+            fetch('<?= Url::to(['/admin/default/save-settings']) ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.isSaving = false;
+                if (data.success) {
+                    this.successMsg = data.message;
+                    // Dispara evento global para o portal saber que as configuracoes foram salvas
+                    document.body.dispatchEvent(new CustomEvent('portalSettingsUpdated'));
+                } else {
+                    this.errorMsg = data.message;
+                }
+            })
+            .catch(err => {
+                this.isSaving = false;
+                this.errorMsg = 'Erro de rede ao salvar as configurações.';
+            });
+        }
+    };
+};
+</script>
 
     <!-- Alertas -->
     <div class="flex-shrink-0">

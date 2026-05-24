@@ -3,41 +3,47 @@
 use yii\helpers\Url;
 ?>
 <div class="space-y-6"
-     x-data="{
-         modules: <?= json_encode($modules) ?>,
-         successMsg: '',
-         errorMsg: '',
-         isToggling: false,
-         
-         toggleModule(module) {
-             if (module.id === 'admin') {
-                 this.errorMsg = 'Não é permitido desativar o módulo de administração.';
-                 return;
-             }
-             
-             this.successMsg = '';
-             this.errorMsg = '';
-             this.isToggling = true;
-             
-             fetch('<?= Url::to(['/admin/default/toggle-module']) ?>?id=' + module.id)
-             .then(res => res.json())
-             .then(data => {
-                 this.isToggling = false;
-                 if (data.success) {
-                     module.is_active = data.is_active;
-                     this.successMsg = data.message;
-                     // Dispara evento global para o portal saber que os modulos foram alterados
-                     document.body.dispatchEvent(new CustomEvent('portalModulesUpdated'));
-                 } else {
-                     this.errorMsg = data.message;
-                 }
-             })
-             .catch(err => {
-                 this.isToggling = false;
-                 this.errorMsg = 'Erro de rede ao alterar status do módulo.';
-             });
-         }
-     }">
+     x-data="adminModulesHandler(<?= Html::encode(json_encode($modules)) ?>)">
+
+<script>
+window.adminModulesHandler = function(initialModules) {
+    return {
+        modules: initialModules,
+        successMsg: '',
+        errorMsg: '',
+        isToggling: false,
+        
+        toggleModule(module) {
+            if (module.id === 'admin') {
+                this.errorMsg = 'Não é permitido desativar o módulo de administração.';
+                return;
+            }
+            
+            this.successMsg = '';
+            this.errorMsg = '';
+            this.isToggling = true;
+            
+            fetch('<?= Url::to(['/admin/default/toggle-module']) ?>?id=' + module.id)
+            .then(res => res.json())
+            .then(data => {
+                this.isToggling = false;
+                if (data.success) {
+                    module.is_active = data.is_active;
+                    this.successMsg = data.message;
+                    // Dispara evento global para o portal saber que os modulos foram alterados
+                    document.body.dispatchEvent(new CustomEvent('portalModulesUpdated'));
+                } else {
+                    this.errorMsg = data.message;
+                }
+            })
+            .catch(err => {
+                this.isToggling = false;
+                this.errorMsg = 'Erro de rede ao alterar status do módulo.';
+            });
+        }
+    };
+};
+</script>
 
     <!-- Alertas -->
     <div class="flex-shrink-0">

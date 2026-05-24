@@ -2,39 +2,45 @@
 use yii\helpers\Url;
 ?>
 <div class="space-y-6"
-     x-data="{
-         isLoading: false,
-         logsContent: '',
-         
-         loadLogs() {
-             this.isLoading = true;
-             fetch('<?= Url::to(['/admin/default/get-logs']) ?>')
-             .then(res => res.text())
-             .then(text => {
-                 this.logsContent = text;
-                 this.isLoading = false;
-                 // Scroll do terminal para o fim após o carregamento
-                 this.$nextTick(() => {
-                     const terminal = this.$refs.terminalContainer;
-                     if (terminal) {
-                         terminal.scrollTop = terminal.scrollHeight;
-                     }
-                 });
-             })
-             .catch(err => {
-                 this.logsContent = '<div class=\"p-4 text-rose-400 font-mono text-xs\">Erro de rede ao carregar os logs do sistema.</div>';
-                 this.isLoading = false;
-             });
-         },
-         
-         clearTerminal() {
-             this.logsContent = '<div class=\"p-4 text-slate-500 font-mono text-xs\">Terminal limpo localmente. Clique em Atualizar para buscar novos logs.</div>';
-         },
-         
-         init() {
-             this.loadLogs();
-         }
-     }">
+     x-data="adminLogsHandler()">
+
+<script>
+window.adminLogsHandler = function() {
+    return {
+        isLoading: false,
+        logsContent: '',
+        
+        loadLogs() {
+            this.isLoading = true;
+            fetch('<?= Url::to(['/admin/default/get-logs']) ?>')
+            .then(res => res.text())
+            .then(text => {
+                this.logsContent = text;
+                this.isLoading = false;
+                // Scroll do terminal para o fim após o carregamento
+                this.$nextTick(() => {
+                    const terminal = this.$refs.terminalContainer;
+                    if (terminal) {
+                        terminal.scrollTop = terminal.scrollHeight;
+                    }
+                });
+            })
+            .catch(err => {
+                this.logsContent = '<div class="p-4 text-rose-400 font-mono text-xs">Erro de rede ao carregar os logs do sistema.</div>';
+                this.isLoading = false;
+            });
+        },
+        
+        clearTerminal() {
+            this.logsContent = '<div class="p-4 text-slate-500 font-mono text-xs">Terminal limpo localmente. Clique em Atualizar para buscar novos logs.</div>';
+        },
+        
+        init() {
+            this.loadLogs();
+        }
+    };
+};
+</script>
 
     <!-- Header -->
     <div class="flex justify-between items-center select-none">
