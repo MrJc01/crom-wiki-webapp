@@ -37,21 +37,12 @@ class DefaultController extends Controller
      */
     public function actionIndex(): string
     {
-        $servers = [];
-        $i = 0;
-        while (true) {
-            $host = getenv("VPS{$i}_HOST") ?: ($_ENV["VPS{$i}_HOST"] ?? null);
-            $name = getenv("VPS{$i}_NAME") ?: ($_ENV["VPS{$i}_NAME"] ?? null);
-            if (!$host) {
-                break;
-            }
-            $servers["vps{$i}"] = $name ? "CROM — " . ucfirst($name) : "VPS {$i} ({$host})";
-            $i++;
-        }
-
-        if (empty($servers)) {
-            $servers['localhost'] = 'localhost (Servidor Local)';
-        }
+        $servers = [
+            'crom.me' => 'crom.me (Guardiões)',
+            'vps1.crom.me' => 'vps1.crom.me (Pilares)',
+            'vps2.crom.me' => 'vps2.crom.me (Forja)',
+            'localhost' => 'localhost (Servidor Local)',
+        ];
 
         return $this->render('index', [
             'servers' => $servers
@@ -75,31 +66,13 @@ class DefaultController extends Controller
         header('Connection: keep-alive');
         header('X-Accel-Buffering: no'); // Importante para o Nginx não reter o stream!
 
-        $hostParam = Yii::$app->request->get('host');
-        $userParam = Yii::$app->request->get('user') ?: '';
-        $passParam = Yii::$app->request->get('pass') ?: '';
+        $host = Yii::$app->request->get('host');
+        $user = Yii::$app->request->get('user');
+        $pass = Yii::$app->request->get('pass');
         $id = Yii::$app->request->get('id');
 
-        if (empty($hostParam) || empty($id)) {
+        if (empty($host) || empty($user) || empty($id)) {
             echo "data: " . json_encode(['error' => 'Parâmetros de conexão inválidos.']) . "\n\n";
-            flush();
-            return;
-        }
-
-        // Carrega credenciais do .env caso seja uma VPS cadastrada (ex: vps0, vps1)
-        if (preg_match('/^vps(\d+)$/', $hostParam, $matches)) {
-            $index = $matches[1];
-            $host = getenv("VPS{$index}_HOST") ?: ($_ENV["VPS{$index}_HOST"] ?? '');
-            $user = getenv("VPS{$index}_USER") ?: ($_ENV["VPS{$index}_USER"] ?? '');
-            $pass = getenv("VPS{$index}_PASS") ?: ($_ENV["VPS{$index}_PASS"] ?? '');
-        } else {
-            $host = $hostParam;
-            $user = $userParam;
-            $pass = $passParam;
-        }
-
-        if (empty($host) || empty($user)) {
-            echo "data: " . json_encode(['error' => 'Configurações de host ou usuário SSH inválidas para a VPS selecionada.']) . "\n\n";
             flush();
             return;
         }
