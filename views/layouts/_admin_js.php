@@ -15,6 +15,9 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
         username: '',
         password: '',
         isEditing: false,
+        isGuardiao: false,
+        isPilar: false,
+        isForja: false,
         
         // Formulário de Permissões
         permUserId: '',
@@ -37,6 +40,9 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
             this.username = '';
             this.password = '';
             this.isEditing = false;
+            this.isGuardiao = false;
+            this.isPilar = false;
+            this.isForja = false;
             this.successMsg = '';
             this.errorMsg = '';
             this.showUserModal = true;
@@ -47,6 +53,9 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
             this.username = user.username;
             this.password = '';
             this.isEditing = true;
+            this.isGuardiao = !!user.is_guardiao;
+            this.isPilar = !!user.is_pilar;
+            this.isForja = !!user.is_forja;
             this.successMsg = '';
             this.errorMsg = '';
             this.showUserModal = true;
@@ -68,6 +77,9 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
             formData.append('id', this.userId);
             formData.append('username', this.username);
             formData.append('password', this.password);
+            formData.append('is_guardiao', this.isGuardiao ? '1' : '0');
+            formData.append('is_pilar', this.isPilar ? '1' : '0');
+            formData.append('is_forja', this.isForja ? '1' : '0');
             formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
             
             fetch('<?= Url::to(['/admin/default/save-user']) ?>', {

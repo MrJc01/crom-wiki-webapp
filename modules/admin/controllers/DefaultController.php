@@ -58,6 +58,9 @@ class DefaultController extends Controller
                 'id' => $u->id,
                 'username' => $u->username,
                 'status' => $u->status,
+                'is_guardiao' => (bool)$u->is_guardiao,
+                'is_pilar' => (bool)$u->is_pilar,
+                'is_forja' => (bool)$u->is_forja,
                 'created_at' => date('d/m/Y H:i', $u->created_at),
                 'permissions' => $assignedPerms
             ];
@@ -187,6 +190,10 @@ class DefaultController extends Controller
                 return ['success' => false, 'message' => 'Nome de usuário não pode ser vazio.'];
             }
 
+            $is_guardiao = $request->post('is_guardiao') ? 1 : 0;
+            $is_pilar = $request->post('is_pilar') ? 1 : 0;
+            $is_forja = $request->post('is_forja') ? 1 : 0;
+
             if (empty($id)) {
                 // Novo Usuário
                 if (empty($password)) {
@@ -201,6 +208,9 @@ class DefaultController extends Controller
                 $user = new User();
                 $user->username = $username;
                 $user->password_hash = Yii::$app->security->generatePasswordHash($password);
+                $user->is_guardiao = $is_guardiao;
+                $user->is_pilar = $is_pilar;
+                $user->is_forja = $is_forja;
                 $user->created_at = time();
                 $user->updated_at = time();
                 $user->status = 1; // Ativo
@@ -227,6 +237,9 @@ class DefaultController extends Controller
                     $user->password_hash = Yii::$app->security->generatePasswordHash($password);
                 }
 
+                $user->is_guardiao = $is_guardiao;
+                $user->is_pilar = $is_pilar;
+                $user->is_forja = $is_forja;
                 $user->updated_at = time();
                 if ($user->save(false)) {
                     return ['success' => true, 'message' => 'Usuário atualizado com sucesso.'];

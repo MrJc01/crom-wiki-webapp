@@ -31,7 +31,11 @@ $initials = strtoupper(substr((string)$roomName, 0, 2));
 
             <!-- Imagem do Chat -->
             <div>
-                <?php if ($room['is_group']): ?>
+                <?php if ($room['is_system']): ?>
+                    <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg tracking-wide shadow-inner select-none">
+                        🔔
+                    </div>
+                <?php elseif ($room['is_group']): ?>
                     <div class="h-10 w-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm tracking-wide shadow-inner">
                         👥
                     </div>
@@ -45,7 +49,12 @@ $initials = strtoupper(substr((string)$roomName, 0, 2));
             <!-- Dados do Chat -->
             <div class="min-w-0">
                 <h3 class="text-xs font-bold text-white truncate leading-tight"><?= Html::encode($roomName) ?></h3>
-                <?php if ($room['is_group']): ?>
+                <?php if ($room['is_system']): ?>
+                    <span class="text-[9px] font-semibold text-amber-400 flex items-center gap-1 leading-none mt-0.5 font-mono uppercase tracking-wider">
+                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse flex-shrink-0"></span>
+                        <span>Alertas de Sistema</span>
+                    </span>
+                <?php elseif ($room['is_group']): ?>
                     <span class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider font-mono">
                         <?= count($members) ?> Membros
                     </span>
@@ -120,25 +129,32 @@ $initials = strtoupper(substr((string)$roomName, 0, 2));
 
     <!-- 3. RODAPÉ DE ENVIO DE MENSAGEM (WhatsApp Style Input) -->
     <footer class="p-3 bg-slate-900/40 border-t border-slate-800/80 flex-shrink-0">
-        <form hx-post="<?= Url::to(['/chat/default/send-message', 'roomId' => $room['id']]) ?>"
-              hx-target="#chat-messages-container"
-              hx-swap="innerHTML"
-              hx-on::after-request="if(event.detail.successful) { this.reset(); const container = document.getElementById('chat-messages-container'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100); }"
-              class="flex items-center gap-3">
-            <input type="hidden" name="<?= Yii::$app->request->csrfParam ?>" value="<?= Yii::$app->request->csrfToken ?>">
-            
-            <input type="text" 
-                   name="message" 
-                   required
-                   autocomplete="off"
-                   placeholder="Digite uma mensagem..." 
-                   class="flex-grow bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
+        <?php if ($room['is_system']): ?>
+            <div class="p-3 bg-sky-500/5 border border-sky-500/10 rounded-2xl flex items-center justify-center gap-2 text-sky-400 font-mono text-[9px] font-bold uppercase select-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+                Canal de leitura exclusiva para notificações automáticas do monólito CROM.
+            </div>
+        <?php else: ?>
+            <form hx-post="<?= Url::to(['/chat/default/send-message', 'roomId' => $room['id']]) ?>"
+                  hx-target="#chat-messages-container"
+                  hx-swap="innerHTML"
+                  hx-on::after-request="if(event.detail.successful) { this.reset(); const container = document.getElementById('chat-messages-container'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100); }"
+                  class="flex items-center gap-3">
+                <input type="hidden" name="<?= Yii::$app->request->csrfParam ?>" value="<?= Yii::$app->request->csrfToken ?>">
+                
+                <input type="text" 
+                       name="message" 
+                       required
+                       autocomplete="off"
+                       placeholder="Digite uma mensagem..." 
+                       class="flex-grow bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
 
-            <button type="submit" 
-                    class="h-9 w-9 rounded-xl bg-sky-400 text-slate-950 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-sky-300 hover:shadow-lg hover:shadow-sky-500/10 active:scale-95 transition-all">
-                <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
-            </button>
-        </form>
+                <button type="submit" 
+                        class="h-9 w-9 rounded-xl bg-sky-400 text-slate-950 flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-sky-300 hover:shadow-lg hover:shadow-sky-500/10 active:scale-95 transition-all">
+                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+                </button>
+            </form>
+        <?php endif; ?>
     </footer>
 
 </div>

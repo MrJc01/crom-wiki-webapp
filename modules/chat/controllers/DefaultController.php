@@ -43,7 +43,7 @@ class DefaultController extends Controller
 
         // Query otimizada para pegar salas de chat em que o usuário participa
         $rooms = $db->createCommand("
-            SELECT r.id, r.name, r.is_group, r.invite_code,
+            SELECT r.id, r.name, r.is_group, r.invite_code, r.is_system,
                    (SELECT m.message FROM chat_messages m WHERE m.room_id = r.id ORDER BY m.created_at DESC, m.id DESC LIMIT 1) as last_message,
                    (SELECT m.created_at FROM chat_messages m WHERE m.room_id = r.id ORDER BY m.created_at DESC, m.id DESC LIMIT 1) as last_message_time,
                    (SELECT u.username FROM chat_room_members rm2 JOIN core_users u ON rm2.user_id = u.id WHERE rm2.room_id = r.id AND rm2.user_id != :userId LIMIT 1) as direct_username
@@ -186,6 +186,15 @@ class DefaultController extends Controller
                 ", [':roomId' => $roomId, ':userId' => $userId])->queryScalar();
 
                 if ($isMember) {
+                    // Validar se a sala é de sistema
+                    $isSystem = $db->createCommand("
+                        SELECT is_system FROM chat_rooms WHERE id = :roomId
+                    ", [':roomId' => $roomId])->queryScalar();
+
+                    if ($isSystem) {
+                        throw new ForbiddenHttpException('Você não tem permissão para enviar mensagens em canais de notificações do sistema.');
+                    }
+
                     $db->createCommand()->insert('chat_messages', [
                         'room_id' => $roomId,
                         'sender_id' => $userId,

@@ -109,8 +109,9 @@ $initialRoomId = Yii::$app->request->get('room_id');
                 </div>
             <?php else: ?>
                 <?php foreach ($rooms as $room): 
-                    $roomName = $room['is_group'] ? $room['name'] : $room['direct_username'];
-                    $initials = strtoupper(substr((string)$roomName, 0, 2));
+                    $isSystem = isset($room['is_system']) && (int)$room['is_system'] === 1;
+                    $roomName = $isSystem ? 'Notificações do Sistema' : ($room['is_group'] ? $room['name'] : $room['direct_username']);
+                    $initials = $isSystem ? '🔔' : strtoupper(substr((string)$roomName, 0, 2));
                     
                     // Formata a última mensagem para não quebrar a UI se for convite estruturado
                     $lastMsgDisplay = $room['last_message'];
@@ -129,7 +130,11 @@ $initialRoomId = Yii::$app->request->get('room_id');
                         
                         <!-- Avatar do Chat -->
                         <div class="flex-shrink-0">
-                            <?php if ($room['is_group']): ?>
+                            <?php if ($isSystem): ?>
+                                <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg tracking-wide shadow-inner select-none">
+                                    🔔
+                                </div>
+                            <?php elseif ($room['is_group']): ?>
                                 <div class="h-10 w-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm tracking-wide shadow-inner">
                                     👥
                                 </div>
@@ -139,11 +144,16 @@ $initialRoomId = Yii::$app->request->get('room_id');
                                 </div>
                             <?php endif; ?>
                         </div>
-
+ 
                         <!-- Detalhes do Chat -->
                         <div class="flex-1 min-w-0 space-y-0.5">
                             <div class="flex justify-between items-baseline gap-2">
-                                <h4 class="text-xs font-bold text-white truncate"><?= Html::encode($roomName) ?></h4>
+                                <h4 class="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                                    <?= Html::encode($roomName) ?>
+                                    <?php if ($isSystem): ?>
+                                        <span class="px-1.5 py-0.2 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[8px] font-mono rounded font-extrabold uppercase tracking-wide">Sistema</span>
+                                    <?php endif; ?>
+                                </h4>
                                 <?php if ($room['last_message_time']): ?>
                                     <span class="text-[9px] font-semibold text-slate-500 font-mono"><?= date('H:i', (int)$room['last_message_time']) ?></span>
                                 <?php endif; ?>

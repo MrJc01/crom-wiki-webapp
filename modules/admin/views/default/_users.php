@@ -56,7 +56,22 @@ use yii\helpers\Html;
                         <tr class="hover:bg-slate-900/10 transition duration-200"
                             :class="user.status === 0 ? 'bg-rose-500/5 hover:bg-rose-500/10' : ''">
                             <td class="p-4 pl-6 font-mono text-[10px] text-slate-500" x-text="user.id"></td>
-                            <td class="p-4 font-bold text-white" x-text="user.username"></td>
+                             <td class="p-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="font-bold text-white" x-text="user.username"></span>
+                                    <div class="flex flex-wrap gap-1 mt-1 select-none">
+                                        <template x-if="user.is_guardiao">
+                                            <span class="px-1.5 py-0.2 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[8px] font-mono rounded font-extrabold uppercase">Guardião</span>
+                                        </template>
+                                        <template x-if="user.is_pilar">
+                                            <span class="px-1.5 py-0.2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-mono rounded font-extrabold uppercase">Pilar</span>
+                                        </template>
+                                        <template x-if="user.is_forja">
+                                            <span class="px-1.5 py-0.2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[8px] font-mono rounded font-extrabold uppercase">Forja</span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </td>
                             <td class="p-4 text-slate-500 font-mono text-[10px]" x-text="user.created_at"></td>
                             <td class="p-4">
                                 <div class="flex flex-wrap gap-1">
@@ -142,6 +157,34 @@ use yii\helpers\Html;
                     <template x-if="isEditing">
                         <span class="text-[9px] text-slate-500 block font-semibold">Deixe em branco para manter a senha atual.</span>
                     </template>
+                </div>
+
+                <!-- Checkboxes Premium de Tags de Governança -->
+                <div class="space-y-1.5 pt-1">
+                    <label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest font-mono">Tags de Governança</label>
+                    <div class="p-3 bg-slate-950/40 border border-slate-800 rounded-xl flex items-center justify-between gap-4 select-none">
+                        <label class="flex items-center gap-2 cursor-pointer p-1">
+                            <input type="checkbox" x-model="isGuardiao" class="rounded border-slate-800 text-sky-500 bg-slate-950 h-4.5 w-4.5">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-slate-200">Guardião</span>
+                                <span class="text-[8px] text-slate-500 font-semibold">Infra</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-1">
+                            <input type="checkbox" x-model="isPilar" class="rounded border-slate-800 text-sky-500 bg-slate-950 h-4.5 w-4.5">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-slate-200">Pilar</span>
+                                <span class="text-[8px] text-slate-500 font-semibold">Garante</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-1">
+                            <input type="checkbox" x-model="isForja" class="rounded border-slate-800 text-sky-500 bg-slate-950 h-4.5 w-4.5">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-slate-200">Forja</span>
+                                <span class="text-[8px] text-slate-500 font-semibold">Apps</span>
+                            </div>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="pt-2 flex justify-end gap-2 select-none">
