@@ -8,6 +8,8 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 use app\modules\tickets\models\SupportTicket;
+
+$userId = (int)Yii::$app->user->id;
 ?>
 
 <div class="space-y-6"
