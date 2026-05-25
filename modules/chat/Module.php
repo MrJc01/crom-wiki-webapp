@@ -18,6 +18,7 @@ class Module extends \yii\base\Module
     public function init()
     {
         parent::init();
+    }
 
     /**
      * Envia uma notificação do sistema privada para um usuário específico.
