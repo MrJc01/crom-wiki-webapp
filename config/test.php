@@ -58,6 +58,9 @@ return [
                 'terminal' => 'terminal/default/index',
                 'terminal/stream' => 'terminal/default/stream',
                 'terminal/write' => 'terminal/default/write',
+
+                // Módulo CromIA
+                'cromia' => 'cromia/default/index',
             ],
         ],
         'user' => [
