@@ -399,22 +399,55 @@ class DefaultController extends Controller
             return ['success' => false, 'message' => 'Módulo não encontrado no disco.'];
         }
         
-        $configFile = "{$modulePath}/config.json";
-        $configContent = '{}';
-        if (file_exists($configFile)) {
-            $content = file_get_contents($configFile);
-            if ($content !== false) {
-                $configContent = $content;
+        $schemaFile = "{$modulePath}/config.json";
+        $localFile = "{$modulePath}/config.local.json";
+        
+        $hasSchema = false;
+        $schema = [];
+        if (file_exists($schemaFile)) {
+            $schemaContent = file_get_contents($schemaFile);
+            $decodedSchema = json_decode($schemaContent, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decodedSchema)) {
+                $hasSchema = true;
+                $schema = $decodedSchema;
             }
-        } else {
-            // Cria o arquivo padrão caso não exista
-            file_put_contents($configFile, json_encode(new \stdClass(), JSON_PRETTY_PRINT));
+        }
+        
+        $values = [];
+        if (file_exists($localFile)) {
+            $localContent = file_get_contents($localFile);
+            $decodedValues = json_decode($localContent, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decodedValues)) {
+                $values = $decodedValues;
+            }
+        }
+        
+        // Se temos um schema mas os valores locais estão vazios, preenche com valores padrão se existirem
+        if ($hasSchema && empty($values)) {
+            foreach ($schema as $field) {
+                if (isset($field['name'])) {
+                    $values[$field['name']] = $field['default'] ?? '';
+                }
+            }
+        }
+        
+        // Se não tem schema, retorna o conteúdo bruto de config.local.json (ou cria se vazio) como string para edição livre
+        $rawConfig = '{}';
+        if (!$hasSchema) {
+            if (file_exists($localFile)) {
+                $rawConfig = file_get_contents($localFile);
+            } else {
+                file_put_contents($localFile, json_encode(new \stdClass(), JSON_PRETTY_PRINT));
+            }
         }
         
         return [
             'success' => true,
             'module_id' => $id,
-            'config' => $configContent
+            'has_schema' => $hasSchema,
+            'schema' => $schema,
+            'values' => (object)$values,
+            'raw_config' => $rawConfig
         ];
     }
 
@@ -435,24 +468,41 @@ class DefaultController extends Controller
         
         $request = Yii::$app->request;
         if ($request->isPost) {
+            $localFile = "{$modulePath}/config.local.json";
+            
+            $values = $request->post('values');
             $configRaw = $request->post('config');
             
-            // Valida se é um JSON válido
-            $decoded = json_decode($configRaw, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return ['success' => false, 'message' => 'JSON inválido: ' . json_last_error_msg()];
+            $dataToSave = null;
+            if ($values !== null) {
+                if (is_array($values)) {
+                    $dataToSave = $values;
+                } else {
+                    $decoded = json_decode($values, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $dataToSave = $decoded;
+                    }
+                }
+            } elseif ($configRaw !== null) {
+                $decoded = json_decode($configRaw, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return ['success' => false, 'message' => 'JSON inválido: ' . json_last_error_msg()];
+                }
+                $dataToSave = $decoded;
             }
             
-            $configFile = "{$modulePath}/config.json";
+            if ($dataToSave === null) {
+                return ['success' => false, 'message' => 'Nenhum dado enviado para salvar.'];
+            }
             
             // Formata o JSON de forma legível (pretty print)
-            $formattedJson = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $formattedJson = json_encode($dataToSave, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             
-            if (file_put_contents($configFile, $formattedJson) !== false) {
-                return ['success' => true, 'message' => 'Configurações do módulo salvas com sucesso!'];
+            if (file_put_contents($localFile, $formattedJson) !== false) {
+                return ['success' => true, 'message' => 'Configurações locais do módulo salvas com sucesso em config.local.json!'];
             }
             
-            return ['success' => false, 'message' => 'Não foi possível gravar no arquivo config.json.'];
+            return ['success' => false, 'message' => 'Não foi possível gravar no arquivo config.local.json.'];
         }
         
         return ['success' => false, 'message' => 'Requisição inválida.'];

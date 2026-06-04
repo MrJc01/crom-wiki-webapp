@@ -127,19 +127,60 @@ use yii\helpers\Html;
 
             <form @submit.prevent="saveConfig()" class="space-y-4">
                 
-                <div class="space-y-1.5">
-                    <label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block font-mono">Arquivo config.json (Salvo no disco / Monitorado pelo Git)</label>
-                    <div class="relative">
-                        <textarea x-model="configRaw"
-                                  required
-                                  rows="12"
-                                  class="w-full p-4 bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 rounded-xl text-xs text-slate-200 placeholder-slate-750 focus:outline-none resize-none font-mono leading-relaxed transition"></textarea>
-                        <div class="absolute bottom-3 right-3 text-[8px] font-mono text-slate-650 select-none uppercase tracking-widest">
-                            JSON FORMAT
-                        </div>
+                <!-- FORMULÁRIO DINÂMICO (Caso tenha schema config.json) -->
+                <template x-if="configHasSchema">
+                    <div class="space-y-4 max-h-[350px] overflow-y-auto pr-1">
+                        <template x-for="field in configSchema" :key="field.name">
+                            <div class="space-y-1.5">
+                                <!-- Se for campo boolean/checkbox -->
+                                <template x-if="field.type === 'boolean' || field.type === 'checkbox'">
+                                    <label class="flex items-center gap-3 cursor-pointer p-3 bg-slate-950/40 border border-slate-800/85 rounded-xl hover:border-slate-700/60 transition select-none">
+                                        <input type="checkbox" 
+                                               x-model="configValues[field.name]" 
+                                               class="rounded border-slate-800 text-sky-500 bg-slate-950 h-5 w-5">
+                                        <div class="flex flex-col">
+                                            <span class="text-xs font-bold text-slate-200" x-text="field.label"></span>
+                                            <template x-if="field.description">
+                                                <span class="text-[9px] text-slate-550 font-semibold mt-0.5" x-text="field.description"></span>
+                                            </template>
+                                        </div>
+                                    </label>
+                                </template>
+
+                                <!-- Se for campo de texto comum (text, password, number, etc.) -->
+                                <template x-if="field.type !== 'boolean' && field.type !== 'checkbox'">
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest font-mono" x-text="field.label"></label>
+                                        <input :type="field.type || 'text'" 
+                                               x-model="configValues[field.name]"
+                                               :placeholder="field.placeholder || ''"
+                                               class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
+                                        <template x-if="field.description">
+                                            <span class="text-[9px] text-slate-500 block font-semibold mt-0.5" x-text="field.description"></span>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
                     </div>
-                    <span class="text-[9px] text-slate-500 block font-semibold">Esta configuração é lida diretamente da pasta do módulo. Não está no gitignore, permitindo versionamento Git.</span>
-                </div>
+                </template>
+
+                <!-- EDITOR RAW JSON (Caso NÃO tenha schema) -->
+                <template x-if="!configHasSchema">
+                    <div class="space-y-1.5">
+                        <label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block font-mono">Arquivo config.local.json (Edição Livre / Sem Schema)</label>
+                        <div class="relative">
+                            <textarea x-model="configRaw"
+                                      required
+                                      rows="12"
+                                      class="w-full p-4 bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 rounded-xl text-xs text-slate-200 placeholder-slate-750 focus:outline-none resize-none font-mono leading-relaxed transition"></textarea>
+                            <div class="absolute bottom-3 right-3 text-[8px] font-mono text-slate-650 select-none uppercase tracking-widest">
+                                JSON FORMAT
+                            </div>
+                        </div>
+                        <span class="text-[9px] text-slate-500 block font-semibold">Crie o arquivo config.json no módulo para estruturar essas chaves em um formulário amigável.</span>
+                    </div>
+                </template>
 
                 <div class="pt-2 flex justify-end gap-2 select-none">
                     <button type="button" @click="showConfigModal = false" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800/50 cursor-pointer">Cancelar</button>

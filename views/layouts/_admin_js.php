@@ -304,18 +304,23 @@ window.adminModulesHandler = function(initialModules) {
             this.errorMsg = '';
             this.isSavingConfig = true;
             
-            // Valida JSON localmente antes do envio
-            try {
-                JSON.parse(this.configRaw);
-            } catch(e) {
-                this.errorMsg = 'JSON inválido no editor: ' + e.message;
-                this.isSavingConfig = false;
-                return;
-            }
-            
             const formData = new FormData();
-            formData.append('config', this.configRaw);
             formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
+            
+            if (this.configHasSchema) {
+                // Envia como string JSON do objeto values para manter tipos boolean/number de forma segura
+                formData.append('values', JSON.stringify(this.configValues));
+            } else {
+                // Valida JSON localmente antes do envio
+                try {
+                    JSON.parse(this.configRaw);
+                } catch(e) {
+                    this.errorMsg = 'JSON inválido no editor: ' + e.message;
+                    this.isSavingConfig = false;
+                    return;
+                }
+                formData.append('config', this.configRaw);
+            }
             
             fetch('<?= Url::to(['/admin/default/save-module-config']) ?>?id=' + this.configModuleId, {
                 method: 'POST',

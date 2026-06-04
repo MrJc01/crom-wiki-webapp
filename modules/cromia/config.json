@@ -1,0 +1,30 @@
+[
+  {
+    "name": "api_key",
+    "label": "Chave de API",
+    "type": "password",
+    "description": "Sua chave de acesso segura ao portal CromIA.",
+    "default": ""
+  },
+  {
+    "name": "api_url",
+    "label": "URL do Endpoint",
+    "type": "text",
+    "description": "Endpoint base do gateway de Inteligência Artificial.",
+    "default": "https://api.cromia.run/v1"
+  },
+  {
+    "name": "model_name",
+    "label": "Modelo Padrão",
+    "type": "text",
+    "description": "ID do modelo LLM utilizado para consultas.",
+    "default": "deepseek-chat"
+  },
+  {
+    "name": "enable_logs",
+    "label": "Habilitar Logs SRE",
+    "type": "boolean",
+    "description": "Ativa a telemetria detalhada no app.log.",
+    "default": false
+  }
+]
