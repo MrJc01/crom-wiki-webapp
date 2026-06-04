@@ -84,7 +84,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                         <!-- Lista rápida dos slides como pequenas badges -->
                         <div class="flex flex-wrap gap-1.5 pt-1">
                             <template x-for="(s, idx) in item.slides" :key="idx">
-                                <span class="text-[9px] font-medium bg-slate-900 border border-slate-850 px-2 py-0.5 rounded-lg text-slate-300 flex items-center gap-1">
+                                <span class="text-[9px] font-medium bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-lg text-slate-300 flex items-center gap-1">
                                     <span x-text="s.image_url || '✨'"></span>
                                     <span x-text="s.title || 'Slide ' + (idx+1)"></span>
                                 </span>
@@ -117,7 +117,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
             </template>
         </div>
 
-        <div class="h-48 border border-dashed border-slate-850 rounded-2xl flex flex-col items-center justify-center gap-3 text-slate-500 p-6 select-none bg-slate-950/10"
+        <div class="h-48 border border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-3 text-slate-500 p-6 select-none bg-slate-950/10"
              x-show="sliders.length === 0">
             <i class="material-icons text-4xl text-slate-650">welcome</i>
             <div class="text-center">
@@ -158,7 +158,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                                x-model="formTitle"
                                required
                                placeholder="Ex: Boas-vindas Gerais"
-                               class="w-full bg-slate-950 border border-slate-850 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
+                               class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
                     </div>
                     
                     <div class="space-y-1">
@@ -166,7 +166,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                         <input type="text" 
                                x-model="formBadgeText"
                                placeholder="Ex: Novo, Alerta, Info"
-                               class="w-full bg-slate-950 border border-slate-850 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
+                               class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
                     </div>
                 </div>
 
@@ -177,13 +177,13 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                                x-model="formIcon"
                                required
                                placeholder="Ex: 👋 ou um nome de ícone"
-                               class="w-full bg-slate-950 border border-slate-850 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
+                               class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
                     </div>
 
                     <div class="space-y-1">
                         <label class="text-[9px] font-extrabold text-slate-550 uppercase tracking-widest font-mono">Público-alvo / Regra de Exibição</label>
                         <select x-model="formRequiredRole"
-                                class="w-full bg-slate-950 border border-slate-850 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-slate-300 outline-none font-sans font-semibold transition-all">
+                                class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-slate-300 outline-none font-sans font-semibold transition-all">
                             <option value="all">Livre para todos (Qualquer usuário logado)</option>
                             <option value="membro">Apenas Membros (role is_membro)</option>
                             <option value="new_membro">Apenas Novos Membros (contas criadas &lt; 48h)</option>
@@ -191,17 +191,17 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                     </div>
                 </div>
 
-                <label class="flex items-center gap-3 cursor-pointer p-3.5 bg-slate-950/40 border border-slate-850/85 rounded-xl hover:border-slate-800 transition select-none">
+                <label class="flex items-center gap-3 cursor-pointer p-3.5 bg-slate-950/40 border border-slate-800/80 rounded-xl hover:border-slate-700 transition select-none">
                     <input type="checkbox" 
                            x-model="formIsActive" 
-                           class="rounded border-slate-850 text-sky-500 bg-slate-950 h-5 w-5 focus:ring-0 focus:ring-offset-0">
+                           class="rounded border-slate-800 text-sky-500 bg-slate-950 h-5 w-5 focus:ring-0 focus:ring-offset-0">
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-slate-200">Ativar experiência de imediato</span>
                         <span class="text-[9px] text-slate-500 font-semibold mt-0.5">Se desmarcado, o badge não aparecerá no Swiper e o auto-abrir fica desativado.</span>
                     </div>
                 </label>
 
-                <hr class="border-slate-850">
+                <hr class="border-slate-800">
 
                 <!-- Slides Manager -->
                 <div class="space-y-4">
@@ -212,7 +212,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                         </h4>
                         <button type="button" 
                                 @click="addSlide()"
-                                class="px-3 py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 rounded-xl text-[10px] font-extrabold transition flex items-center gap-1 cursor-pointer">
+                                class="px-3 py-1.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-slate-650 text-slate-200 rounded-xl text-[10px] font-extrabold transition flex items-center gap-1 cursor-pointer">
                             <i class="material-icons text-[12px]">add</i>
                             Adicionar Slide
                         </button>
@@ -221,7 +221,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                     <!-- Lista de Slides a Editar -->
                     <div class="space-y-4 max-h-[300px] overflow-y-auto pr-1">
                         <template x-for="(slide, idx) in formSlides" :key="idx">
-                            <div class="bg-slate-950/60 border border-slate-850/80 rounded-2xl p-4 space-y-4 relative group hover:border-slate-850 transition duration-200">
+                            <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-4 relative group hover:border-slate-800 transition duration-200">
                                 
                                 <!-- Controles do Slide -->
                                 <div class="flex items-center justify-between pb-2 border-b border-slate-900/60 select-none">
@@ -264,7 +264,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                                                x-model="slide.title"
                                                required
                                                placeholder="Ex: Bem-vindo ao CROM"
-                                               class="w-full bg-slate-950 border border-slate-850 focus:border-sky-500 text-[11px] rounded-lg px-3 py-2 text-white outline-none font-sans font-semibold">
+                                               class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 text-[11px] rounded-lg px-3 py-2 text-white outline-none font-sans font-semibold">
                                     </div>
                                     <div class="space-y-1">
                                         <label class="text-[8px] font-extrabold text-slate-550 uppercase tracking-widest font-mono">Emoji / Ícone do Slide</label>
@@ -272,7 +272,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                                                x-model="slide.image_url"
                                                required
                                                placeholder="Ex: 👋 ou URL da imagem"
-                                               class="w-full bg-slate-950 border border-slate-850 focus:border-sky-500 text-[11px] rounded-lg px-3 py-2 text-white outline-none font-sans font-semibold">
+                                               class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 text-[11px] rounded-lg px-3 py-2 text-white outline-none font-sans font-semibold">
                                     </div>
                                 </div>
 
@@ -283,14 +283,14 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                                                   required
                                                   rows="2"
                                                   placeholder="Descreva o conteúdo deste slide..."
-                                                  class="w-full bg-slate-950 border border-slate-850 focus:border-sky-500 text-[11px] rounded-lg px-3 py-2 text-white outline-none font-sans font-semibold resize-none"></textarea>
+                                                  class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 text-[11px] rounded-lg px-3 py-2 text-white outline-none font-sans font-semibold resize-none"></textarea>
                                     </div>
                                     <div class="space-y-1">
                                         <label class="text-[8px] font-extrabold text-slate-550 uppercase tracking-widest font-mono">Estilo do Gradiente (Tailwind CSS)</label>
                                         <input type="text" 
                                                x-model="slide.gradiente"
                                                placeholder="Ex: from-sky-500/20 to-indigo-500/0"
-                                               class="w-full bg-slate-950 border border-slate-850 focus:border-sky-500 text-[11px] rounded-lg px-3 py-2 text-white outline-none font-sans font-semibold">
+                                               class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 text-[11px] rounded-lg px-3 py-2 text-white outline-none font-sans font-semibold">
                                         <span class="text-[8px] text-slate-550 block leading-tight font-mono">Exemplos: from-sky-500/20 to-indigo-500/0 ou from-emerald-500/20 to-teal-500/0</span>
                                     </div>
                                 </div>
@@ -300,7 +300,7 @@ $this->title = 'Configuração de Boas-vindas & Badges';
                     </div>
 
                     <div x-show="formSlides.length === 0" 
-                         class="p-4 border border-slate-850 bg-slate-950/20 rounded-xl text-center text-slate-550 text-[10px]">
+                         class="p-4 border border-slate-800 bg-slate-950/20 rounded-xl text-center text-slate-550 text-[10px]">
                         Nenhum slide adicionado. Clique em "Adicionar Slide" acima.
                     </div>
                 </div>

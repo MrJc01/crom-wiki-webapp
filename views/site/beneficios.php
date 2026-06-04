@@ -413,7 +413,7 @@ $beneficios = [
                     </div>
                     <div class="text-[10px] text-sky-400 font-bold border-t border-slate-900 pt-2 flex items-center gap-1.5 leading-relaxed">
                         <span>🤖</span>
-                        <span>Pressione <code class="bg-slate-950 px-1.5 py-0.5 rounded border border-slate-850 text-slate-300 font-mono text-[9px]">c</code> para chamar a Rosa IA.</span>
+                        <span>Pressione <code class="bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800 text-slate-300 font-mono text-[9px]">c</code> para chamar a Rosa IA.</span>
                     </div>
                 </div>
 

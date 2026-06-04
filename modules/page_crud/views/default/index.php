@@ -428,7 +428,7 @@ $this->title = 'Páginas Documentadas — Central Modular';
                                             <span class="text-[8px] font-bold text-sky-400 bg-sky-500/10 border border-sky-500/20 px-1.5 py-0.5 rounded-full uppercase font-mono" title="Público (Acesso livre sem login)">🔓 Público</span>
                                         </template>
                                         <template x-if="page.is_public !== 1">
-                                            <span class="text-[8px] font-bold text-slate-500 bg-slate-900 border border-slate-850 px-1.5 py-0.5 rounded-full uppercase font-mono" title="Privado (Exige login)">🔒 Privado</span>
+                                            <span class="text-[8px] font-bold text-slate-500 bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded-full uppercase font-mono" title="Privado (Exige login)">🔒 Privado</span>
                                         </template>
                                         <span class="text-xs" x-text="getCategoryIcon(page.category)"></span>
                                     </div>

@@ -950,7 +950,7 @@ try {
                     <h3 class="text-sm font-bold text-slate-200">Palavra do Dia</h3>
                 </div>
                 
-                <div class="bg-gradient-to-br from-slate-950/60 to-slate-900 border border-slate-850 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
+                <div class="bg-gradient-to-br from-slate-950/60 to-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
                     <div class="absolute -right-6 -bottom-6 w-16 h-16 bg-amber-500/5 rounded-full blur-md group-hover:scale-150 transition duration-500"></div>
                     <p class="text-xs text-slate-350 leading-relaxed font-sans italic">
                         "<?= htmlspecialchars($dashboard['projetos_hook']['subtitulo']) ?>"
@@ -984,13 +984,13 @@ try {
                 
                 <div class="space-y-3">
                     <?php foreach ($dashboard['beneficios_preview'] as $previewItem): ?>
-                        <div class="bg-slate-950/40 border border-slate-850 hover:border-slate-750 p-4 rounded-2xl transition duration-200 flex flex-col gap-2 relative overflow-hidden group">
+                        <div class="bg-slate-950/40 border border-slate-800 hover:border-slate-700 p-4 rounded-2xl transition duration-200 flex flex-col gap-2 relative overflow-hidden group">
                             <div class="flex items-start justify-between gap-1">
                                 <h4 class="text-xs font-bold text-slate-200 line-clamp-1">
                                     <?= htmlspecialchars($previewItem['titulo']) ?>
                                 </h4>
                                 <?php if (isset($previewItem['tag'])): ?>
-                                    <span class="text-[8px] uppercase font-mono font-extrabold px-1.5 py-0.2 rounded bg-slate-850 border border-slate-800 text-slate-550 flex-shrink-0">
+                                    <span class="text-[8px] uppercase font-mono font-extrabold px-1.5 py-0.2 rounded bg-slate-900 border border-slate-800 text-slate-500 flex-shrink-0">
                                         <?= htmlspecialchars($previewItem['tag']) ?>
                                     </span>
                                 <?php endif; ?>
@@ -1109,7 +1109,7 @@ try {
                             <span class="text-slate-400 font-mono">Uso de CPU</span>
                             <span class="text-emerald-400 font-mono" x-text="serverCpu + '%'"></span>
                         </div>
-                        <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-850">
+                        <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
                             <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-1000"
                                  :style="{ width: serverCpu + '%' }"></div>
                         </div>
@@ -1121,7 +1121,7 @@ try {
                             <span class="text-slate-400 font-mono">Memória RAM</span>
                             <span class="text-sky-400 font-mono" x-text="serverRam + '% (4.2GB / 8GB)'"></span>
                         </div>
-                        <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-850">
+                        <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
                             <div class="h-full bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full"
                                  :style="{ width: serverRam + '%' }"></div>
                         </div>
@@ -1133,14 +1133,14 @@ try {
                             <span class="text-slate-400 font-mono">Armazenamento</span>
                             <span class="text-amber-400 font-mono" x-text="serverDisk + '% (68GB / 120GB)'"></span>
                         </div>
-                        <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-850">
+                        <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
                             <div class="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
                                  :style="{ width: serverDisk + '%' }"></div>
                         </div>
                     </div>
 
                     <!-- Network Ping -->
-                    <div class="flex items-center justify-between bg-slate-950/40 border border-slate-850 p-2.5 rounded-xl">
+                    <div class="flex items-center justify-between bg-slate-950/40 border border-slate-800 p-2.5 rounded-xl">
                         <span class="text-[10px] font-bold text-slate-400 font-mono">Latência de Rede</span>
                         <div class="flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>

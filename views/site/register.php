@@ -43,7 +43,7 @@ $this->title = 'CROM — Registro de Novo Membro';
             <!-- Grid de Recursos e Benefícios -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4">
                 <!-- Benefício 1 -->
-                <div class="bg-slate-900/30 border border-slate-850 p-5 rounded-2xl space-y-2 hover:border-slate-800 transition duration-300">
+                <div class="bg-slate-900/30 border border-slate-800 p-5 rounded-2xl space-y-2 hover:border-slate-700 transition duration-300">
                     <div class="text-xl">🖥️</div>
                     <h4 class="font-bold text-slate-200 text-xs uppercase tracking-wider">VPS Dedicada</h4>
                     <p class="text-[11px] text-slate-500 leading-relaxed">
@@ -52,7 +52,7 @@ $this->title = 'CROM — Registro de Novo Membro';
                 </div>
 
                 <!-- Benefício 2 -->
-                <div class="bg-slate-900/30 border border-slate-850 p-5 rounded-2xl space-y-2 hover:border-slate-800 transition duration-300">
+                <div class="bg-slate-900/30 border border-slate-800 p-5 rounded-2xl space-y-2 hover:border-slate-700 transition duration-300">
                     <div class="text-xl">🤖</div>
                     <h4 class="font-bold text-slate-200 text-xs uppercase tracking-wider">CromIA API Gateway</h4>
                     <p class="text-[11px] text-slate-500 leading-relaxed">
@@ -61,7 +61,7 @@ $this->title = 'CROM — Registro de Novo Membro';
                 </div>
 
                 <!-- Benefício 3 -->
-                <div class="bg-slate-900/30 border border-slate-850 p-5 rounded-2xl space-y-2 hover:border-slate-800 transition duration-300">
+                <div class="bg-slate-900/30 border border-slate-800 p-5 rounded-2xl space-y-2 hover:border-slate-700 transition duration-300">
                     <div class="text-xl">📜</div>
                     <h4 class="font-bold text-slate-200 text-xs uppercase tracking-wider">Contrato de Cuidado</h4>
                     <p class="text-[11px] text-slate-500 leading-relaxed">
@@ -70,7 +70,7 @@ $this->title = 'CROM — Registro de Novo Membro';
                 </div>
 
                 <!-- Benefício 4 -->
-                <div class="bg-slate-900/30 border border-slate-850 p-5 rounded-2xl space-y-2 hover:border-slate-800 transition duration-300">
+                <div class="bg-slate-900/30 border border-slate-800 p-5 rounded-2xl space-y-2 hover:border-slate-700 transition duration-300">
                     <div class="text-xl">⚔️</div>
                     <h4 class="font-bold text-slate-200 text-xs uppercase tracking-wider">Autonomia Radical</h4>
                     <p class="text-[11px] text-slate-500 leading-relaxed">
@@ -84,7 +84,7 @@ $this->title = 'CROM — Registro de Novo Membro';
                 <span class="text-lg mt-0.5">⚠️</span>
                 <div>
                     <h5 class="text-xs font-bold text-amber-400">Restrição Inicial de Membro</h5>
-                    <p class="text-[10px] text-slate-450 mt-1 leading-relaxed">
+                    <p class="text-[10px] text-slate-455 mt-1 leading-relaxed">
                         Ao se cadastrar, você ingressará na camada de <strong>Membro comum</strong>. Acesso a recursos avançados (como servidores SSH, Central de Deploy e API de IA) exige aprovação manual dos Guardiões da CROM.
                     </p>
                 </div>
@@ -130,7 +130,7 @@ $this->title = 'CROM — Registro de Novo Membro';
                 'fieldConfig' => [
                     'template' => "{label}\n{input}\n{error}",
                     'labelOptions' => ['class' => 'block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest font-mono mb-1'],
-                    'inputOptions' => ['class' => 'w-full bg-slate-900 border border-slate-850 rounded-xl p-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all font-sans text-xs font-semibold'],
+                    'inputOptions' => ['class' => 'w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all font-sans text-xs font-semibold'],
                     'errorOptions' => ['class' => 'text-[10px] text-rose-400 mt-1 font-bold'],
                 ],
             ]); ?>
