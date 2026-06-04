@@ -11,6 +11,8 @@ use yii\web\NotFoundHttpException;
 use yii\helpers\FileHelper;
 use app\modules\wiki\models\WikiPagesCache;
 use app\modules\wiki\models\WikiLiveSessions;
+use app\modules\wiki\models\WikiGithubAuth;
+use app\modules\wiki\components\GithubClient;
 use app\models\User;
 
 class DefaultController extends Controller
@@ -117,6 +119,7 @@ class DefaultController extends Controller
         $path = $request->post('filepath') ?: $request->get('filepath');
         $content = $request->post('markdown_content') ?: $request->get('markdown_content');
         $adminId = $request->post('admin_id');
+        $commitGithub = (bool)$request->post('commit_github');
 
         if (empty($path)) {
             return ['success' => false, 'message' => 'Caminho do arquivo não fornecido.'];
@@ -165,11 +168,47 @@ class DefaultController extends Controller
             }
         }
 
-        // Atualiza os metadados e conteúdo
+        // Se o usuário optou por enviar para o GitHub
+        if ($commitGithub) {
+            $userId = Yii::$app->user->id;
+            $authModel = WikiGithubAuth::findOne(['user_id' => $userId]);
+            if (!$authModel) {
+                return [
+                    'success' => false,
+                    'message' => 'Sua conta não está conectada ao GitHub. Por favor, conecte-a primeiro no painel lateral.'
+                ];
+            }
+
+            $secretKey = getenv('WIKI_SECRET_KEY') ?: (Yii::$app->request->cookieValidationKey ?: 'default_secret_key_32_chars_long_!!');
+            $decryptedToken = $authModel->getDecryptedAccessToken($secretKey);
+
+            if (empty($decryptedToken)) {
+                return [
+                    'success' => false,
+                    'message' => 'Token de acesso do GitHub inválido ou expirado. Tente reconectar sua conta.'
+                ];
+            }
+
+            $owner = getenv('GITHUB_REPO_OWNER') ?: 'MrJc01';
+            $repo = getenv('GITHUB_REPO_NAME') ?: 'crom-wiki';
+            $branch = getenv('GITHUB_REPO_BRANCH') ?: 'main';
+            $commitMessage = "wiki: atualiza " . basename($path) . " por @" . $authModel->gh_username;
+
+            // Envia via API do GitHub
+            $ghResult = GithubClient::createOrUpdateFile($decryptedToken, $owner, $repo, $path, $content, $commitMessage, $branch);
+            if (!$ghResult) {
+                return [
+                    'success' => false,
+                    'message' => 'Falha ao enviar o commit ao GitHub. Verifique as permissões de escrita do repositório ou seu token.'
+                ];
+            }
+        }
+
+        // Atualiza os metadados e conteúdo locais
         $page->content = $content;
         $page->last_synced_at = time();
         $page->sha = md5($content);
-        
+
         if (!empty($adminId)) {
             $page->admin_id = (int)$adminId;
         }
@@ -194,9 +233,14 @@ class DefaultController extends Controller
                 // Silencia se for erro de escrita de disco e retorna sucesso no banco
             }
 
+            $successMsg = $isNew ? 'Página criada e sincronizada com sucesso!' : 'Página salva e sincronizada com sucesso!';
+            if ($commitGithub) {
+                $successMsg .= ' (Commit enviado ao GitHub)';
+            }
+
             return [
                 'success' => true,
-                'message' => $isNew ? 'Página criada e sincronizada com sucesso!' : 'Página salva e sincronizada com sucesso!',
+                'message' => $successMsg,
                 'title' => $page->title,
                 'path' => $page->path
             ];

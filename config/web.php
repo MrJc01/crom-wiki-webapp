@@ -63,6 +63,10 @@ $config = [
                 'comunidades' => 'site/comunidades',
                 'aprendizado' => 'site/aprendizado',
                 'wiki' => 'wiki/default/index',
+                'wiki/auth/login' => 'wiki/auth/login',
+                'wiki/auth/callback' => 'wiki/auth/callback',
+                'wiki/auth/status' => 'wiki/auth/status',
+                'wiki/auth/disconnect' => 'wiki/auth/disconnect',
                 
                 // Módulo page_crud
                 'p' => 'page_crud/default/index',

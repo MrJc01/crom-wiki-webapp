@@ -10,17 +10,24 @@ $activeAppsJson = [];
 foreach ($modules as $mod) {
     $alpineId = $mod['id'] === 'app-wiki' ? 'wiki' : $mod['id'];
     $hasPermission = empty($mod['required_permission']) || Yii::$app->user->can($mod['required_permission']);
+    
+    $isWiki = ($mod['id'] === 'wiki' || $mod['id'] === 'app-wiki');
+    $name = $isWiki ? 'Wiki Interna (GitOps Engine)' : $mod['name'];
+    $icon = $isWiki 
+        ? '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>' 
+        : $mod['icon'];
+
     $activeAppsJson[] = [
         'id' => $mod['id'],
         'alpineId' => $alpineId,
-        'name' => $mod['name'],
+        'name' => $name,
         'entry_point' => $mod['entry_point'],
-        'icon' => $mod['icon'],
+        'icon' => $icon,
         'required_permission' => $mod['required_permission'] ?: '',
         'has_permission' => $hasPermission,
         'category' => 'Produtividade', // Categoria padrão para módulos ativos
         'status' => 'Ativo',
-        'description' => $mod['id'] === 'wiki' || $mod['id'] === 'app-wiki' 
+        'description' => $isWiki 
             ? 'Wiki colaborativa GitOps descentralizada. Crie e organize páginas Markdown com atribuição de criadores e administradores de forma integrada.'
             : 'Módulo de aplicação isolado do sistema integrado dinamicamente via barramento de eventos globais do monólito.'
     ];

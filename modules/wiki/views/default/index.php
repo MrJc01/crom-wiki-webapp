@@ -57,193 +57,7 @@ if (!function_exists('renderWikiTree')) {
 ?>
 
 <div class="flex flex-col md:flex-row h-full w-full bg-slate-950 text-slate-100 border border-slate-800/40 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm"
-     x-data="{
-        currentUser: {
-            id: <?= (int)Yii::$app->user->id ?>,
-            username: <?= json_encode(Yii::$app->user->identity->username) ?>,
-            isAdmin: <?= Yii::$app->user->can('admin-access') ? 'true' : 'false' ?>
-        },
-        canManage() {
-            if (this.currentUser.isAdmin) return true;
-            if (this.createdBy === this.currentUser.username) return true;
-            return this.adminId !== null && parseInt(this.adminId) === this.currentUser.id;
-        },
-        activeFile: '',
-        fileTitle: '',
-        fileContent: '',
-        lastSynced: '',
-        createdBy: '',
-        adminId: '',
-        adminName: '',
-        editing: false,
-        creating: false,
-        saving: false,
-        successMsg: '',
-        errMsg: '',
-        users: [],
-        
-        // Dados para Criação de Nova Página
-        newFilePath: '',
-        newFileContent: '# 📝 Nova Página\n\nDigite o conteúdo em Markdown aqui.',
-        newFileAdminId: '',
-        
-        // Inicializador
-        init() {
-            this.loadUsers();
-        },
-        
-        // Carrega a lista de usuários ativos para administradores
-        loadUsers() {
-            fetch('<?= Url::to(['/wiki/default/users-list']) ?>')
-                .then(res => res.json())
-                .then(data => {
-                    this.users = data;
-                })
-                .catch(err => {
-                    console.error('Erro ao buscar lista de usuários.');
-                });
-        },
-        
-        // Carrega arquivo do backend
-        loadFile(path) {
-            this.activeFile = path;
-            this.editing = false;
-            this.creating = false;
-            this.successMsg = '';
-            this.errMsg = '';
-            
-            fetch('<?= Url::to(['/wiki/default/view']) ?>?path=' + encodeURIComponent(path))
-                .then(response => response.json())
-                .then(data => {
-                    this.fileTitle = data.title;
-                    this.fileContent = data.content;
-                    this.lastSynced = data.last_synced_at;
-                    this.createdBy = data.created_by;
-                    this.adminId = data.admin_id || '';
-                    this.adminName = data.admin_name;
-                    
-                    // Dispara renderização imediata do markdown
-                    this.$nextTick(() => {
-                        this.renderMarkdown();
-                    });
-                })
-                .catch(err => {
-                    this.errMsg = 'Erro ao ler arquivo do servidor.';
-                });
-        },
-        
-        // Renderiza o markdown bruto para HTML com marked.js
-        renderMarkdown() {
-            const el = document.getElementById('markdown-preview');
-            if (el) {
-                el.innerHTML = marked.parse(this.fileContent || '');
-                if (window.addCopyButtonsToPreElements) {
-                    window.addCopyButtonsToPreElements(el);
-                }
-            }
-        },
-        
-        // Abre formulário para Criar Nova Página
-        openCreateForm() {
-            this.creating = true;
-            this.editing = false;
-            this.activeFile = 'criar-nova-pagina';
-            this.fileTitle = 'Criar Nova Página';
-            this.newFilePath = '';
-            this.newFileContent = '# 📝 Nova Página\n\nDigite o conteúdo em Markdown aqui.';
-            this.newFileAdminId = '';
-            this.successMsg = '';
-            this.errMsg = '';
-        },
-        
-        // Salva arquivo (Edição de existente)
-        saveFile() {
-            this.saving = true;
-            this.successMsg = '';
-            this.errMsg = '';
-            
-            const formData = new FormData();
-            formData.append('filepath', this.activeFile);
-            formData.append('markdown_content', this.fileContent);
-            if (this.adminId) {
-                formData.append('admin_id', this.adminId);
-            }
-            
-            // Adiciona o token CSRF de segurança do Yii2
-            formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
-            
-            fetch('<?= Url::to(['/wiki/default/save']) ?>', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                this.saving = false;
-                if (data.success) {
-                    this.successMsg = data.message;
-                    this.fileTitle = data.title;
-                    this.editing = false;
-                    this.renderMarkdown();
-                    
-                    // Atualiza metadados
-                    this.loadFile(this.activeFile);
-                    
-                    // Autoclose alert depois de 3 segundos
-                    setTimeout(() => { this.successMsg = ''; }, 3000);
-                } else {
-                    this.errMsg = data.message;
-                }
-            })
-            .catch(err => {
-                this.saving = false;
-                this.errMsg = 'Falha de comunicação com o servidor.';
-            });
-        },
-        
-        // Cria Nova Página no servidor
-        createPage() {
-            if (!this.newFilePath) {
-                this.errMsg = 'O caminho relativo do arquivo é obrigatório.';
-                return;
-            }
-            
-            this.saving = true;
-            this.successMsg = '';
-            this.errMsg = '';
-            
-            const formData = new FormData();
-            formData.append('filepath', this.newFilePath);
-            formData.append('markdown_content', this.newFileContent);
-            if (this.newFileAdminId) {
-                formData.append('admin_id', this.newFileAdminId);
-            }
-            
-            formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
-            
-            fetch('<?= Url::to(['/wiki/default/save']) ?>', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                this.saving = false;
-                if (data.success) {
-                    this.successMsg = data.message;
-                    
-                    // Força a recarga para atualizar a árvore com o novo item
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
-                } else {
-                    this.errMsg = data.message;
-                }
-            })
-            .catch(err => {
-                this.saving = false;
-                this.errMsg = 'Erro de rede ou permissão ao criar página.';
-            });
-        }
-     }">
+     x-data="wikiApp()">
     
     <!-- LADO ESQUERDO: Árvore de Diretórios (25% no desktop, full/auto no mobile) -->
     <div class="w-full md:w-80 border-b md:border-b-0 md:border-r border-slate-800/80 bg-slate-900/20 p-4 flex flex-col justify-between flex-shrink-0 select-none">
@@ -284,6 +98,40 @@ if (!function_exists('renderWikiTree')) {
                 </svg>
                 🔄 Atualizar Base (Git Pull)
             </button>
+        </div>
+
+        <!-- Painel de Conexão do GitHub -->
+        <div class="pt-4 border-t border-slate-900 flex-shrink-0 mt-4 space-y-2 select-none">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Integração GitHub</span>
+                <span class="px-2 py-0.5 bg-slate-950 text-slate-400 border border-slate-800 text-[10px] font-mono rounded-full font-bold">OAuth</span>
+            </div>
+            
+            <template x-if="github.connected">
+                <div class="space-y-2">
+                    <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
+                        <div class="min-w-0 flex-1 pr-2">
+                            <div class="text-xs font-bold text-sky-400 truncate">@<span x-text="github.username"></span></div>
+                            <div class="text-[9px] text-slate-500 font-mono truncate" x-text="github.repo"></div>
+                        </div>
+                        <span class="text-xs flex-shrink-0">🟢</span>
+                    </div>
+                    <a href="<?= Url::to(['/wiki/auth/disconnect']) ?>"
+                       class="w-full bg-rose-500/10 border border-rose-500/20 hover:border-rose-500/40 text-rose-400 hover:text-rose-300 text-xs py-2 px-3 rounded-xl transition duration-300 flex items-center justify-center gap-1.5 font-bold shadow-md shadow-rose-950/20">
+                        Desconectar GitHub
+                    </a>
+                </div>
+            </template>
+            
+            <template x-if="!github.connected">
+                <a href="<?= Url::to(['/wiki/auth/login']) ?>"
+                   class="w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs py-2.5 px-3 rounded-xl transition duration-300 flex items-center justify-center gap-2 font-bold shadow-md shadow-sky-950/20">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.167 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.164 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+                    </svg>
+                    Conectar com GitHub
+                </a>
+            </template>
         </div>
     </div>
 
@@ -362,19 +210,29 @@ if (!function_exists('renderWikiTree')) {
                               placeholder="# Digite seu Markdown aqui..."></textarea>
                 </div>
 
-                <div class="flex justify-end gap-2 pt-4 border-t border-slate-900 select-none">
-                    <button type="button" @click="creating = false; activeFile = '';" class="py-2 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 text-xs rounded-xl font-bold transition">Cancelar</button>
-                    <button type="button" @click="createPage()" 
-                            :disabled="saving"
-                            class="py-2 px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs rounded-xl font-bold shadow-lg shadow-emerald-600/15 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
-                        <template x-if="saving">
-                            <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+                <div class="flex items-center justify-between pt-4 border-t border-slate-900 select-none">
+                    <div>
+                        <template x-if="github.connected">
+                            <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300 hover:text-slate-100 transition">
+                                <input type="checkbox" x-model="commitGithub" class="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-slate-950 w-4 h-4">
+                                <span>🚀 Enviar commit para o GitHub (<span class="font-mono text-emerald-400 text-[10px]" x-text="github.repo"></span>)</span>
+                            </label>
                         </template>
-                        <span x-text="saving ? 'Salvando...' : '🚀 Criar Página Wiki'"></span>
-                    </button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" @click="creating = false; activeFile = '';" class="py-2 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 text-xs rounded-xl font-bold transition">Cancelar</button>
+                        <button type="button" @click="createPage()" 
+                                :disabled="saving"
+                                class="py-2 px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs rounded-xl font-bold shadow-lg shadow-emerald-600/15 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
+                            <template x-if="saving">
+                                <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </template>
+                            <span x-text="saving ? 'Salvando...' : '🚀 Criar Página Wiki'"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -465,19 +323,29 @@ if (!function_exists('renderWikiTree')) {
                         </div>
                     </div>
                     
-                    <div class="mt-4 flex justify-end gap-2 pt-4 border-t border-slate-900 flex-shrink-0 select-none">
-                        <button type="button" @click="editing = false; renderMarkdown();" class="py-2 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 text-xs rounded-xl font-bold transition">Cancelar</button>
-                        <button type="button" @click="saveFile()" 
-                                :disabled="saving"
-                                class="py-2 px-5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs rounded-xl font-bold shadow-lg shadow-sky-600/15 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
-                            <template x-if="saving">
-                                <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
+                    <div class="mt-4 flex items-center justify-between pt-4 border-t border-slate-900 flex-shrink-0 select-none">
+                        <div>
+                            <template x-if="github.connected">
+                                <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300 hover:text-slate-100 transition">
+                                    <input type="checkbox" x-model="commitGithub" class="rounded border-slate-800 bg-slate-950 text-sky-500 focus:ring-sky-500/20 focus:ring-offset-slate-950 w-4 h-4">
+                                    <span>🚀 Enviar commit para o GitHub (<span class="font-mono text-sky-400 text-[10px]" x-text="github.repo"></span>)</span>
+                                </label>
                             </template>
-                            <span x-text="saving ? 'Salvando...' : '🚀 Salvar Alterações'"></span>
-                        </button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" @click="editing = false; renderMarkdown();" class="py-2 px-4 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 text-xs rounded-xl font-bold transition">Cancelar</button>
+                            <button type="button" @click="saveFile()" 
+                                    :disabled="saving"
+                                    class="py-2 px-5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs rounded-xl font-bold shadow-lg shadow-sky-600/15 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
+                                <template x-if="saving">
+                                    <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </template>
+                                <span x-text="saving ? 'Salvando...' : '🚀 Salvar Alterações'"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -534,3 +402,212 @@ if (!function_exists('renderWikiTree')) {
     to { transform: rotate(360deg); }
 }
 </style>
+
+<script>
+function wikiApp() {
+    return {
+        currentUser: {
+            id: <?= (int)Yii::$app->user->id ?>,
+            username: <?= json_encode(Yii::$app->user->identity->username) ?>,
+            isAdmin: <?= Yii::$app->user->can('admin-access') ? 'true' : 'false' ?>
+        },
+        canManage() {
+            if (this.currentUser.isAdmin) return true;
+            if (this.createdBy === this.currentUser.username) return true;
+            return this.adminId !== null && parseInt(this.adminId) === this.currentUser.id;
+        },
+        activeFile: '',
+        fileTitle: '',
+        fileContent: '',
+        lastSynced: '',
+        createdBy: '',
+        adminId: '',
+        adminName: '',
+        editing: false,
+        creating: false,
+        saving: false,
+        successMsg: '',
+        errMsg: '',
+        users: [],
+        github: { connected: false, username: '', repo: '' },
+        commitGithub: false,
+        
+        // Dados para Criação de Nova Página
+        newFilePath: '',
+        newFileContent: '# 📝 Nova Página\n\nDigite o conteúdo em Markdown aqui.',
+        newFileAdminId: '',
+        
+        // Inicializador
+        init() {
+            this.loadUsers();
+            this.loadGithubStatus();
+        },
+        
+        // Carrega a lista de usuários ativos para administradores
+        loadUsers() {
+            fetch('<?= Url::to(['/wiki/default/users-list']) ?>')
+                .then(res => res.json())
+                .then(data => {
+                    this.users = data;
+                })
+                .catch(err => {
+                    console.error('Erro ao buscar lista de usuários.');
+                });
+        },
+        
+        // Carrega status da conexão GitHub
+        loadGithubStatus() {
+            fetch('<?= Url::to(['/wiki/auth/status']) ?>')
+                .then(res => res.json())
+                .then(data => {
+                    this.github = data;
+                })
+                .catch(err => {
+                    console.error('Erro ao buscar status do GitHub.');
+                });
+        },
+        
+        // Carrega arquivo do backend
+        loadFile(path) {
+            this.activeFile = path;
+            this.editing = false;
+            this.creating = false;
+            this.successMsg = '';
+            this.errMsg = '';
+            
+            fetch('<?= Url::to(['/wiki/default/view']) ?>?path=' + encodeURIComponent(path))
+                .then(response => response.json())
+                .then(data => {
+                    this.fileTitle = data.title;
+                    this.fileContent = data.content;
+                    this.lastSynced = data.last_synced_at;
+                    this.createdBy = data.created_by;
+                    this.adminId = data.admin_id || '';
+                    this.adminName = data.admin_name;
+                    
+                    // Dispara renderização imediata do markdown
+                    this.$nextTick(() => {
+                        this.renderMarkdown();
+                    });
+                })
+                .catch(err => {
+                    this.errMsg = 'Erro ao ler arquivo do servidor.';
+                });
+        },
+        
+        // Renderiza o markdown bruto para HTML com marked.js
+        renderMarkdown() {
+            const el = document.getElementById('markdown-preview');
+            if (el) {
+                el.innerHTML = marked.parse(this.fileContent || '');
+                if (window.addCopyButtonsToPreElements) {
+                    window.addCopyButtonsToPreElements(el);
+                }
+            }
+        },
+        
+        // Abre formulário para Criar Nova Página
+        openCreateForm() {
+            this.creating = true;
+            this.editing = false;
+            this.activeFile = 'criar-nova-pagina';
+            this.fileTitle = 'Criar Nova Página';
+            this.newFilePath = '';
+            this.newFileContent = '# 📝 Nova Página\n\nDigite o conteúdo em Markdown aqui.';
+            this.newFileAdminId = '';
+            this.successMsg = '';
+            this.errMsg = '';
+        },
+        
+        // Salva arquivo (Edição de existente)
+        saveFile() {
+            this.saving = true;
+            this.successMsg = '';
+            this.errMsg = '';
+            
+            const formData = new FormData();
+            formData.append('filepath', this.activeFile);
+            formData.append('markdown_content', this.fileContent);
+            formData.append('commit_github', this.commitGithub ? '1' : '0');
+            if (this.adminId) {
+                formData.append('admin_id', this.adminId);
+            }
+            
+            // Adiciona o token CSRF de segurança do Yii2
+            formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
+            
+            fetch('<?= Url::to(['/wiki/default/save']) ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.saving = false;
+                if (data.success) {
+                    this.successMsg = data.message;
+                    this.fileTitle = data.title;
+                    this.editing = false;
+                    this.renderMarkdown();
+                    
+                    // Atualiza metadados
+                    this.loadFile(this.activeFile);
+                    
+                    // Autoclose alert depois de 3 segundos
+                    setTimeout(() => { this.successMsg = ''; }, 3000);
+                } else {
+                    this.errMsg = data.message;
+                }
+            })
+            .catch(err => {
+                this.saving = false;
+                this.errMsg = 'Falha de comunicação com o servidor.';
+            });
+        },
+        
+        // Cria Nova Página no servidor
+        createPage() {
+            if (!this.newFilePath) {
+                this.errMsg = 'O caminho relativo do arquivo é obrigatório.';
+                return;
+            }
+            
+            this.saving = true;
+            this.successMsg = '';
+            this.errMsg = '';
+            
+            const formData = new FormData();
+            formData.append('filepath', this.newFilePath);
+            formData.append('markdown_content', this.newFileContent);
+            formData.append('commit_github', this.commitGithub ? '1' : '0');
+            if (this.newFileAdminId) {
+                formData.append('admin_id', this.newFileAdminId);
+            }
+            
+            formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
+            
+            fetch('<?= Url::to(['/wiki/default/save']) ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.saving = false;
+                if (data.success) {
+                    this.successMsg = data.message;
+                    
+                    // Força a recarga para atualizar a árvore com o novo item
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    this.errMsg = data.message;
+                }
+            })
+            .catch(err => {
+                this.saving = false;
+                this.errMsg = 'Erro de rede ou permissão ao criar página.';
+            });
+        }
+    };
+}
+</script>
