@@ -24,6 +24,11 @@ $this->title = 'CromIA Gateway — Controle de API & IA';
 
         <!-- Indicador de Status & Logout -->
         <div class="flex items-center gap-3">
+            <a href="https://cromia-api.crom.me" target="_blank" rel="noopener noreferrer"
+               class="px-2.5 py-1 bg-slate-800 hover:bg-purple-600 text-slate-300 hover:text-white rounded-lg text-[10px] font-bold uppercase transition duration-150 flex items-center gap-1 no-underline">
+                <span class="material-icons text-xs">public</span>
+                Site Oficial
+            </a>
             <a href="https://cromia-api.crom.me/docs" target="_blank" rel="noopener noreferrer"
                class="px-2.5 py-1 bg-slate-800 hover:bg-purple-600 text-slate-300 hover:text-white rounded-lg text-[10px] font-bold uppercase transition duration-150 flex items-center gap-1 no-underline">
                 <span class="material-icons text-xs">menu_book</span>
@@ -182,6 +187,27 @@ $this->title = 'CromIA Gateway — Controle de API & IA';
                             </a>
                         </div>
                     </div>
+
+                    <!-- Modelos Disponíveis -->
+                    <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 space-y-3 select-none">
+                        <h4 class="text-xs font-extrabold text-white tracking-wide uppercase">Modelos Disponíveis</h4>
+                        <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                            <template x-for="model in modelsList" :key="model.id">
+                                <div class="flex items-center justify-between p-2 bg-slate-950 border border-slate-800/60 rounded-xl">
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-xs font-bold text-white font-mono" x-text="model.id"></span>
+                                        <span class="text-[8px] text-slate-500 font-extrabold uppercase tracking-wider" x-text="'Provedor: ' + model.owned_by"></span>
+                                    </div>
+                                    <span class="text-[8px] px-1.5 py-0.5 bg-purple-500/10 border border-purple-500/20 text-purple-400 font-extrabold rounded-md font-mono uppercase">Ativo</span>
+                                </div>
+                            </template>
+                            <template x-if="modelsList.length === 0">
+                                <div class="text-[10px] text-slate-500 italic py-2">
+                                    Nenhum modelo listado. Conecte-se para puxar a lista de modelos ativos.
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Coluna Direita: Gerenciador de Chaves e Playground -->
@@ -274,16 +300,28 @@ $this->title = 'CromIA Gateway — Controle de API & IA';
                             </div>
                         </div>
 
-                        <!-- Seletor de Chave para o Teste -->
-                        <div class="flex gap-3 items-center select-none">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Chave de Consumo:</span>
-                            <div class="flex-1 flex gap-2">
+                        <!-- Seletor de Chave e Modelo para o Teste -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 select-none">
+                            <div class="flex gap-2 items-center">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono flex-shrink-0">Chave:</span>
                                 <input type="password" x-model="playgroundKey" placeholder="Cole sua chave crom_sk_... para testar"
-                                       class="flex-1 bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 text-xs rounded-xl px-4 py-2 text-white outline-none font-sans font-semibold transition-all">
+                                       class="flex-1 bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 text-[11px] rounded-xl px-3 py-2 text-white outline-none font-sans font-semibold transition-all">
                                 <button @click="autoSelectPlaygroundKey()" type="button"
-                                        class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-[10px] font-bold uppercase transition flex-shrink-0 cursor-pointer">
-                                    Usar Gerada
+                                        class="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-[9px] font-bold uppercase transition flex-shrink-0 cursor-pointer">
+                                    Usar
                                 </button>
+                            </div>
+                            <div class="flex gap-2 items-center">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono flex-shrink-0">Modelo:</span>
+                                <select x-model="selectedModel"
+                                        class="flex-1 bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 text-xs rounded-xl px-3 py-2.5 text-white outline-none font-sans font-semibold cursor-pointer">
+                                    <template x-for="model in modelsList" :key="model.id">
+                                        <option :value="model.id" x-text="model.id"></option>
+                                    </template>
+                                    <template x-if="modelsList.length === 0">
+                                        <option value="gpt-4o-mini">gpt-4o-mini</option>
+                                    </template>
+                                </select>
                             </div>
                         </div>
 
@@ -364,6 +402,11 @@ window.cromiaHandler = function() {
         newlyGeneratedKey: '',
         copied: false,
 
+        // Modelos
+        modelsList: [],
+        selectedModel: 'gpt-4o-mini',
+        loadingModels: false,
+
         // Playground Chat
         playgroundKey: '',
         chatInput: '',
@@ -390,6 +433,7 @@ window.cromiaHandler = function() {
                 }
                 this.fetchProfile();
                 this.fetchKeys();
+                this.fetchModels();
             }
         },
 
@@ -425,6 +469,7 @@ window.cromiaHandler = function() {
                 // Busca dados atualizados e chaves
                 this.fetchProfile();
                 this.fetchKeys();
+                this.fetchModels();
 
             } catch (err) {
                 this.errorMsg = err.message;
@@ -512,6 +557,31 @@ window.cromiaHandler = function() {
                 }
             } catch (err) {
                 console.error('Erro ao buscar chaves de API:', err);
+            }
+        },
+
+        async fetchModels() {
+            const token = localStorage.getItem("cromia_session_token");
+            if (!token) return;
+
+            this.loadingModels = true;
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/models`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.modelsList = data.data || [];
+                    if (this.modelsList.length > 0) {
+                        this.selectedModel = this.modelsList[0].id;
+                    }
+                }
+            } catch (err) {
+                console.error('Erro ao buscar modelos:', err);
+            } finally {
+                this.loadingModels = false;
             }
         },
 
@@ -605,7 +675,7 @@ window.cromiaHandler = function() {
                         'Authorization': `Bearer ${this.playgroundKey}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4o-mini',
+                        model: this.selectedModel,
                         messages: [{ role: 'user', content: prompt }]
                     })
                 });
@@ -651,6 +721,8 @@ window.cromiaHandler = function() {
             this.authenticated = false;
             this.user = { username: '', balance: 0 };
             this.apiKeys = [];
+            this.modelsList = [];
+            this.selectedModel = 'gpt-4o-mini';
             this.newlyGeneratedKey = '';
             this.playgroundKey = '';
             this.chatHistory = [];
