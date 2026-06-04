@@ -24,6 +24,11 @@ $this->title = 'CromIA Gateway — Controle de API & IA';
 
         <!-- Indicador de Status & Logout -->
         <div class="flex items-center gap-3">
+            <a href="https://cromia-api.crom.me/docs" target="_blank" rel="noopener noreferrer"
+               class="px-2.5 py-1 bg-slate-800 hover:bg-purple-600 text-slate-300 hover:text-white rounded-lg text-[10px] font-bold uppercase transition duration-150 flex items-center gap-1 no-underline">
+                <span class="material-icons text-xs">menu_book</span>
+                Documentação
+            </a>
             <template x-if="authenticated">
                 <div class="flex items-center gap-3">
                     <span class="text-[9px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -168,6 +173,13 @@ $this->title = 'CromIA Gateway — Controle de API & IA';
                             <div class="bg-slate-950 px-3 py-2 rounded-lg font-mono text-[9px] text-purple-300 border border-slate-800 select-all overflow-x-auto">
                                 Authorization: Bearer crom_sk_...
                             </div>
+                        </div>
+                        <div class="pt-2">
+                            <a href="https://cromia-api.crom.me/docs" target="_blank" rel="noopener noreferrer"
+                               class="w-full py-2 bg-purple-600/20 hover:bg-purple-600 border border-purple-500/30 text-purple-300 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-wider transition duration-200 flex items-center justify-center gap-1.5 no-underline">
+                                <span class="material-icons text-sm">menu_book</span>
+                                Documentação Oficial
+                            </a>
                         </div>
                     </div>
                 </div>
