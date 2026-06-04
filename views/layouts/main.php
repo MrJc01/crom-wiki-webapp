@@ -29,6 +29,14 @@ if ($currentRoute === 'site/discover') {
     $initialTab = 'tickets';
 } elseif (strpos($currentRoute, 'cromia') !== false) {
     $initialTab = 'cromia';
+} elseif (strpos($currentRoute, 'ferramentas') !== false) {
+    $initialTab = 'ferramentas';
+} elseif (strpos($currentRoute, 'p2p') !== false) {
+    $initialTab = 'p2p';
+} elseif (strpos($currentRoute, 'comva') !== false) {
+    $initialTab = 'comva';
+} elseif (strpos($currentRoute, 'dokploy') !== false) {
+    $initialTab = 'dokploy';
 } elseif (strpos($currentRoute, 'admin') !== false) {
     $initialTab = 'admin';
 }
@@ -98,9 +106,11 @@ echo $this->render('_head');
 
     <!-- CASCA PRINCIPAL PREMIUM SPA (Estilo Google Developer Program) -->
     <div class="flex flex-col h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden" 
+         @toggle-fullscreen.window="isFullscreen = $event.detail"
          x-data="{ 
              activeTab: '<?= $initialTab ?>',
              showChatDrawer: false,
+             isFullscreen: false,
              routes: {
                  'paravoce': '<?= Url::to(['/site/index']) ?>',
                  'discover': '<?= Url::to(['/site/discover']) ?>',
@@ -114,11 +124,16 @@ echo $this->render('_head');
                  'terminal': '<?= Url::to(['/terminal/default/index']) ?>',
                  'tickets': '<?= Url::to(['/tickets/default/index']) ?>',
                  'cromia': '<?= Url::to(['/cromia/default/index']) ?>',
+                 'ferramentas': '<?= Url::to(['/ferramentas/default/index']) ?>',
+                 'p2p': '<?= Url::to(['/p2p/default/index']) ?>',
+                 'comva': '<?= Url::to(['/comva/default/index']) ?>',
+                 'dokploy': '<?= Url::to(['/dokploy/default/index']) ?>',
                  'admin': '<?= Url::to(['/admin/default/index']) ?>'
              },
              openTab(id, push = true) {
                  if (!id) return;
                  this.activeTab = id;
+                 this.isFullscreen = false;
                  if (push) {
                      const path = this.routes[id] || ('/' + id);
                      if (window.location.pathname !== path) {
@@ -199,7 +214,14 @@ echo $this->render('_head');
          }">
 
         <!-- 1. TOPBAR SUPERIOR FIXO (Google Style) -->
-        <header class="h-16 bg-slate-900 border-b border-slate-800/80 flex items-center justify-between px-6 flex-shrink-0 select-none z-50 shadow-md">
+        <header class="h-16 bg-slate-900 border-b border-slate-800/80 flex items-center justify-between px-6 flex-shrink-0 select-none z-50 shadow-md transition-all duration-300"
+                x-show="!isFullscreen"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="-translate-y-16 opacity-0"
+                x-transition:enter-end="translate-y-0 opacity-100"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="translate-y-0 opacity-100"
+                x-transition:leave-end="-translate-y-16 opacity-0">
             <!-- Lado Esquerdo: Logotipo CROM Program -->
             <div class="flex items-center gap-3 cursor-pointer" @click="openTab('paravoce')">
                 <!-- Logotipo Oficial CROM (favicon de crom.run) -->
@@ -270,10 +292,18 @@ echo $this->render('_head');
         </header>
 
         <!-- 2. LAYOUT INFERIOR (SIDEBAR + CONTEÚDO) -->
-        <div class="flex flex-grow h-[calc(100vh-64px)] w-screen overflow-hidden relative">
+        <div class="flex flex-grow w-screen overflow-hidden relative transition-all duration-300"
+             :class="isFullscreen ? 'h-screen' : 'h-[calc(100vh-64px)]'">
             
             <!-- SIDEBAR VERTICAL (Google Developer Style) -->
-            <aside class="w-20 md:w-24 bg-slate-900 border-r border-slate-800/80 flex flex-col justify-between py-6 select-none flex-shrink-0 z-40 shadow-lg">
+            <aside class="w-20 md:w-24 bg-slate-900 border-r border-slate-800/80 flex flex-col justify-between py-6 select-none flex-shrink-0 z-40 shadow-lg transition-all duration-300"
+                   x-show="!isFullscreen"
+                   x-transition:enter="transition ease-out duration-300"
+                   x-transition:enter-start="-translate-x-24 opacity-0"
+                   x-transition:enter-end="translate-x-0 opacity-100"
+                   x-transition:leave="transition ease-in duration-300"
+                   x-transition:leave-start="translate-x-0 opacity-100"
+                   x-transition:leave-end="-translate-x-24 opacity-0">
                 <div class="flex flex-col items-center gap-6 w-full px-2">
                     
                     <!-- Aba 1: Para Você (Dashboard) -->
@@ -724,6 +754,120 @@ echo $this->render('_head');
                          </div>
                      <?php endif; ?>
                 </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Ferramentas -->
+                <button id="btn-nav-ferramentas"
+                        hx-get="<?= Url::to(['/ferramentas/default/index']) ?>"
+                        hx-target="#container-ferramentas"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba Ferramentas: Iframe (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-hidden bg-slate-950" 
+                     x-show="activeTab === 'ferramentas'"
+                     id="container-ferramentas"
+                     <?= $initialTab === 'ferramentas' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'ferramentas'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Ferramentas...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de P2P -->
+                <button id="btn-nav-p2p"
+                        hx-get="<?= Url::to(['/p2p/default/index']) ?>"
+                        hx-target="#container-p2p"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba P2P: Iframe (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-hidden bg-slate-950" 
+                     x-show="activeTab === 'p2p'"
+                     id="container-p2p"
+                     <?= $initialTab === 'p2p' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'p2p'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando P2P Secure Share...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Cromva -->
+                <button id="btn-nav-comva"
+                        hx-get="<?= Url::to(['/comva/default/index']) ?>"
+                        hx-target="#container-comva"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba Cromva: Iframe (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-hidden bg-slate-950" 
+                     x-show="activeTab === 'comva'"
+                     id="container-comva"
+                     <?= $initialTab === 'comva' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'comva'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Cromva...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Dokploy -->
+                <?php if (Yii::$app->user->can('admin-access')): ?>
+                <button id="btn-nav-dokploy"
+                        hx-get="<?= Url::to(['/dokploy/default/index']) ?>"
+                        hx-target="#container-dokploy"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba Dokploy: Iframe (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-hidden bg-slate-950" 
+                     x-show="activeTab === 'dokploy'"
+                     id="container-dokploy"
+                     <?= $initialTab === 'dokploy' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'dokploy'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Dokploy...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+                <?php endif; ?>
 
             </main>
         </div>

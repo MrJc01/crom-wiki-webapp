@@ -25,11 +25,13 @@ foreach ($modules as $mod) {
         'icon' => $icon,
         'required_permission' => $mod['required_permission'] ?: '',
         'has_permission' => $hasPermission,
-        'category' => 'Produtividade', // Categoria padrão para módulos ativos
+        'category' => !empty($mod['category']) ? $mod['category'] : 'Produtividade',
         'status' => 'Ativo',
-        'description' => $isWiki 
-            ? 'Wiki colaborativa GitOps descentralizada. Crie e organize páginas Markdown com atribuição de criadores e administradores de forma integrada.'
-            : 'Módulo de aplicação isolado do sistema integrado dinamicamente via barramento de eventos globais do monólito.'
+        'description' => !empty($mod['description']) 
+            ? $mod['description']
+            : ($isWiki 
+                ? 'Wiki colaborativa GitOps descentralizada. Crie e organize páginas Markdown com atribuição de criadores e administradores de forma integrada.'
+                : 'Módulo de aplicação isolado do sistema integrado dinamicamente via barramento de eventos globais do monólito.')
     ];
 }
 

@@ -95,6 +95,12 @@ $config = [
 
                 // Módulo CromIA
                 'cromia' => 'cromia/default/index',
+
+                // Módulos Iframe
+                'ferramentas' => 'ferramentas/default/index',
+                'p2p' => 'p2p/default/index',
+                'comva' => 'comva/default/index',
+                'dokploy' => 'dokploy/default/index',
             ],
         ],
     ],

@@ -168,7 +168,7 @@ class SiteController extends Controller
         $modules = [];
         try {
             $modules = Yii::$app->db->createCommand("
-                SELECT id, name, icon, entry_point, required_permission 
+                SELECT id, name, icon, entry_point, required_permission, category, description 
                 FROM core_modules 
                 WHERE is_active = 1 
                 ORDER BY sort_order ASC
