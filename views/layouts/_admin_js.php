@@ -18,6 +18,7 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
         isGuardiao: false,
         isPilar: false,
         isForja: false,
+        isMembro: true,
         
         // Formulário de Permissões
         permUserId: '',
@@ -43,6 +44,7 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
             this.isGuardiao = false;
             this.isPilar = false;
             this.isForja = false;
+            this.isMembro = true;
             this.successMsg = '';
             this.errorMsg = '';
             this.showUserModal = true;
@@ -56,6 +58,7 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
             this.isGuardiao = !!user.is_guardiao;
             this.isPilar = !!user.is_pilar;
             this.isForja = !!user.is_forja;
+            this.isMembro = !!user.is_membro;
             this.successMsg = '';
             this.errorMsg = '';
             this.showUserModal = true;
@@ -80,6 +83,7 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
             formData.append('is_guardiao', this.isGuardiao ? '1' : '0');
             formData.append('is_pilar', this.isPilar ? '1' : '0');
             formData.append('is_forja', this.isForja ? '1' : '0');
+            formData.append('is_membro', this.isMembro ? '1' : '0');
             formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
             
             fetch('<?= Url::to(['/admin/default/save-user']) ?>', {

@@ -22,9 +22,10 @@ class UserController extends Controller
      * @param int $is_guardiao Indica se o usuário é guardião (0 ou 1)
      * @param int $is_pilar Indica se o usuário é pilar (0 ou 1)
      * @param int $is_forja Indica se o usuário é forja (0 ou 1)
+     * @param int $is_membro Indica se o usuário é membro (0 ou 1)
      * @return int Código de saída
      */
-    public function actionCreate(string $username, string $password, int $is_guardiao = 0, int $is_pilar = 0, int $is_forja = 0): int
+    public function actionCreate(string $username, string $password, int $is_guardiao = 0, int $is_pilar = 0, int $is_forja = 0, int $is_membro = 1): int
     {
         $existing = User::findOne(['username' => $username]);
         if ($existing) {
@@ -38,6 +39,7 @@ class UserController extends Controller
         $user->is_guardiao = $is_guardiao;
         $user->is_pilar = $is_pilar;
         $user->is_forja = $is_forja;
+        $user->is_membro = $is_membro;
         $user->created_at = time();
         $user->updated_at = time();
         $user->status = 1; // Ativo
@@ -61,16 +63,17 @@ class UserController extends Controller
     public function actionList(): int
     {
         $users = User::find()->all();
-        $this->stdout(sprintf("%-5s | %-20s | %-10s | %-10s | %-10s\n", "ID", "Username", "Guardião", "Pilar", "Forja"));
-        $this->stdout(str_repeat("-", 65) . "\n");
+        $this->stdout(sprintf("%-5s | %-20s | %-10s | %-10s | %-10s | %-10s\n", "ID", "Username", "Guardião", "Pilar", "Forja", "Membro"));
+        $this->stdout(str_repeat("-", 78) . "\n");
         foreach ($users as $user) {
             $this->stdout(sprintf(
-                "%-5d | %-20s | %-10s | %-10s | %-10s\n",
+                "%-5d | %-20s | %-10s | %-10s | %-10s | %-10s\n",
                 $user->id,
                 $user->username,
                 $user->is_guardiao ? 'Sim' : 'Não',
                 $user->is_pilar ? 'Sim' : 'Não',
-                $user->is_forja ? 'Sim' : 'Não'
+                $user->is_forja ? 'Sim' : 'Não',
+                $user->is_membro ? 'Sim' : 'Não'
             ));
         }
         return ExitCode::OK;

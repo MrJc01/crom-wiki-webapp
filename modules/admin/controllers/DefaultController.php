@@ -61,6 +61,7 @@ class DefaultController extends Controller
                 'is_guardiao' => (bool)$u->is_guardiao,
                 'is_pilar' => (bool)$u->is_pilar,
                 'is_forja' => (bool)$u->is_forja,
+                'is_membro' => (bool)$u->is_membro,
                 'created_at' => date('d/m/Y H:i', $u->created_at),
                 'permissions' => $assignedPerms
             ];
@@ -193,6 +194,7 @@ class DefaultController extends Controller
             $is_guardiao = $request->post('is_guardiao') ? 1 : 0;
             $is_pilar = $request->post('is_pilar') ? 1 : 0;
             $is_forja = $request->post('is_forja') ? 1 : 0;
+            $is_membro = $request->post('is_membro') ? 1 : 0;
 
             if (empty($id)) {
                 // Novo Usuário
@@ -211,6 +213,7 @@ class DefaultController extends Controller
                 $user->is_guardiao = $is_guardiao;
                 $user->is_pilar = $is_pilar;
                 $user->is_forja = $is_forja;
+                $user->is_membro = $is_membro;
                 $user->created_at = time();
                 $user->updated_at = time();
                 $user->status = 1; // Ativo
@@ -240,6 +243,7 @@ class DefaultController extends Controller
                 $user->is_guardiao = $is_guardiao;
                 $user->is_pilar = $is_pilar;
                 $user->is_forja = $is_forja;
+                $user->is_membro = $is_membro;
                 $user->updated_at = time();
                 if ($user->save(false)) {
                     return ['success' => true, 'message' => 'Usuário atualizado com sucesso.'];

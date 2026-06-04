@@ -161,7 +161,7 @@ class SiteController extends Controller
     public function actionDiscover(): string
     {
         if (Yii::$app->user->isGuest) {
-            return '';
+            throw new \yii\web\ForbiddenHttpException('Você precisa estar logado para acessar esta página.');
         }
         
         // Busca todos os módulos ativos cadastrados no banco
@@ -188,7 +188,7 @@ class SiteController extends Controller
     public function actionBeneficios(): string
     {
         if (Yii::$app->user->isGuest) {
-            return '';
+            throw new \yii\web\ForbiddenHttpException('Você precisa estar logado para acessar esta página.');
         }
         return $this->render('beneficios');
     }
@@ -199,7 +199,7 @@ class SiteController extends Controller
     public function actionProjetos(): string
     {
         if (Yii::$app->user->isGuest) {
-            return '';
+            throw new \yii\web\ForbiddenHttpException('Você precisa estar logado para acessar esta página.');
         }
         return $this->render('projetos');
     }
@@ -210,7 +210,7 @@ class SiteController extends Controller
     public function actionAprendizado(): string
     {
         if (Yii::$app->user->isGuest) {
-            return '';
+            throw new \yii\web\ForbiddenHttpException('Você precisa estar logado para acessar esta página.');
         }
         return $this->render('aprendizado');
     }
@@ -221,7 +221,7 @@ class SiteController extends Controller
     public function actionComunidades(): string
     {
         if (Yii::$app->user->isGuest) {
-            return '';
+            throw new \yii\web\ForbiddenHttpException('Você precisa estar logado para acessar esta página.');
         }
         return $this->render('comunidades');
     }
@@ -335,7 +335,7 @@ class SiteController extends Controller
     public function actionOnlineMembers(): string
     {
         if (Yii::$app->user->isGuest) {
-            return '';
+            throw new \yii\web\ForbiddenHttpException('Você precisa estar logado para acessar esta página.');
         }
 
         $timeThreshold = time() - 900; // 15 minutos de tolerância
@@ -363,7 +363,7 @@ class SiteController extends Controller
     public function actionOnlineBadge(): string
     {
         if (Yii::$app->user->isGuest) {
-            return '';
+            throw new \yii\web\ForbiddenHttpException('Você precisa estar logado para acessar esta página.');
         }
 
         $timeThreshold = time() - 900; // 15 minutos de tolerância
@@ -389,7 +389,7 @@ class SiteController extends Controller
     public function actionChatDrawer()
     {
         if (Yii::$app->user->isGuest) {
-            return '';
+            throw new \yii\web\ForbiddenHttpException('Você precisa estar logado para acessar esta página.');
         }
 
         $userId = Yii::$app->user->id;

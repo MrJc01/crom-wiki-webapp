@@ -17,6 +17,7 @@ use yii\web\IdentityInterface;
  * @property int $is_guardiao
  * @property int $is_pilar
  * @property int $is_forja
+ * @property int $is_membro
  * @property int $created_at
  * @property int $updated_at
  */
@@ -40,8 +41,9 @@ class User extends ActiveRecord implements IdentityInterface
             [['username', 'password_hash', 'access_token'], 'string', 'max' => 255],
             [['username'], 'unique'],
             [['access_token'], 'unique'],
-            [['created_at', 'updated_at', 'is_guardiao', 'is_pilar', 'is_forja'], 'integer'],
+            [['created_at', 'updated_at', 'is_guardiao', 'is_pilar', 'is_forja', 'is_membro'], 'integer'],
             [['is_guardiao', 'is_pilar', 'is_forja'], 'default', 'value' => 0],
+            [['is_membro'], 'default', 'value' => 1],
         ];
     }
 

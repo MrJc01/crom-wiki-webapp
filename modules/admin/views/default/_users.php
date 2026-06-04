@@ -60,6 +60,9 @@ use yii\helpers\Html;
                                 <div class="flex flex-col gap-1">
                                     <span class="font-bold text-white" x-text="user.username"></span>
                                     <div class="flex flex-wrap gap-1 mt-1 select-none">
+                                        <template x-if="user.is_membro">
+                                            <span class="px-1.5 py-0.2 bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[8px] font-mono rounded font-extrabold uppercase">Membro</span>
+                                        </template>
                                         <template x-if="user.is_guardiao">
                                             <span class="px-1.5 py-0.2 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[8px] font-mono rounded font-extrabold uppercase">Guardião</span>
                                         </template>
@@ -162,7 +165,14 @@ use yii\helpers\Html;
                 <!-- Checkboxes Premium de Tags de Governança -->
                 <div class="space-y-1.5 pt-1">
                     <label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest font-mono">Tags de Governança</label>
-                    <div class="p-3 bg-slate-950/40 border border-slate-800 rounded-xl flex items-center justify-between gap-4 select-none">
+                    <div class="p-3 bg-slate-950/40 border border-slate-800 rounded-xl grid grid-cols-2 gap-3 select-none">
+                        <label class="flex items-center gap-2 cursor-pointer p-1">
+                            <input type="checkbox" x-model="isMembro" class="rounded border-slate-800 text-sky-500 bg-slate-950 h-4.5 w-4.5">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-slate-200">Membro</span>
+                                <span class="text-[8px] text-slate-500 font-semibold">Geral</span>
+                            </div>
+                        </label>
                         <label class="flex items-center gap-2 cursor-pointer p-1">
                             <input type="checkbox" x-model="isGuardiao" class="rounded border-slate-800 text-sky-500 bg-slate-950 h-4.5 w-4.5">
                             <div class="flex flex-col">
