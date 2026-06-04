@@ -9,6 +9,7 @@ use yii\helpers\Html;
 $activeAppsJson = [];
 foreach ($modules as $mod) {
     $alpineId = $mod['id'] === 'app-wiki' ? 'wiki' : $mod['id'];
+    $hasPermission = empty($mod['required_permission']) || Yii::$app->user->can($mod['required_permission']);
     $activeAppsJson[] = [
         'id' => $mod['id'],
         'alpineId' => $alpineId,
@@ -16,6 +17,7 @@ foreach ($modules as $mod) {
         'entry_point' => $mod['entry_point'],
         'icon' => $mod['icon'],
         'required_permission' => $mod['required_permission'] ?: '',
+        'has_permission' => $hasPermission,
         'category' => 'Produtividade', // Categoria padrão para módulos ativos
         'status' => 'Ativo',
         'description' => $mod['id'] === 'wiki' || $mod['id'] === 'app-wiki' 
@@ -103,6 +105,8 @@ foreach ($roadmapApps as $app) {
         continue; // Oculta completamente módulos que foram desativados no painel admin
     }
     if (!in_array($app['id'], $registeredModuleIds) && !in_array($app['alpineId'], $registeredModuleIds)) {
+        $hasPermission = empty($app['required_permission']) || Yii::$app->user->can($app['required_permission']);
+        $app['has_permission'] = $hasPermission;
         $roadmapAppsFiltered[] = $app;
     }
 }
@@ -242,14 +246,21 @@ $allApps = array_merge($activeAppsJson, $roadmapAppsFiltered);
                     </div>
 
                     <div class="mt-6 pt-4 border-t border-slate-900">
-                        <!-- Botão Ativo -->
-                        <template x-if="app.status === 'Ativo'">
+                        <!-- Botão Ativo com Permissão -->
+                        <template x-if="app.status === 'Ativo' && (app.has_permission === undefined || app.has_permission)">
                             <button @click="openTab(app.alpineId)"
                                     class="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-slate-100 text-xs font-bold rounded-xl transition duration-300 flex items-center justify-center gap-2 shadow-md">
                                 🚀 Executar Módulo
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                                 </svg>
+                            </button>
+                        </template>
+                        <!-- Botão Ativo sem Permissão -->
+                        <template x-if="app.status === 'Ativo' && app.has_permission !== undefined && !app.has_permission">
+                            <button disabled 
+                                    class="w-full py-2.5 px-4 bg-slate-900/40 text-slate-600 text-xs font-bold rounded-xl border border-slate-800/40 cursor-not-allowed flex items-center justify-center gap-2">
+                                🔒 Acesso Restrito
                             </button>
                         </template>
                         <!-- Botão Inativo / Roadmap -->

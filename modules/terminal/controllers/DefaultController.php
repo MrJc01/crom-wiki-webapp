@@ -7,12 +7,31 @@ namespace app\modules\terminal\controllers;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
+use yii\filters\AccessControl;
 use phpseclib3\Net\SSH2;
 
 class DefaultController extends Controller
 {
     // Desabilitar validação CSRF para requisições do terminal via POST
     public $enableCsrfValidation = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors(): array
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['access-terminal'], // Exige a permissão RBAC access-terminal
+                    ],
+                ],
+            ],
+        ];
+    }
 
     /**
      * Interceptador para ignorar layout no HTMX
