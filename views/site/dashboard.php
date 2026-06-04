@@ -498,6 +498,13 @@ try {
                  this.serverPing = Math.floor(38 + Math.random() * 10);
              }, 4000);
              this.initWelcomeSliders(window.__cromWelcomeSliders || []);
+             
+             window.addEventListener('open-welcome-slider', (e) => {
+                 const slider = (window.__cromWelcomeSliders || []).find(s => s.id == e.detail.id);
+                 if (slider) {
+                     this.openWelcomeSlider(slider.id, slider.slides, slider.title);
+                 }
+             });
          },
          
          save() {

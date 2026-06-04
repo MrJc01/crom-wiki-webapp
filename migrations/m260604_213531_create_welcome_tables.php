@@ -25,22 +25,40 @@ class m260604_213531_create_welcome_tables extends Migration
         // 2. Inserir dados padrão de boas-vindas
         $defaultSlides = [
             [
-                'title' => 'Bem-vindo ao Portal CROM',
-                'description' => 'Este é o seu novo ecossistema de desenvolvimento descentralizado. Explore ferramentas e documentação integrada de forma local-first.',
+                'title' => 'Bem-vindo à CROM',
+                'description' => '"Soberania não se pede, constrói-se." Você agora faz parte de um ecossistema focado em autonomia digital e descentralização.',
                 'image_url' => '👋',
                 'gradiente' => 'from-sky-500/20 to-indigo-500/0'
             ],
             [
-                'title' => 'Soberania Digital & Local-First',
-                'description' => 'Todos os seus dados de wiki e configurações são locais e sincronizados via GitOps. Autonomia total sobre sua governança.',
-                'image_url' => '🔒',
+                'title' => 'Estrutura Horizontal de Camadas',
+                'description' => 'Não temos chefes ou gerentes. Funcionamos em 3 camadas de evolução contínua baseadas em confiança e histórico auditável: a Forja (Camada 1), os Pilares (Camada 2) e os Guardiões (Camada 3).',
+                'image_url' => '🏛️',
+                'gradiente' => 'from-indigo-500/20 to-purple-500/0'
+            ],
+            [
+                'title' => 'A Forja',
+                'description' => 'Sua jornada começa aqui. Explore ferramentas, crie protótipos em nossa VPS dedicada com Podman e mostre seu impacto auditável no Git para ascender ao nível Pilar.',
+                'image_url' => '🔥',
+                'gradiente' => 'from-amber-500/20 to-orange-500/0'
+            ],
+            [
+                'title' => 'Contrato de Cuidado & Vesting',
+                'description' => 'O valor que você gera nunca é apagado. O Vesting de Impacto garante recompensas residuais futuras e reconhecimento perpétuo do seu trabalho histórico (Passivo de Gratidão).',
+                'image_url' => '🤝',
                 'gradiente' => 'from-emerald-500/20 to-teal-500/0'
             ],
             [
-                'title' => 'Inteligência Artificial Integrada',
-                'description' => 'Acesse modelos de linguagem avançados de forma segura e privada diretamente da aba CromIA.',
-                'image_url' => '🤖',
-                'gradiente' => 'from-purple-500/20 to-rose-500/0'
+                'title' => 'Nossas Cadências Semanais',
+                'description' => 'A transparência é o que nos move. É obrigatório manter o seu status.md semanal e o seu metas.md mensal atualizados dentro da sua pasta na Wiki.',
+                'image_url' => '🔄',
+                'gradiente' => 'from-pink-500/20 to-rose-500/0'
+            ],
+            [
+                'title' => 'Linha de Comando Própria',
+                'description' => 'Use o crom.sh para navegar na Wiki local e falar com a Rosa (nossa IA). No servidor, utilize a CLI crom-ws para gerenciar containers e publicar aplicações web com HTTPS em segundos.',
+                'image_url' => '💻',
+                'gradiente' => 'from-cyan-500/20 to-sky-500/0'
             ]
         ];
 
@@ -48,7 +66,7 @@ class m260604_213531_create_welcome_tables extends Migration
             'title' => 'Bem-vindo',
             'badge_text' => 'Novo',
             'icon' => '👋',
-            'required_role' => 'new_membro',
+            'required_role' => 'all', // Permite que todos vejam por padrão para testes
             'is_active' => true,
             'slides_json' => json_encode($defaultSlides, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
             'created_at' => time(),
