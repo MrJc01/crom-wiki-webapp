@@ -1,0 +1,16 @@
+[
+  {
+    "name": "enable_auto_open",
+    "label": "Auto-abrir Boas-Vindas",
+    "type": "boolean",
+    "default": true,
+    "description": "Se ativado, abre automaticamente o carrossel de boas-vindas para novos membros quando entram no Portal."
+  },
+  {
+    "name": "new_member_threshold_hours",
+    "label": "Janela de Novo Membro (Horas)",
+    "type": "number",
+    "default": 48,
+    "description": "Número de horas após a criação da conta para considerar o membro como 'Novo'."
+  }
+]

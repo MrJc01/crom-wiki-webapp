@@ -239,10 +239,21 @@ $dailyQuoterandomDayTitle = $dailyQuotersTitle[date('d') % count($dailyQuotersTi
 // Centralização de dados da infra, rituais, camadas e soluções da CROM.
 // Carrega as configurações do SQLite (com mocks como fallback de deploy)
 $settingsMap = [];
+$welcomeSliders = [];
 try {
     $settingsList = Yii::$app->db->createCommand("SELECT * FROM core_settings")->queryAll();
     foreach ($settingsList as $s) {
         $settingsMap[$s['key']] = $s['value'];
+    }
+    
+    // Consulta sliders de boas-vindas ativos
+    $welcomeSliders = Yii::$app->db->createCommand("
+        SELECT * FROM welcome_sliders 
+        WHERE is_active = 1
+        ORDER BY id ASC
+    ")->queryAll();
+    foreach ($welcomeSliders as $k => $s) {
+        $welcomeSliders[$k]['slides'] = json_decode($s['slides_json'], true) ?: [];
     }
 } catch (\Exception $e) {
     // Silencia se a tabela não existir
@@ -430,6 +441,10 @@ try {
     }
 </style>
 
+<script>
+    window.__cromWelcomeSliders = <?= json_encode($welcomeSliders, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
+</script>
+
 <div class="space-y-10 pb-16 selection:bg-sky-500/20"
      x-data="{
          widgets: [],
@@ -482,6 +497,7 @@ try {
                  this.serverCpu = Math.floor(20 + Math.random() * 15);
                  this.serverPing = Math.floor(38 + Math.random() * 10);
              }, 4000);
+             this.initWelcomeSliders(window.__cromWelcomeSliders || []);
          },
          
          save() {
@@ -531,11 +547,146 @@ try {
                      window.initDashboardSwipers();
                  }
              }, 50);
-         }
-     }">
+         },
+
+          showWelcomeSlider: false,
+          welcomeTitle: '',
+          welcomeSlides: [],
+          welcomeSliderId: null,
+          welcomeActiveIndex: 0,
+          welcomeSwiperInstance: null,
+
+          openWelcomeSlider(id, slides, title) {
+              this.welcomeSliderId = id;
+              this.welcomeSlides = slides;
+              this.welcomeTitle = title || 'Boas-vindas';
+              this.welcomeActiveIndex = 0;
+              this.showWelcomeSlider = true;
+              window.dispatchEvent(new CustomEvent('toggle-fullscreen', { detail: true }));
+              this.$nextTick(() => {
+                  const welcomeEl = document.querySelector('.cromSwiperWelcome');
+                  if (welcomeEl && welcomeEl.swiper) {
+                      try { welcomeEl.swiper.destroy(true, true); } catch(e) {}
+                  }
+                  this.welcomeSwiperInstance = new Swiper('.cromSwiperWelcome', {
+                      slidesPerView: 1,
+                      spaceBetween: 30,
+                      grabCursor: true,
+                      observer: true,
+                      observeParents: true,
+                      pagination: {
+                          el: '.swiper-pagination-welcome',
+                          clickable: true,
+                          bulletClass: 'swiper-pagination-bullet bg-slate-700 opacity-50',
+                          bulletActiveClass: 'swiper-pagination-bullet-active bg-sky-500 opacity-100',
+                      },
+                      on: {
+                          init: (swiper) => {
+                              this.welcomeActiveIndex = swiper.activeIndex;
+                          },
+                          slideChange: (swiper) => {
+                              this.welcomeActiveIndex = swiper.activeIndex;
+                          }
+                      }
+                  });
+              });
+          },
+
+          closeWelcomeSlider() {
+              this.showWelcomeSlider = false;
+              window.dispatchEvent(new CustomEvent('toggle-fullscreen', { detail: false }));
+              if (this.welcomeSliderId) {
+                  localStorage.setItem('crom_welcome_dismissed_' + this.welcomeSliderId, 'true');
+              }
+          },
+
+          initWelcomeSliders(sliders) {
+              if (!sliders || sliders.length === 0) return;
+              
+              let autoOpenEnabled = true;
+              let memberThresholdHours = 48;
+              <?php
+              $welcomeLocalFile = Yii::getAlias('@app/modules/welcome/config.local.json');
+              if (file_exists($welcomeLocalFile)) {
+                  $welcomeLocal = json_decode(file_get_contents($welcomeLocalFile), true);
+                  if (isset($welcomeLocal['enable_auto_open'])) {
+                      echo "autoOpenEnabled = " . ($welcomeLocal['enable_auto_open'] ? "true" : "false") . ";\n";
+                  }
+                  if (isset($welcomeLocal['new_member_threshold_hours'])) {
+                      echo "memberThresholdHours = " . (int)$welcomeLocal['new_member_threshold_hours'] . ";\n";
+                  }
+              }
+              ?>
+
+              if (!autoOpenEnabled) return;
+
+              const userCreatedAt = <?= (int)Yii::$app->user->identity->created_at ?>;
+              const currentTime = Math.floor(Date.now() / 1000);
+              const isNewMember = (currentTime - userCreatedAt) < (memberThresholdHours * 3600);
+
+              for (const s of sliders) {
+                  if (s.required_role === 'new_membro' && !isNewMember) {
+                      continue;
+                  }
+                  
+                  const dismissed = localStorage.getItem('crom_welcome_dismissed_' + s.id);
+                  if (!dismissed) {
+                      setTimeout(() => {
+                          this.openWelcomeSlider(s.id, s.slides, s.title);
+                      }, 500);
+                      break;
+                  }
+              }
+          }
+      }">
     
     <!-- 1. BANNER FIXO DO TOPO -->
     <section class="bg-[#e8f0fe] rounded-[32px] border border-sky-200/50 shadow-lg relative overflow-hidden select-none min-h-[420px] md:min-h-0 md:h-[320px] py-4 md:py-0">
+        
+        <!-- Badges Overlay em cima do Swiper -->
+        <div class="absolute top-4 right-4 z-20 flex flex-col gap-2 select-none pointer-events-auto">
+            <?php foreach ($welcomeSliders as $ws): ?>
+                <?php
+                $showBadge = false;
+                $user = Yii::$app->user->identity;
+                if ($ws['required_role'] === 'all') {
+                    $showBadge = true;
+                } elseif ($ws['required_role'] === 'membro' && $user->is_membro) {
+                    $showBadge = true;
+                } elseif ($ws['required_role'] === 'new_membro') {
+                    $thresholdHours = 48;
+                    $welcomeLocalFile = Yii::getAlias('@app/modules/welcome/config.local.json');
+                    if (file_exists($welcomeLocalFile)) {
+                        $welcomeLocal = json_decode(file_get_contents($welcomeLocalFile), true);
+                        if (isset($welcomeLocal['new_member_threshold_hours'])) {
+                            $thresholdHours = (int)$welcomeLocal['new_member_threshold_hours'];
+                        }
+                    }
+                    if (time() - $user->created_at < $thresholdHours * 3600) {
+                        $showBadge = true;
+                    }
+                }
+                
+                if ($showBadge):
+                ?>
+                <button @click="openWelcomeSlider(<?= $ws['id'] ?>, (window.__cromWelcomeSliders.find(s => s.id == <?= $ws['id'] ?>) || {}).slides || [], '<?= htmlspecialchars($ws['title'], ENT_QUOTES) ?>')"
+                        class="px-3.5 py-2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800/80 hover:border-sky-500/50 text-slate-350 hover:text-white rounded-2xl text-xs font-bold transition flex items-center gap-2 shadow-lg cursor-pointer transform hover:scale-105 active:scale-95 duration-200">
+                    <span class="text-base"><?= htmlspecialchars($ws['icon']) ?></span>
+                    <span><?= htmlspecialchars($ws['title']) ?></span>
+                    <?php if ($ws['badge_text']): ?>
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-450 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                        </span>
+                        <span class="px-1.5 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-450 text-[8px] uppercase tracking-wider rounded font-black select-none">
+                            <?= htmlspecialchars($ws['badge_text']) ?>
+                        </span>
+                    <?php endif; ?>
+                </button>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+
         <div class="swiper cromSwiperBanner h-full w-full">
             <div class="swiper-wrapper">
                 
@@ -1108,6 +1259,131 @@ try {
                 <div class="border-t border-slate-800 p-6 bg-slate-900/60 absolute bottom-0 left-0 right-0 h-24">
                     <button @click="resetWidgets()" class="w-full py-2.5 bg-slate-950 border border-slate-800 hover:border-rose-500/30 text-rose-450 hover:text-rose-350 text-xs font-bold rounded-xl transition shadow-md cursor-pointer">
                         Restaurar Configurações Originais
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FULLSCREEN WELCOME SLIDER OVERLAY -->
+    <div x-show="showWelcomeSlider"
+         x-transition:enter="transition ease-out duration-400"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-[200] flex items-center justify-center"
+         style="display: none;">
+
+        <!-- Fundo com glassmorphism -->
+        <div class="absolute inset-0 bg-slate-950/95 backdrop-blur-xl"></div>
+
+        <!-- Conteúdo centralizado -->
+        <div class="relative z-10 w-full max-w-3xl mx-auto px-4 flex flex-col items-center gap-6">
+            
+            <!-- Header do Welcome -->
+            <div class="flex items-center justify-between w-full select-none">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-sky-500/10 border border-sky-500/20 rounded-2xl flex items-center justify-center shadow-lg">
+                        <span class="text-xl">👋</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-white tracking-tight" x-text="welcomeTitle"></h2>
+                        <p class="text-[10px] text-slate-500 font-mono font-semibold uppercase tracking-widest">Experiência Interativa</p>
+                    </div>
+                </div>
+                <button @click="closeWelcomeSlider()"
+                        class="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 hover:border-slate-600 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shadow-lg backdrop-blur-sm">
+                    <span>Fechar</span>
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Swiper do Welcome -->
+            <div class="w-full rounded-[28px] overflow-hidden border border-slate-800/60 bg-slate-900/40 backdrop-blur-md shadow-2xl shadow-sky-500/5">
+                <div class="swiper cromSwiperWelcome w-full">
+                    <div class="swiper-wrapper">
+                        <template x-for="(slide, idx) in welcomeSlides" :key="idx">
+                            <div class="swiper-slide">
+                                <div class="relative w-full min-h-[380px] md:min-h-[420px] flex flex-col items-center justify-center text-center p-8 md:p-12 overflow-hidden select-none">
+                                    
+                                    <!-- Gradiente decorativo de fundo do slide -->
+                                    <div class="absolute inset-0 bg-gradient-to-br opacity-30 pointer-events-none"
+                                         :class="slide.gradiente || 'from-sky-500/20 to-indigo-500/0'"></div>
+                                    
+                                    <!-- Glow central animado -->
+                                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-sky-500/5 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
+                                    
+                                    <!-- Decorative orbs -->
+                                    <div class="absolute top-8 right-8 w-16 h-16 bg-gradient-to-tr from-sky-500/10 to-indigo-500/10 rounded-full blur-xl pointer-events-none"></div>
+                                    <div class="absolute bottom-8 left-8 w-20 h-20 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-full blur-xl pointer-events-none"></div>
+
+                                    <!-- Conteúdo do Slide -->
+                                    <div class="relative z-10 space-y-6 max-w-lg mx-auto">
+                                        <!-- Ícone / Emoji grande -->
+                                        <div class="flex justify-center">
+                                            <div class="w-20 h-20 bg-slate-800/60 border border-slate-700/40 rounded-3xl flex items-center justify-center shadow-2xl backdrop-blur-sm">
+                                                <span class="text-4xl" x-text="slide.image_url || '✨'"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Título do Slide -->
+                                        <h3 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight"
+                                            x-text="slide.title || 'Slide ' + (idx + 1)"></h3>
+
+                                        <!-- Descrição do Slide -->
+                                        <p class="text-sm text-slate-400 leading-relaxed font-medium max-w-md mx-auto"
+                                           x-text="slide.description || ''"></p>
+
+                                        <!-- Indicador de progresso -->
+                                        <div class="flex items-center justify-center gap-1.5 pt-2 select-none">
+                                            <span class="text-[9px] font-extrabold text-slate-600 font-mono uppercase tracking-widest"
+                                                  x-text="(idx + 1) + ' / ' + welcomeSlides.length"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Pagination dots -->
+                    <div class="swiper-pagination-welcome pb-5"></div>
+                </div>
+            </div>
+
+            <!-- Navigation & Dismiss Footer -->
+            <div class="flex items-center justify-between w-full select-none min-h-[44px]">
+                <div>
+                    <button x-show="welcomeActiveIndex > 0"
+                            @click="welcomeSwiperInstance?.slidePrev()"
+                            class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/60 font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer shadow-lg flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span>Voltar</span>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button x-show="welcomeActiveIndex < welcomeSlides.length - 1"
+                            @click="welcomeSwiperInstance?.slideNext()"
+                            class="px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold rounded-xl text-xs transition transform active:scale-95 cursor-pointer shadow-lg shadow-sky-500/20 hover:shadow-sky-500/30 flex items-center gap-2">
+                        <span>Próximo</span>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    
+                    <button x-show="welcomeActiveIndex === welcomeSlides.length - 1"
+                            @click="closeWelcomeSlider()"
+                            class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl text-xs transition transform active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 flex items-center gap-2">
+                        <span>Finalizar</span>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
                     </button>
                 </div>
             </div>

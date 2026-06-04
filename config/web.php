@@ -101,6 +101,7 @@ $config = [
                 'p2p' => 'p2p/default/index',
                 'comva' => 'comva/default/index',
                 'dokploy' => 'dokploy/default/index',
+                'welcome' => 'welcome/default/index',
             ],
         ],
     ],

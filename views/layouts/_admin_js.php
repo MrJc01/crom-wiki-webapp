@@ -319,12 +319,18 @@ window.adminModulesHandler = function(initialModules) {
         configModuleId: '',
         configModuleName: '',
         configRaw: '',
+        configHasSchema: false,
+        configSchema: [],
+        configValues: {},
         isSavingConfig: false,
         
         openConfigModal(module) {
             this.configModuleId = module.id;
             this.configModuleName = module.name;
             this.configRaw = '';
+            this.configHasSchema = false;
+            this.configSchema = [];
+            this.configValues = {};
             this.successMsg = '';
             this.errorMsg = '';
             this.showConfigModal = true;
@@ -333,7 +339,10 @@ window.adminModulesHandler = function(initialModules) {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    this.configRaw = data.config;
+                    this.configHasSchema = !!data.has_schema;
+                    this.configSchema = data.schema || [];
+                    this.configValues = data.values || {};
+                    this.configRaw = data.raw_config || '{}';
                 } else {
                     this.errorMsg = data.message;
                 }
