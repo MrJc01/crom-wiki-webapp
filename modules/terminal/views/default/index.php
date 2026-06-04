@@ -17,7 +17,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
      x-data="{
          connected: false,
          connecting: false,
-         serverMode: '192.168.1.69',
+         serverMode: '<?= array_key_first($servers) ?>',
          customHost: '',
          username: 'root',
          password: '',
@@ -93,7 +93,7 @@ $this->title = 'CROM Terminal — Multi-VPS SSH';
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Endereço IP / Host</label>
                     <input type="text" 
                            x-model="customHost"
-                           placeholder="Ex: 191.243.165.182"
+                           placeholder="Ex: 192.168.1.100"
                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold">
                 </div>
 

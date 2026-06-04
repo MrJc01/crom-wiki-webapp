@@ -567,7 +567,11 @@ try {
               this.welcomeSliderId = id;
               this.welcomeSlides = slides;
               this.welcomeTitle = title || 'Boas-vindas';
-              this.welcomeActiveIndex = 0;
+              
+              const urlParams = new URLSearchParams(window.location.search);
+              const slideParam = urlParams.get('slide');
+              this.welcomeActiveIndex = slideParam ? (parseInt(slideParam) - 1) : 0;
+              
               this.showWelcomeSlider = true;
               window.dispatchEvent(new CustomEvent('toggle-fullscreen', { detail: true }));
               this.$nextTick(() => {
@@ -578,6 +582,7 @@ try {
                   this.welcomeSwiperInstance = new Swiper('.cromSwiperWelcome', {
                       slidesPerView: 1,
                       spaceBetween: 30,
+                      initialSlide: this.welcomeActiveIndex,
                       grabCursor: true,
                       observer: true,
                       observeParents: true,
