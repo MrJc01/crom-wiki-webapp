@@ -271,6 +271,72 @@ window.adminModulesHandler = function(initialModules) {
         errorMsg: '',
         isToggling: false,
         
+        showConfigModal: false,
+        configModuleId: '',
+        configModuleName: '',
+        configRaw: '',
+        isSavingConfig: false,
+        
+        openConfigModal(module) {
+            this.configModuleId = module.id;
+            this.configModuleName = module.name;
+            this.configRaw = '';
+            this.successMsg = '';
+            this.errorMsg = '';
+            this.showConfigModal = true;
+            
+            fetch('<?= Url::to(['/admin/default/get-module-config']) ?>?id=' + module.id)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    this.configRaw = data.config;
+                } else {
+                    this.errorMsg = data.message;
+                }
+            })
+            .catch(err => {
+                this.errorMsg = 'Erro de rede ao buscar configuração do módulo.';
+            });
+        },
+        
+        saveConfig() {
+            this.successMsg = '';
+            this.errorMsg = '';
+            this.isSavingConfig = true;
+            
+            // Valida JSON localmente antes do envio
+            try {
+                JSON.parse(this.configRaw);
+            } catch(e) {
+                this.errorMsg = 'JSON inválido no editor: ' + e.message;
+                this.isSavingConfig = false;
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('config', this.configRaw);
+            formData.append('<?= Yii::$app->request->csrfParam ?>', '<?= Yii::$app->request->getCsrfToken() ?>');
+            
+            fetch('<?= Url::to(['/admin/default/save-module-config']) ?>?id=' + this.configModuleId, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.isSavingConfig = false;
+                if (data.success) {
+                    this.successMsg = data.message;
+                    this.showConfigModal = false;
+                } else {
+                    this.errorMsg = data.message;
+                }
+            })
+            .catch(err => {
+                this.isSavingConfig = false;
+                this.errorMsg = 'Erro de rede ao salvar configuração do módulo.';
+            });
+        },
+        
         toggleModule(module) {
             if (module.id === 'admin') {
                 this.errorMsg = 'Não é permitido desativar o módulo de administração.';

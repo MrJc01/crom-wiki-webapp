@@ -385,6 +385,80 @@ class DefaultController extends Controller
     }
 
     /**
+     * Retorna a configuração JSON de um módulo.
+     */
+    public function actionGetModuleConfig($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        // Sanitiza o ID do módulo para evitar Directory Traversal
+        $id = preg_replace('/[^a-zA-Z0-9_\-]/', '', $id);
+        
+        $modulePath = Yii::getAlias("@app/modules/{$id}");
+        if (!is_dir($modulePath)) {
+            return ['success' => false, 'message' => 'Módulo não encontrado no disco.'];
+        }
+        
+        $configFile = "{$modulePath}/config.json";
+        $configContent = '{}';
+        if (file_exists($configFile)) {
+            $content = file_get_contents($configFile);
+            if ($content !== false) {
+                $configContent = $content;
+            }
+        } else {
+            // Cria o arquivo padrão caso não exista
+            file_put_contents($configFile, json_encode(new \stdClass(), JSON_PRETTY_PRINT));
+        }
+        
+        return [
+            'success' => true,
+            'module_id' => $id,
+            'config' => $configContent
+        ];
+    }
+
+    /**
+     * Salva a configuração JSON de um módulo.
+     */
+    public function actionSaveModuleConfig($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        // Sanitiza o ID do módulo para evitar Directory Traversal
+        $id = preg_replace('/[^a-zA-Z0-9_\-]/', '', $id);
+        
+        $modulePath = Yii::getAlias("@app/modules/{$id}");
+        if (!is_dir($modulePath)) {
+            return ['success' => false, 'message' => 'Módulo não encontrado no disco.'];
+        }
+        
+        $request = Yii::$app->request;
+        if ($request->isPost) {
+            $configRaw = $request->post('config');
+            
+            // Valida se é um JSON válido
+            $decoded = json_decode($configRaw, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return ['success' => false, 'message' => 'JSON inválido: ' . json_last_error_msg()];
+            }
+            
+            $configFile = "{$modulePath}/config.json";
+            
+            // Formata o JSON de forma legível (pretty print)
+            $formattedJson = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            
+            if (file_put_contents($configFile, $formattedJson) !== false) {
+                return ['success' => true, 'message' => 'Configurações do módulo salvas com sucesso!'];
+            }
+            
+            return ['success' => false, 'message' => 'Não foi possível gravar no arquivo config.json.'];
+        }
+        
+        return ['success' => false, 'message' => 'Requisição inválida.'];
+    }
+
+    /**
      * Retorna o log do sistema de forma otimizada (últimas 150 linhas)
      */
     public function actionGetLogs()

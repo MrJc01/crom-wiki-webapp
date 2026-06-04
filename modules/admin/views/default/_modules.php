@@ -79,24 +79,80 @@ use yii\helpers\Html;
                     </div>
                 </div>
 
-                <div class="mt-6 flex justify-end items-center select-none pt-2 border-t border-slate-900">
-                    <template x-if="mod.id === 'admin'">
-                        <span class="text-[10px] text-slate-500 font-bold italic flex items-center gap-1 py-1">
-                            <i class="material-icons text-xs">shield</i>
-                            Módulo do Sistema (Protegido)
-                        </span>
-                    </template>
-                    <template x-if="mod.id !== 'admin'">
-                        <button @click="toggleModule(mod)"
-                                :disabled="isToggling"
-                                class="px-4 py-1.5 rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-                                :class="(mod.is_active == 1 || mod.is_active === true) ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400' : 'bg-sky-500/15 hover:bg-sky-500/25 text-sky-400'">
-                            <i class="material-icons text-xs" x-text="(mod.is_active == 1 || mod.is_active === true) ? 'power_settings_new' : 'play_arrow'"></i>
-                            <span x-text="(mod.is_active == 1 || mod.is_active === true) ? 'Desativar Módulo' : 'Ativar Módulo'"></span>
-                        </button>
-                    </template>
+                <div class="mt-6 flex justify-between items-center select-none pt-2 border-t border-slate-900">
+                    <button @click="openConfigModal(mod)"
+                            class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/50 hover:border-slate-600 text-slate-200 hover:text-white rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer">
+                        <i class="material-icons text-[12px]">settings</i>
+                        <span>Configurar</span>
+                    </button>
+                    <div>
+                        <template x-if="mod.id === 'admin'">
+                            <span class="text-[10px] text-slate-500 font-bold italic flex items-center gap-1 py-1">
+                                <i class="material-icons text-xs">shield</i>
+                                Protegido
+                            </span>
+                        </template>
+                        <template x-if="mod.id !== 'admin'">
+                            <button @click="toggleModule(mod)"
+                                    :disabled="isToggling"
+                                    class="px-4 py-1.5 rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+                                    :class="(mod.is_active == 1 || mod.is_active === true) ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400' : 'bg-sky-500/15 hover:bg-sky-500/25 text-sky-400'">
+                                <i class="material-icons text-xs" x-text="(mod.is_active == 1 || mod.is_active === true) ? 'power_settings_new' : 'play_arrow'"></i>
+                                <span x-text="(mod.is_active == 1 || mod.is_active === true) ? 'Desativar Módulo' : 'Ativar Módulo'"></span>
+                            </button>
+                        </template>
+                    </div>
                 </div>
             </div>
         </template>
+    </div>
+
+    <!-- MODAL: CONFIGURAÇÃO DO MÓDULO -->
+    <div x-show="showConfigModal" 
+         x-transition
+         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+         style="display: none;">
+        <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 space-y-4"
+             @click.outside="showConfigModal = false">
+            
+            <div class="flex justify-between items-center select-none">
+                <div>
+                    <h3 class="text-sm font-extrabold text-white tracking-wide">Configurar Módulo</h3>
+                    <p class="text-[10px] text-slate-500 font-semibold mt-0.5" x-text="'Ajuste as definições de ' + configModuleName + ' (' + configModuleId + ')'"></p>
+                </div>
+                <button @click="showConfigModal = false" class="text-slate-500 hover:text-white cursor-pointer transition">
+                    <i class="material-icons text-base">close</i>
+                </button>
+            </div>
+
+            <form @submit.prevent="saveConfig()" class="space-y-4">
+                
+                <div class="space-y-1.5">
+                    <label class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block font-mono">Arquivo config.json (Salvo no disco / Monitorado pelo Git)</label>
+                    <div class="relative">
+                        <textarea x-model="configRaw"
+                                  required
+                                  rows="12"
+                                  class="w-full p-4 bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 rounded-xl text-xs text-slate-200 placeholder-slate-750 focus:outline-none resize-none font-mono leading-relaxed transition"></textarea>
+                        <div class="absolute bottom-3 right-3 text-[8px] font-mono text-slate-650 select-none uppercase tracking-widest">
+                            JSON FORMAT
+                        </div>
+                    </div>
+                    <span class="text-[9px] text-slate-500 block font-semibold">Esta configuração é lida diretamente da pasta do módulo. Não está no gitignore, permitindo versionamento Git.</span>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2 select-none">
+                    <button type="button" @click="showConfigModal = false" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800/50 cursor-pointer">Cancelar</button>
+                    <button type="submit" 
+                            :disabled="isSavingConfig"
+                            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-sky-400 hover:bg-sky-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition flex items-center gap-1.5">
+                        <template x-if="isSavingConfig">
+                            <span class="w-3 h-3 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
+                        </template>
+                        <span x-text="isSavingConfig ? 'Salvando...' : 'Salvar Configuração'"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
