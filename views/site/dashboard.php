@@ -275,7 +275,7 @@ if (empty($ecosystemCards) || !is_array($ecosystemCards)) {
             'btn_texto'   => 'Acessar Token Privado',
             'btn_style'   => 'bg-purple-600 hover:bg-purple-500 text-white',
             'disabled'    => false,
-            'tab'         => 'beneficios'
+            'tab'         => 'cromia'
         ],
         [
             'nome'        => 'P2P Secure Share',

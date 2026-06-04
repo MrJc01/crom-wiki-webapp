@@ -27,6 +27,8 @@ if ($currentRoute === 'site/discover') {
     $initialTab = 'terminal';
 } elseif (strpos($currentRoute, 'tickets') !== false) {
     $initialTab = 'tickets';
+} elseif (strpos($currentRoute, 'cromia') !== false) {
+    $initialTab = 'cromia';
 } elseif (strpos($currentRoute, 'admin') !== false) {
     $initialTab = 'admin';
 }
@@ -111,6 +113,7 @@ echo $this->render('_head');
                  'json_store': '<?= Url::to(['/json_store/default/index']) ?>',
                  'terminal': '<?= Url::to(['/terminal/default/index']) ?>',
                  'tickets': '<?= Url::to(['/tickets/default/index']) ?>',
+                 'cromia': '<?= Url::to(['/cromia/default/index']) ?>',
                  'admin': '<?= Url::to(['/admin/default/index']) ?>'
              },
              openTab(id, push = true) {
@@ -175,13 +178,21 @@ echo $this->render('_head');
                  document.body.addEventListener('portalModulesUpdated', () => {
                      window.location.reload();
                  });
-
                  // Escuta respostas HTMX para reinicializar os Swipers da home
                  document.body.addEventListener('htmx:afterSwap', (evt) => {
                      if (evt.detail.target.id === 'container-paravoce') {
                          if (typeof window.initDashboardSwipers === 'function') {
                              window.initDashboardSwipers();
                          }
+                     }
+                     // Reinicializa o componente Alpine.js do CromIA após o swap HTMX
+                     if (evt.detail.target.id === 'container-cromia') {
+                         setTimeout(() => {
+                             const cromiaEl = document.querySelector('#container-cromia [x-data]');
+                             if (cromiaEl && typeof Alpine !== 'undefined' && !cromiaEl._x_dataStack) {
+                                 Alpine.initTree(cromiaEl);
+                             }
+                         }, 50);
                      }
                  });
              }
@@ -681,6 +692,34 @@ echo $this->render('_head');
                                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                   </svg>
                                   <span class="font-mono text-xs text-slate-400 tracking-wider">carregando módulo de tickets...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de CromIA -->
+                <button id="btn-nav-cromia"
+                        hx-get="<?= Url::to(['/cromia/default/index']) ?>"
+                        hx-target="#container-cromia"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba CromIA: Gateway de IA (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-y-auto scrollbar-thin p-6 md:p-10 bg-slate-950" 
+                     x-show="activeTab === 'cromia'"
+                     id="container-cromia"
+                     <?= $initialTab === 'cromia' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'cromia'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando CromIA Gateway...</span>
                               </div>
                          </div>
                      <?php endif; ?>

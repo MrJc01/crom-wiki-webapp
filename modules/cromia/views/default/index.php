@@ -7,6 +7,369 @@ declare(strict_types=1);
 $this->title = 'CromIA Gateway — Controle de API & IA';
 ?>
 
+<script>
+window.cromiaHandler = function() {
+    return {
+        // Estado de Autenticação
+        authenticated: false,
+        authTab: 'login',
+        username: '',
+        password: '',
+        loading: false,
+
+        // Dados do Perfil e Sessão
+        user: {
+            username: '',
+            balance: 0
+        },
+        loadingProfile: false,
+
+        // Chaves de API
+        apiKeys: [],
+        newKeyName: '',
+        generating: false,
+        newlyGeneratedKey: '',
+        copied: false,
+
+        // Modelos
+        modelsList: [],
+        selectedModel: 'gpt-4o-mini',
+        loadingModels: false,
+
+        // Playground Chat
+        playgroundKey: '',
+        chatInput: '',
+        chatLoading: false,
+        chatHistory: [],
+
+        // Mensagens Globais de feedback
+        successMsg: '',
+        errorMsg: '',
+
+        CROMIA_API_URL: 'https://cromia-api.crom.me',
+
+        init() {
+            // Verifica se há sessão ativa no LocalStorage
+            const token = localStorage.getItem("cromia_session_token");
+            const cachedUser = localStorage.getItem("cromia_user");
+
+            if (token && cachedUser) {
+                this.authenticated = true;
+                try {
+                    this.user = JSON.parse(cachedUser);
+                } catch (e) {
+                    this.user = { username: '', balance: 0 };
+                }
+                this.fetchProfile();
+                this.fetchKeys();
+                this.fetchModels();
+            }
+        },
+
+        async login() {
+            this.successMsg = '';
+            this.errorMsg = '';
+            this.loading = true;
+
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: this.username,
+                        password: this.password
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Falha na autenticação.');
+                }
+
+                // Salva sessão no localStorage
+                localStorage.setItem("cromia_session_token", data.token);
+                localStorage.setItem("cromia_user", JSON.stringify(data.user));
+
+                this.user = data.user;
+                this.authenticated = true;
+                this.password = '';
+                this.username = '';
+
+                // Busca dados atualizados e chaves
+                this.fetchProfile();
+                this.fetchKeys();
+                this.fetchModels();
+
+            } catch (err) {
+                this.errorMsg = err.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async register() {
+            this.successMsg = '';
+            this.errorMsg = '';
+            this.loading = true;
+
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: this.username,
+                        password: this.password
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Falha ao realizar cadastro.');
+                }
+
+                this.successMsg = data.message || 'Cadastro efetuado com sucesso! Saldo inicial: 0. Entre em contato com os Guardiões do CROM para recarga de créditos.';
+                this.password = '';
+                this.username = '';
+
+            } catch (err) {
+                this.errorMsg = err.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async fetchProfile() {
+            const token = localStorage.getItem("cromia_session_token");
+            if (!token) return;
+
+            this.loadingProfile = true;
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/admin/me`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        this.logout();
+                    }
+                    throw new Error('Falha ao buscar dados do perfil.');
+                }
+
+                const data = await response.json();
+                this.user.username = data.username;
+                this.user.balance = data.balance;
+
+                // Atualiza cache local
+                localStorage.setItem("cromia_user", JSON.stringify(this.user));
+
+            } catch (err) {
+                console.error(err);
+            } finally {
+                this.loadingProfile = false;
+            }
+        },
+
+        async fetchKeys() {
+            const token = localStorage.getItem("cromia_session_token");
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/admin/keys`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.apiKeys = data.data || [];
+                }
+            } catch (err) {
+                console.error('Erro ao buscar chaves de API:', err);
+            }
+        },
+
+        async fetchModels() {
+            const token = localStorage.getItem("cromia_session_token");
+            if (!token) return;
+
+            this.loadingModels = true;
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/models`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.modelsList = data.data || [];
+                    if (this.modelsList.length > 0) {
+                        this.selectedModel = this.modelsList[0].id;
+                    }
+                }
+            } catch (err) {
+                console.error('Erro ao buscar modelos:', err);
+            } finally {
+                this.loadingModels = false;
+            }
+        },
+
+        async generateKey() {
+            const token = localStorage.getItem("cromia_session_token");
+            if (!token || !this.newKeyName.trim()) return;
+
+            this.generating = true;
+            this.newlyGeneratedKey = '';
+            this.copied = false;
+
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/admin/keys`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ name: this.newKeyName })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erro ao gerar chave de API.');
+                }
+
+                this.newlyGeneratedKey = data.key_string;
+                this.newKeyName = '';
+                this.fetchKeys(); // Recarrega lista
+
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                this.generating = false;
+            }
+        },
+
+        async revokeKey(keyId) {
+            const token = localStorage.getItem("cromia_session_token");
+            if (!token) return;
+
+            if (!confirm('Deseja realmente revogar esta chave de API? Qualquer aplicação que a utilize perderá o acesso imediatamente.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/admin/keys/${keyId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    this.fetchKeys();
+                } else {
+                    alert('Falha ao revogar chave.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        },
+
+        autoSelectPlaygroundKey() {
+            if (this.newlyGeneratedKey) {
+                this.playgroundKey = this.newlyGeneratedKey;
+            } else if (this.apiKeys.length > 0) {
+                alert('Por favor, copie e cole sua chave de API gerada no campo de texto para iniciar os testes.');
+            } else {
+                alert('Gere uma chave de API primeiro para poder testar.');
+            }
+        },
+
+        async sendChatMessage() {
+            if (!this.playgroundKey.trim() || !this.chatInput.trim()) {
+                alert('Insira uma chave de API CromIA válida para consumir a IA.');
+                return;
+            }
+
+            const prompt = this.chatInput;
+            this.chatInput = '';
+            this.chatHistory.push({ role: 'user', content: prompt });
+            this.chatLoading = true;
+
+            // Scroll do chat para o fundo
+            this.scrollChat();
+
+            try {
+                const response = await fetch(`${this.CROMIA_API_URL}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.playgroundKey}`
+                    },
+                    body: JSON.stringify({
+                        model: this.selectedModel,
+                        messages: [{ role: 'user', content: prompt }]
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erro na chamada de IA.');
+                }
+
+                const reply = data.choices?.[0]?.message?.content || 'Nenhuma resposta retornada.';
+                this.chatHistory.push({ role: 'assistant', content: reply });
+
+                // Recarrega saldo em segundo plano após consumo do token
+                setTimeout(() => { this.fetchProfile(); }, 1500);
+
+            } catch (err) {
+                this.chatHistory.push({ role: 'assistant', content: `Erro ao chamar IA: ${err.message}` });
+            } finally {
+                this.chatLoading = false;
+                this.scrollChat();
+            }
+        },
+
+        scrollChat() {
+            this.$nextTick(() => {
+                const container = this.$refs.chatBody;
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            });
+        },
+
+        copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                this.copied = true;
+                setTimeout(() => { this.copied = false; }, 3000);
+            });
+        },
+
+        logout() {
+            localStorage.removeItem("cromia_session_token");
+            localStorage.removeItem("cromia_user");
+            this.authenticated = false;
+            this.user = { username: '', balance: 0 };
+            this.apiKeys = [];
+            this.modelsList = [];
+            this.selectedModel = 'gpt-4o-mini';
+            this.newlyGeneratedKey = '';
+            this.playgroundKey = '';
+            this.chatHistory = [];
+        },
+
+        formatBalance(value) {
+            return Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+
+        formatDate(timestamp) {
+            if (!timestamp) return '-';
+            const date = new Date(Number(timestamp) * 1000);
+            return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+    };
+};
+</script>
+
 <div class="h-[calc(100vh-130px)] md:h-[calc(100vh-112px)] bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden backdrop-blur-md flex flex-col relative"
      x-data="cromiaHandler()">
 
@@ -378,365 +741,3 @@ $this->title = 'CromIA Gateway — Controle de API & IA';
     </div>
 </div>
 
-<script>
-window.cromiaHandler = function() {
-    return {
-        // Estado de Autenticação
-        authenticated: false,
-        authTab: 'login',
-        username: '',
-        password: '',
-        loading: false,
-
-        // Dados do Perfil e Sessão
-        user: {
-            username: '',
-            balance: 0
-        },
-        loadingProfile: false,
-
-        // Chaves de API
-        apiKeys: [],
-        newKeyName: '',
-        generating: false,
-        newlyGeneratedKey: '',
-        copied: false,
-
-        // Modelos
-        modelsList: [],
-        selectedModel: 'gpt-4o-mini',
-        loadingModels: false,
-
-        // Playground Chat
-        playgroundKey: '',
-        chatInput: '',
-        chatLoading: false,
-        chatHistory: [],
-
-        // Mensagens Globais de feedback
-        successMsg: '',
-        errorMsg: '',
-
-        CROMIA_API_URL: 'https://cromia-api.crom.me',
-
-        init() {
-            // Verifica se há sessão ativa no LocalStorage
-            const token = localStorage.getItem("cromia_session_token");
-            const cachedUser = localStorage.getItem("cromia_user");
-
-            if (token && cachedUser) {
-                this.authenticated = true;
-                try {
-                    this.user = JSON.parse(cachedUser);
-                } catch (e) {
-                    this.user = { username: '', balance: 0 };
-                }
-                this.fetchProfile();
-                this.fetchKeys();
-                this.fetchModels();
-            }
-        },
-
-        async login() {
-            this.successMsg = '';
-            this.errorMsg = '';
-            this.loading = true;
-
-            try {
-                const response = await fetch(`${this.CROMIA_API_URL}/v1/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: this.username,
-                        password: this.password
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'Falha na autenticação.');
-                }
-
-                // Salva sessão no localStorage
-                localStorage.setItem("cromia_session_token", data.token);
-                localStorage.setItem("cromia_user", JSON.stringify(data.user));
-
-                this.user = data.user;
-                this.authenticated = true;
-                this.password = '';
-                this.username = '';
-
-                // Busca dados atualizados e chaves
-                this.fetchProfile();
-                this.fetchKeys();
-                this.fetchModels();
-
-            } catch (err) {
-                this.errorMsg = err.message;
-            } finally {
-                this.loading = false;
-            }
-        },
-
-        async register() {
-            this.successMsg = '';
-            this.errorMsg = '';
-            this.loading = true;
-
-            try {
-                const response = await fetch(`${this.CROMIA_API_URL}/v1/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: this.username,
-                        password: this.password
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'Falha ao realizar cadastro.');
-                }
-
-                this.successMsg = data.message || 'Cadastro efetuado com sucesso! Saldo inicial: 0. Entre em contato com os Guardiões do CROM para recarga de créditos.';
-                this.password = '';
-                this.username = '';
-
-            } catch (err) {
-                this.errorMsg = err.message;
-            } finally {
-                this.loading = false;
-            }
-        },
-
-        async fetchProfile() {
-            const token = localStorage.getItem("cromia_session_token");
-            if (!token) return;
-
-            this.loadingProfile = true;
-            try {
-                const response = await fetch(`${this.CROMIA_API_URL}/v1/admin/me`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        this.logout();
-                    }
-                    throw new Error('Falha ao buscar dados do perfil.');
-                }
-
-                const data = await response.json();
-                this.user.username = data.username;
-                this.user.balance = data.balance;
-
-                // Atualiza cache local
-                localStorage.setItem("cromia_user", JSON.stringify(this.user));
-
-            } catch (err) {
-                console.error(err);
-            } finally {
-                this.loadingProfile = false;
-            }
-        },
-
-        async fetchKeys() {
-            const token = localStorage.getItem("cromia_session_token");
-            if (!token) return;
-
-            try {
-                const response = await fetch(`${this.CROMIA_API_URL}/v1/admin/keys`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    this.apiKeys = data.data || [];
-                }
-            } catch (err) {
-                console.error('Erro ao buscar chaves de API:', err);
-            }
-        },
-
-        async fetchModels() {
-            const token = localStorage.getItem("cromia_session_token");
-            if (!token) return;
-
-            this.loadingModels = true;
-            try {
-                const response = await fetch(`${this.CROMIA_API_URL}/v1/models`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    this.modelsList = data.data || [];
-                    if (this.modelsList.length > 0) {
-                        this.selectedModel = this.modelsList[0].id;
-                    }
-                }
-            } catch (err) {
-                console.error('Erro ao buscar modelos:', err);
-            } finally {
-                this.loadingModels = false;
-            }
-        },
-
-        async generateKey() {
-            const token = localStorage.getItem("cromia_session_token");
-            if (!token || !this.newKeyName.trim()) return;
-
-            this.generating = true;
-            this.newlyGeneratedKey = '';
-            this.copied = false;
-
-            try {
-                const response = await fetch(`${this.CROMIA_API_URL}/v1/admin/keys`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ name: this.newKeyName })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'Erro ao gerar chave de API.');
-                }
-
-                this.newlyGeneratedKey = data.key_string;
-                this.newKeyName = '';
-                this.fetchKeys(); // Recarrega lista
-
-            } catch (err) {
-                alert(err.message);
-            } finally {
-                this.generating = false;
-            }
-        },
-
-        async revokeKey(keyId) {
-            const token = localStorage.getItem("cromia_session_token");
-            if (!token) return;
-
-            if (!confirm('Deseja realmente revogar esta chave de API? Qualquer aplicação que a utilize perderá o acesso imediatamente.')) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`${this.CROMIA_API_URL}/v1/admin/keys/${keyId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    this.fetchKeys();
-                } else {
-                    alert('Falha ao revogar chave.');
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        },
-
-        autoSelectPlaygroundKey() {
-            if (this.newlyGeneratedKey) {
-                this.playgroundKey = this.newlyGeneratedKey;
-            } else if (this.apiKeys.length > 0) {
-                alert('Por favor, copie e cole sua chave de API gerada no campo de texto para iniciar os testes.');
-            } else {
-                alert('Gere uma chave de API primeiro para poder testar.');
-            }
-        },
-
-        async sendChatMessage() {
-            if (!this.playgroundKey.trim() || !this.chatInput.trim()) {
-                alert('Insira uma chave de API CromIA válida para consumir a IA.');
-                return;
-            }
-
-            const prompt = this.chatInput;
-            this.chatInput = '';
-            this.chatHistory.push({ role: 'user', content: prompt });
-            this.chatLoading = true;
-
-            // Scroll do chat para o fundo
-            this.scrollChat();
-
-            try {
-                const response = await fetch(`${this.CROMIA_API_URL}/v1/chat/completions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${this.playgroundKey}`
-                    },
-                    body: JSON.stringify({
-                        model: this.selectedModel,
-                        messages: [{ role: 'user', content: prompt }]
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'Erro na chamada de IA.');
-                }
-
-                const reply = data.choices?.[0]?.message?.content || 'Nenhuma resposta retornada.';
-                this.chatHistory.push({ role: 'assistant', content: reply });
-
-                // Recarrega saldo em segundo plano após consumo do token
-                setTimeout(() => { this.fetchProfile(); }, 1500);
-
-            } catch (err) {
-                this.chatHistory.push({ role: 'assistant', content: `Erro ao chamar IA: ${err.message}` });
-            } finally {
-                this.chatLoading = false;
-                this.scrollChat();
-            }
-        },
-
-        scrollChat() {
-            this.$nextTick(() => {
-                const container = this.$refs.chatBody;
-                if (container) {
-                    container.scrollTop = container.scrollHeight;
-                }
-            });
-        },
-
-        copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                this.copied = true;
-                setTimeout(() => { this.copied = false; }, 3000);
-            });
-        },
-
-        logout() {
-            localStorage.removeItem("cromia_session_token");
-            localStorage.removeItem("cromia_user");
-            this.authenticated = false;
-            this.user = { username: '', balance: 0 };
-            this.apiKeys = [];
-            this.modelsList = [];
-            this.selectedModel = 'gpt-4o-mini';
-            this.newlyGeneratedKey = '';
-            this.playgroundKey = '';
-            this.chatHistory = [];
-        },
-
-        formatBalance(value) {
-            return Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        },
-
-        formatDate(timestamp) {
-            if (!timestamp) return '-';
-            const date = new Date(Number(timestamp) * 1000);
-            return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        }
-    };
-};
-</script>
