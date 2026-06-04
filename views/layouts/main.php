@@ -37,6 +37,10 @@ if ($currentRoute === 'site/discover') {
     $initialTab = 'comva';
 } elseif (strpos($currentRoute, 'dokploy') !== false) {
     $initialTab = 'dokploy';
+} elseif (strpos($currentRoute, 'mblog') !== false) {
+    $initialTab = 'mblog';
+} elseif (strpos($currentRoute, 'mapp') !== false) {
+    $initialTab = 'mapp';
 } elseif (strpos($currentRoute, 'admin') !== false) {
     $initialTab = 'admin';
 }
@@ -128,6 +132,8 @@ echo $this->render('_head');
                  'p2p': '<?= Url::to(['/p2p/default/index']) ?>',
                  'comva': '<?= Url::to(['/comva/default/index']) ?>',
                  'dokploy': '<?= Url::to(['/dokploy/default/index']) ?>',
+                 'mblog': '<?= Url::to(['/mblog/default/index']) ?>',
+                 'mapp': '<?= Url::to(['/mapp/default/index']) ?>',
                  'admin': '<?= Url::to(['/admin/default/index']) ?>'
              },
              openTab(id, push = true) {
@@ -868,6 +874,62 @@ echo $this->render('_head');
                      <?php endif; ?>
                 </div>
                 <?php endif; ?>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Log Diário -->
+                <button id="btn-nav-mblog"
+                        hx-get="<?= Url::to(['/mblog/default/index']) ?>"
+                        hx-target="#container-mblog"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba mblog: Iframe (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-hidden bg-slate-950" 
+                     x-show="activeTab === 'mblog'"
+                     id="container-mblog"
+                     <?= $initialTab === 'mblog' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'mblog'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-rose-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Log Diário...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
+
+                <!-- Gatilho de Carregamento Assíncrono Invisível HTMX para a Aba de Arsenal Tático -->
+                <button id="btn-nav-mapp"
+                        hx-get="<?= Url::to(['/mapp/default/index']) ?>"
+                        hx-target="#container-mapp"
+                        hx-trigger="click once"
+                        class="hidden">
+                </button>
+
+                <!-- Aba mapp: Iframe (Injeção SPA) -->
+                <div class="h-full w-full absolute inset-0 overflow-hidden bg-slate-950" 
+                     x-show="activeTab === 'mapp'"
+                     id="container-mapp"
+                     <?= $initialTab === 'mapp' ? 'hx-isomorphic="true"' : '' ?>>
+                     <?php if ($initialTab === 'mapp'): ?>
+                         <?= $content ?>
+                     <?php else: ?>
+                         <div class="flex items-center justify-center h-full text-slate-500 text-sm">
+                              <div class="flex flex-col items-center gap-2">
+                                  <svg class="animate-spin h-5 w-5 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span class="font-mono text-xs text-slate-400 tracking-wider">carregando Arsenal Tático...</span>
+                              </div>
+                         </div>
+                     <?php endif; ?>
+                </div>
 
             </main>
         </div>

@@ -102,6 +102,8 @@ $config = [
                 'comva' => 'comva/default/index',
                 'dokploy' => 'dokploy/default/index',
                 'welcome' => 'welcome/default/index',
+                'mblog' => 'mblog/default/index',
+                'mapp' => 'mapp/default/index',
             ],
         ],
     ],
