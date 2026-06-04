@@ -57,6 +57,7 @@ $config = [
                 'discover' => 'site/discover',
                 'dashboard' => 'site/index',
                 'login' => 'site/login',
+                'register' => 'site/register',
                 'logout' => 'site/logout',
                 'beneficios' => 'site/beneficios',
                 'projetos' => 'site/projetos',

@@ -129,6 +129,27 @@ class SiteController extends Controller
     }
 
     /**
+     * Register action.
+     *
+     * @return Response|string
+     */
+    public function actionRegister(): Response|string
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new \app\models\RegisterForm();
+
+        if ($model->load(Yii::$app->request->post()) && $model->register()) {
+            $this->updateUserActivity();
+            return $this->goHome();
+        }
+
+        return $this->render('register', ['model' => $model]);
+    }
+
+    /**
      * Logout action.
      *
      * @return Response

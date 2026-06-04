@@ -20,6 +20,11 @@ use yii\web\IdentityInterface;
  * @property int $is_membro
  * @property int $created_at
  * @property int $updated_at
+ * @property string|null $email
+ * @property string|null $whatsapp
+ * @property string|null $discord
+ * @property string|null $github
+ * @property string|null $registration_ip
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -38,12 +43,14 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['username', 'password_hash', 'created_at', 'updated_at'], 'required'],
-            [['username', 'password_hash', 'access_token'], 'string', 'max' => 255],
+            [['username', 'password_hash', 'access_token', 'email', 'whatsapp', 'discord', 'github'], 'string', 'max' => 255],
+            [['registration_ip'], 'string', 'max' => 45],
             [['username'], 'unique'],
             [['access_token'], 'unique'],
             [['created_at', 'updated_at', 'is_guardiao', 'is_pilar', 'is_forja', 'is_membro'], 'integer'],
             [['is_guardiao', 'is_pilar', 'is_forja'], 'default', 'value' => 0],
             [['is_membro'], 'default', 'value' => 1],
+            [['email'], 'email'],
         ];
     }
 

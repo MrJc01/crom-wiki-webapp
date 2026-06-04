@@ -5,6 +5,7 @@
 
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 $this->title = 'Portal CROM — Autenticação';
 ?>
@@ -60,8 +61,12 @@ $this->title = 'Portal CROM — Autenticação';
 
     <?php ActiveForm::end(); ?>
 
-    <div class="mt-6 text-center border-t border-slate-800/60 pt-4 w-full">
-        <p class="text-[10px] text-slate-500 font-mono">
+    <div class="mt-6 text-center border-t border-slate-800/60 pt-4 w-full flex flex-col gap-2">
+        <span class="text-xs text-slate-500">Novo por aqui? Solicite sua entrada</span>
+        <a href="<?= Url::to(['/site/register']) ?>" class="text-xs text-sky-400 hover:text-sky-300 font-bold hover:underline">
+            Cadastre-se como Membro
+        </a>
+        <p class="text-[10px] text-slate-550 font-mono mt-2">
             Ambiente Interno Restrito. Acesso criptografado.
         </p>
     </div>
