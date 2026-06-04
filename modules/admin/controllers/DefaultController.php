@@ -141,6 +141,17 @@ class DefaultController extends Controller
                     'link' => 'https://crom.me/manifesto'
                 ]
             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            'dashboard_banners_json' => json_encode([
+                [
+                    'badge'            => 'Soberania',
+                    'titulo_principal' => 'CROM',
+                    'titulo_accent'    => '',
+                    'descricao'        => 'Crie e colabore em documentações locais em Markdown com autonomia radical e controle de governança direto na base.',
+                    'btn_texto'        => 'Consultar Documentos Internos',
+                    'btn_tab'          => 'page_crud',
+                    'gradiente'        => 'from-sky-400/20 to-indigo-500/0'
+                ]
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
         ];
 
         foreach ($defaultExtraSettings as $key => $val) {

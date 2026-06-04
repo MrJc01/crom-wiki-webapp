@@ -178,6 +178,7 @@ window.adminSettingsHandler = function(initialSettings) {
         
         ecosystemCards: [],
         alignmentCards: [],
+        bannerCards: [],
         
         init() {
             try {
@@ -189,6 +190,11 @@ window.adminSettingsHandler = function(initialSettings) {
                 this.alignmentCards = JSON.parse(this.settings.alignment_cards_json || '[]');
             } catch(e) {
                 this.alignmentCards = [];
+            }
+            try {
+                this.bannerCards = JSON.parse(this.settings.dashboard_banners_json || '[]');
+            } catch(e) {
+                this.bannerCards = [];
             }
         },
         
@@ -211,6 +217,13 @@ window.adminSettingsHandler = function(initialSettings) {
             this.ecosystemCards.splice(index, 1);
         },
         
+        moveEcosystemCard(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= this.ecosystemCards.length) return;
+            const item = this.ecosystemCards.splice(index, 1)[0];
+            this.ecosystemCards.splice(newIndex, 0, item);
+        },
+        
         addAlignmentCard() {
             this.alignmentCards.push({
                 titulo: '',
@@ -225,6 +238,36 @@ window.adminSettingsHandler = function(initialSettings) {
             this.alignmentCards.splice(index, 1);
         },
         
+        moveAlignmentCard(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= this.alignmentCards.length) return;
+            const item = this.alignmentCards.splice(index, 1)[0];
+            this.alignmentCards.splice(newIndex, 0, item);
+        },
+
+        addBannerCard() {
+            this.bannerCards.push({
+                badge: '',
+                titulo_principal: '',
+                titulo_accent: '',
+                descricao: '',
+                btn_texto: 'Ver',
+                btn_tab: 'page_crud',
+                gradiente: 'from-sky-400/20 to-indigo-500/0'
+            });
+        },
+        
+        removeBannerCard(index) {
+            this.bannerCards.splice(index, 1);
+        },
+        
+        moveBannerCard(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= this.bannerCards.length) return;
+            const item = this.bannerCards.splice(index, 1)[0];
+            this.bannerCards.splice(newIndex, 0, item);
+        },
+        
         saveSettings() {
             this.successMsg = '';
             this.errorMsg = '';
@@ -233,6 +276,7 @@ window.adminSettingsHandler = function(initialSettings) {
             // Serializa os cartões de volta para JSON para envio
             this.settings.ecosystem_cards_json = JSON.stringify(this.ecosystemCards);
             this.settings.alignment_cards_json = JSON.stringify(this.alignmentCards);
+            this.settings.dashboard_banners_json = JSON.stringify(this.bannerCards);
             
             const formData = new FormData();
             for (const [key, val] of Object.entries(this.settings)) {

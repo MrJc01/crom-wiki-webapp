@@ -59,63 +59,174 @@ use yii\helpers\Html;
 
         <hr class="border-slate-900">
 
-        <!-- Bloco 2: Hero Banner Principal -->
-        <div class="space-y-4">
-            <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest font-mono flex items-center gap-1.5 select-none">
-                <i class="material-icons text-sm text-indigo-400">view_carousel</i>
-                Banner Principal (Hero Section)
-            </h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="space-y-1.5 md:col-span-1">
-                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Badge de Destaque</label>
-                    <input type="text" 
-                           x-model="settings.dashboard_badge" 
-                           required
-                           placeholder="Ex: Soberania"
-                           class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
-                </div>
-                <div class="space-y-1.5 md:col-span-2">
-                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Título Principal do Banner</label>
-                    <input type="text" 
-                           x-model="settings.dashboard_title" 
-                           required
-                           placeholder="Ex: CROM"
-                           class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
-                </div>
-            </div>
-            
-            <div class="space-y-1.5">
-                <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Descrição Detalhada do Banner</label>
-                <textarea x-model="settings.dashboard_desc" 
-                          required
-                          rows="3"
-                          placeholder="Digite o parágrafo de introdução exibido no topo..."
-                          class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all resize-none"></textarea>
+        <!-- Bloco 2: Carrossel de Banners Principais (Hero Section) -->
+        <div class="space-y-6">
+            <div class="space-y-1 select-none">
+                <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest font-mono flex items-center gap-1.5">
+                    <i class="material-icons text-sm text-indigo-400">view_carousel</i>
+                    Carrossel de Banners Principais (Hero Section)
+                </h4>
+                <p class="text-[10px] text-slate-500 font-semibold leading-relaxed">
+                    Gerencie os slides de banner exibidos na seção superior do Dashboard principal.
+                </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-1.5">
-                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Texto do Botão de Ação</label>
-                    <input type="text" 
-                           x-model="settings.dashboard_btn_text" 
-                           required
-                           placeholder="Ex: Consultar Documentos"
-                           class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all">
-                </div>
-                <div class="space-y-1.5">
-                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Aba de Destino (Redirecionamento)</label>
-                    <select x-model="settings.dashboard_btn_tab" 
-                            required
-                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-4 py-2.5 text-white outline-none font-sans font-semibold transition-all cursor-pointer font-semibold text-white">
-                        <option value="paravoce" class="bg-slate-950 text-white">Para Você (Dashboard)</option>
-                        <option value="discover" class="bg-slate-950 text-white">Discover (Aplicativos)</option>
-                        <option value="beneficios" class="bg-slate-950 text-white">Benefícios</option>
-                        <option value="page_crud" class="bg-slate-950 text-white">Páginas Dinâmicas</option>
-                        <option value="json_store" class="bg-slate-950 text-white">JSON Store</option>
-                        <option value="wiki" class="bg-slate-950 text-white">Wiki Documentações</option>
-                        <option value="chat" class="bg-slate-950 text-white">Chat Integrado</option>
-                    </select>
-                </div>
+            <!-- Lista de Banners Interativos -->
+            <div class="space-y-4">
+                <template x-for="(card, index) in bannerCards" :key="index">
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl overflow-hidden relative group hover:border-slate-700/60 transition duration-300">
+                        
+                        <!-- Live Mini-Preview do Banner -->
+                        <div class="relative overflow-hidden rounded-t-2xl h-28 select-none"
+                             :class="'bg-gradient-to-r ' + (card.gradiente || 'from-sky-400/20 to-indigo-500/0')"
+                             :style="'background-color: #e8f0fe'">
+                            <div class="absolute inset-0 flex items-center justify-between px-6 py-4">
+                                <div class="space-y-1.5 max-w-[65%]">
+                                    <span class="inline-block px-2 py-0.5 bg-sky-600/10 border border-sky-600/20 text-sky-700 font-mono font-bold text-[8px] tracking-wide uppercase rounded-full"
+                                          x-text="card.badge || 'Badge'"></span>
+                                    <h4 class="text-lg font-extrabold tracking-tight text-slate-900 flex items-center gap-1 leading-tight">
+                                        <span x-text="card.titulo_principal || 'Título'"></span>
+                                        <span class="font-black text-slate-800" x-text="card.titulo_accent || ''"></span>
+                                        <span class="inline-block w-2 h-2 bg-slate-900 rounded-full ml-0.5"></span>
+                                    </h4>
+                                    <p class="text-[9px] text-slate-600 font-medium leading-relaxed line-clamp-2" x-text="card.descricao || 'Descrição do slide...'"></p>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 opacity-40">
+                                    <div class="w-8 h-8 bg-gradient-to-tr from-sky-400 via-indigo-500 to-rose-500 rounded-full blur-sm"></div>
+                                    <div class="w-6 h-6 bg-gradient-to-br from-amber-400 via-rose-500 to-sky-400 rounded-tl-lg rounded-br-lg flex items-center justify-center transform -rotate-12">
+                                        <span class="text-white text-[8px] font-black">Ω</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide Number Badge -->
+                            <div class="absolute top-2 left-2 px-2 py-0.5 bg-slate-900/70 text-white text-[9px] font-mono font-bold rounded-lg backdrop-blur-sm flex items-center gap-1">
+                                <i class="material-icons text-[10px] text-sky-400">slideshow</i>
+                                Slide <span x-text="index + 1"></span>/<span x-text="bannerCards.length"></span>
+                            </div>
+                        </div>
+
+                        <div class="p-5 space-y-4">
+                            <!-- Controles e Botão de Deletar Card -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono flex items-center gap-1">
+                                    <i class="material-icons text-sm text-sky-400">tune</i>
+                                    Configurações do Slide
+                                </span>
+                                <div class="flex items-center gap-1">
+                                    <!-- Mover para cima -->
+                                    <button type="button" 
+                                            @click="moveBannerCard(index, -1)"
+                                            :disabled="index === 0"
+                                            class="text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer p-1 rounded-lg hover:bg-slate-800/50 border-none outline-none bg-transparent"
+                                            title="Subir Slide">
+                                        <i class="material-icons text-sm">arrow_upward</i>
+                                    </button>
+                                    <!-- Mover para baixo -->
+                                    <button type="button" 
+                                            @click="moveBannerCard(index, 1)"
+                                            :disabled="index === bannerCards.length - 1"
+                                            class="text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer p-1 rounded-lg hover:bg-slate-800/50 border-none outline-none bg-transparent"
+                                            title="Descer Slide">
+                                        <i class="material-icons text-sm">arrow_downward</i>
+                                    </button>
+                                    <!-- Duplicar Slide -->
+                                    <button type="button" 
+                                            @click="bannerCards.splice(index + 1, 0, JSON.parse(JSON.stringify(card)))"
+                                            class="text-slate-500 hover:text-sky-400 transition cursor-pointer p-1 rounded-lg hover:bg-sky-500/10 border-none outline-none bg-transparent"
+                                            title="Duplicar Slide">
+                                        <i class="material-icons text-sm">content_copy</i>
+                                    </button>
+                                    <!-- Deletar Slide -->
+                                    <button type="button" 
+                                            @click="removeBannerCard(index)"
+                                            class="text-slate-500 hover:text-rose-400 transition cursor-pointer p-1 rounded-lg hover:bg-rose-500/10 border-none outline-none bg-transparent"
+                                            title="Remover Slide">
+                                        <i class="material-icons text-sm">delete</i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Badge de Destaque -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Badge de Destaque</label>
+                                    <input type="text" x-model="card.badge" required placeholder="Ex: Soberania"
+                                           class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-3 py-2 text-white outline-none font-sans font-semibold transition-all">
+                                </div>
+                                <!-- Título Principal -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Título Principal</label>
+                                    <input type="text" x-model="card.titulo_principal" required placeholder="Ex: CROM"
+                                           class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-3 py-2 text-white outline-none font-sans font-semibold transition-all">
+                                </div>
+                                <!-- Título Accent (Destaque Negro) -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Título Destaque (Bold)</label>
+                                    <input type="text" x-model="card.titulo_accent" placeholder="Ex: WIKI"
+                                           class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-3 py-2 text-white outline-none font-sans font-semibold transition-all">
+                                </div>
+                            </div>
+
+                            <!-- Descrição do Banner -->
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Descrição Detalhada do Slide</label>
+                                <textarea x-model="card.descricao" required rows="2" placeholder="Descreva o conteúdo do slide de banner..."
+                                          class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-3 py-2 text-white outline-none font-sans font-semibold transition-all resize-none"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Texto do Botão -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Texto do Botão</label>
+                                    <input type="text" x-model="card.btn_texto" required placeholder="Ex: Acessar Documentos"
+                                           class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-3 py-2 text-white outline-none font-sans font-semibold transition-all">
+                                </div>
+                                <!-- Redirecionamento (Aba) -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Aba de Destino</label>
+                                    <select x-model="card.btn_tab" required
+                                            class="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-3 py-2 text-white outline-none font-sans font-semibold transition-all cursor-pointer font-semibold">
+                                        <option value="paravoce" class="bg-slate-950 text-white font-semibold">Para Você (Dashboard)</option>
+                                        <option value="discover" class="bg-slate-950 text-white font-semibold">Discover (Aplicativos)</option>
+                                        <option value="beneficios" class="bg-slate-950 text-white font-semibold">Benefícios</option>
+                                        <option value="page_crud" class="bg-slate-950 text-white font-semibold">Páginas Dinâmicas</option>
+                                        <option value="json_store" class="bg-slate-950 text-white font-semibold">JSON Store</option>
+                                        <option value="wiki" class="bg-slate-950 text-white font-semibold">Wiki Documentações</option>
+                                        <option value="chat" class="bg-slate-950 text-white font-semibold">Chat Integrado</option>
+                                    </select>
+                                </div>
+                                <!-- Tema/Gradiente de Cor -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-mono">Estilo de Fundo (Gradiente)</label>
+                                    <div class="flex items-center gap-2">
+                                        <select x-model="card.gradiente" required
+                                                class="flex-1 bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 text-xs rounded-xl px-3 py-2 text-white outline-none font-sans font-semibold transition-all cursor-pointer">
+                                            <option value="from-sky-400/20 to-indigo-500/0">Azul Sutil</option>
+                                            <option value="from-emerald-400/20 to-teal-500/0">Verde Sutil</option>
+                                            <option value="from-purple-400/20 to-pink-500/0">Roxo Sutil</option>
+                                            <option value="from-amber-400/20 to-orange-500/0">Laranja Sutil</option>
+                                            <option value="from-rose-400/20 to-red-500/0">Vermelho Sutil</option>
+                                            <option value="from-cyan-400/20 to-sky-500/0">Ciano Sutil</option>
+                                            <option value="from-indigo-400/20 to-violet-500/0">Índigo Sutil</option>
+                                        </select>
+                                        <!-- Color Swatch Indicator -->
+                                        <div class="w-8 h-8 rounded-lg border border-slate-700 flex-shrink-0 bg-[#e8f0fe]"
+                                             :class="'bg-gradient-to-r ' + card.gradiente"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Botão Adicionar Banner -->
+            <div class="flex justify-start">
+                <button type="button" @click="addBannerCard()"
+                        class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md select-none">
+                    <i class="material-icons text-sm text-sky-400">add_circle</i>
+                    Adicionar Novo Slide de Banner
+                </button>
             </div>
         </div>
 
@@ -165,13 +276,25 @@ use yii\helpers\Html;
             <div class="space-y-4">
                 <template x-for="(card, index) in ecosystemCards" :key="index">
                     <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 space-y-4 relative group hover:border-slate-700/60 transition duration-300">
-                        <!-- Botão de Deletar Card -->
-                        <button type="button" 
-                                @click="removeEcosystemCard(index)"
-                                class="absolute top-4 right-4 text-slate-500 hover:text-rose-400 transition cursor-pointer p-1 rounded-lg hover:bg-rose-500/10 border-none outline-none bg-transparent"
-                                title="Remover Card">
-                            <i class="material-icons text-sm">delete</i>
-                        </button>
+                        <!-- Controles do Card -->
+                        <div class="absolute top-4 right-4 flex items-center gap-1">
+                            <button type="button" @click="moveEcosystemCard(index, -1)" :disabled="index === 0"
+                                    class="text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer p-1 rounded-lg hover:bg-slate-800/50 border-none outline-none bg-transparent" title="Subir">
+                                <i class="material-icons text-sm">arrow_upward</i>
+                            </button>
+                            <button type="button" @click="moveEcosystemCard(index, 1)" :disabled="index === ecosystemCards.length - 1"
+                                    class="text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer p-1 rounded-lg hover:bg-slate-800/50 border-none outline-none bg-transparent" title="Descer">
+                                <i class="material-icons text-sm">arrow_downward</i>
+                            </button>
+                            <button type="button" @click="ecosystemCards.splice(index + 1, 0, JSON.parse(JSON.stringify(card)))"
+                                    class="text-slate-500 hover:text-sky-400 transition cursor-pointer p-1 rounded-lg hover:bg-sky-500/10 border-none outline-none bg-transparent" title="Duplicar">
+                                <i class="material-icons text-sm">content_copy</i>
+                            </button>
+                            <button type="button" @click="removeEcosystemCard(index)"
+                                    class="text-slate-500 hover:text-rose-400 transition cursor-pointer p-1 rounded-lg hover:bg-rose-500/10 border-none outline-none bg-transparent" title="Remover">
+                                <i class="material-icons text-sm">delete</i>
+                            </button>
+                        </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <!-- Nome do App -->
@@ -300,13 +423,25 @@ use yii\helpers\Html;
             <div class="space-y-4">
                 <template x-for="(card, index) in alignmentCards" :key="index">
                     <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 space-y-4 relative group hover:border-slate-700/60 transition duration-300">
-                        <!-- Botão de Deletar Card -->
-                        <button type="button" 
-                                @click="removeAlignmentCard(index)"
-                                class="absolute top-4 right-4 text-slate-500 hover:text-rose-400 transition cursor-pointer p-1 rounded-lg hover:bg-rose-500/10 border-none outline-none bg-transparent"
-                                title="Remover Card">
-                            <i class="material-icons text-sm">delete</i>
-                        </button>
+                        <!-- Controles do Card -->
+                        <div class="absolute top-4 right-4 flex items-center gap-1">
+                            <button type="button" @click="moveAlignmentCard(index, -1)" :disabled="index === 0"
+                                    class="text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer p-1 rounded-lg hover:bg-slate-800/50 border-none outline-none bg-transparent" title="Subir">
+                                <i class="material-icons text-sm">arrow_upward</i>
+                            </button>
+                            <button type="button" @click="moveAlignmentCard(index, 1)" :disabled="index === alignmentCards.length - 1"
+                                    class="text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer p-1 rounded-lg hover:bg-slate-800/50 border-none outline-none bg-transparent" title="Descer">
+                                <i class="material-icons text-sm">arrow_downward</i>
+                            </button>
+                            <button type="button" @click="alignmentCards.splice(index + 1, 0, JSON.parse(JSON.stringify(card)))"
+                                    class="text-slate-500 hover:text-sky-400 transition cursor-pointer p-1 rounded-lg hover:bg-sky-500/10 border-none outline-none bg-transparent" title="Duplicar">
+                                <i class="material-icons text-sm">content_copy</i>
+                            </button>
+                            <button type="button" @click="removeAlignmentCard(index)"
+                                    class="text-slate-500 hover:text-rose-400 transition cursor-pointer p-1 rounded-lg hover:bg-rose-500/10 border-none outline-none bg-transparent" title="Remover">
+                                <i class="material-icons text-sm">delete</i>
+                            </button>
+                        </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <!-- Título do Card -->

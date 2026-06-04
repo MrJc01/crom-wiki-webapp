@@ -254,6 +254,25 @@ $dashboardDesc = $settingsMap['dashboard_desc'] ?? 'Crie e colabore em documenta
 $dashboardBtnText = $settingsMap['dashboard_btn_text'] ?? 'Consultar Documentos Internos';
 $dashboardBtnTab = $settingsMap['dashboard_btn_tab'] ?? 'page_crud';
 
+// Banners Dinâmicos (Carregamento JSON com Fallback)
+$dashboardBanners = [];
+if (!empty($settingsMap['dashboard_banners_json'])) {
+    $dashboardBanners = json_decode($settingsMap['dashboard_banners_json'], true);
+}
+if (empty($dashboardBanners) || !is_array($dashboardBanners)) {
+    $dashboardBanners = [
+        [
+            'badge'            => $dashboardBadge,
+            'titulo_principal' => $dashboardTitle,
+            'titulo_accent'    => '',
+            'descricao'        => $dashboardDesc,
+            'btn_texto'        => $dashboardBtnText,
+            'btn_tab'          => $dashboardBtnTab,
+            'gradiente'        => 'from-sky-400/20 to-indigo-500/0'
+        ]
+    ];
+}
+
 // 1. Frases e palavra do dia
 $dailyQuoteTitle = $settingsMap['daily_quote_title'] ?? $dailyQuoterandomDayTitle;
 $dailyQuoteText = $settingsMap['daily_quote_text'] ?? $dailyQuoterandomDay;
@@ -352,17 +371,7 @@ if (empty($alignmentCards) || !is_array($alignmentCards)) {
 }
 
 $dashboard = [
-    'banners' => [
-        [
-            'badge'            => $dashboardBadge,
-            'titulo_principal' => $dashboardTitle,
-            'titulo_accent'    => '',
-            'descricao'        => $dashboardDesc,
-            'btn_texto'        => $dashboardBtnText,
-            'btn_tab'          => $dashboardBtnTab,
-            'gradiente'        => 'from-sky-400/20 to-indigo-500/0'
-        ]
-    ],
+    'banners' => $dashboardBanners,
     'ecossistema' => $ecosystemCards,
     'beneficios_preview' => $alignmentCards,
     'projetos_hook' => [
