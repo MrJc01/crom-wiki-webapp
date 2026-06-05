@@ -63,6 +63,12 @@ class DefaultController extends Controller
                 'is_forja' => (bool)$u->is_forja,
                 'is_membro' => (bool)$u->is_membro,
                 'created_at' => date('d/m/Y H:i', $u->created_at),
+                'updated_at' => $u->updated_at ? date('d/m/Y H:i', $u->updated_at) : null,
+                'email' => $u->email,
+                'whatsapp' => $u->whatsapp,
+                'discord' => $u->discord,
+                'github' => $u->github,
+                'registration_ip' => $u->registration_ip,
                 'permissions' => $assignedPerms
             ];
         }

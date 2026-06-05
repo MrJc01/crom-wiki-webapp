@@ -9,6 +9,8 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
         allPermissions: allPermissions,
         showUserModal: false,
         showPermModal: false,
+        showInfoModal: false,
+        infoUser: {},
         
         // Formulário do Usuário
         userId: '',
@@ -71,6 +73,11 @@ window.adminUsersHandler = function(initialUsers, allPermissions) {
             this.successMsg = '';
             this.errorMsg = '';
             this.showPermModal = true;
+        },
+
+        openInfoModal(user) {
+            this.infoUser = user;
+            this.showInfoModal = true;
         },
         
         saveUser() {

@@ -96,6 +96,12 @@ use yii\helpers\Html;
                             </td>
                             <td class="p-4 pr-6 text-right select-none">
                                 <div class="flex items-center justify-end gap-1.5">
+                                    <!-- Visualizar Detalhes -->
+                                    <button @click="openInfoModal(user)" 
+                                            class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                                            title="Visualizar Informações">
+                                        <i class="material-icons text-base">visibility</i>
+                                    </button>
                                     <!-- Alterar Permissões -->
                                     <button @click="openPermModal(user)" 
                                             class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
@@ -248,6 +254,161 @@ use yii\helpers\Html;
                     <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-sky-400 hover:bg-sky-300 cursor-pointer transition">Salvar Alterações</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- 3. MODAL: DETALHES DO USUÁRIO -->
+    <div x-show="showInfoModal" 
+         x-transition
+         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+         style="display: none;">
+        <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 space-y-5"
+             @click.outside="showInfoModal = false">
+            
+            <!-- Cabeçalho -->
+            <div class="flex justify-between items-center select-none">
+                <div class="flex items-center gap-2.5">
+                    <div class="h-10 w-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-lg">
+                        👤
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white tracking-wide" x-text="infoUser.username"></h3>
+                        <span class="text-[9px] text-slate-500 font-mono" x-text="'ID: #' + infoUser.id"></span>
+                    </div>
+                </div>
+                <button @click="showInfoModal = false" class="text-slate-500 hover:text-white cursor-pointer transition">
+                    <i class="material-icons text-base">close</i>
+                </button>
+            </div>
+
+            <!-- Corpo -->
+            <div class="space-y-4 font-sans text-xs">
+                
+                <!-- Status & Tags -->
+                <div class="grid grid-cols-2 gap-3 p-3 bg-slate-950/40 border border-slate-800 rounded-xl select-none">
+                    <div class="space-y-1">
+                        <span class="text-[8px] font-extrabold text-slate-500 uppercase tracking-wider block">Status da Conta</span>
+                        <template x-if="infoUser.status === 1">
+                            <span class="inline-flex px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] rounded-full uppercase font-bold">Ativo</span>
+                        </template>
+                        <template x-if="infoUser.status === 0">
+                            <span class="inline-flex px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[9px] rounded-full uppercase font-bold animate-pulse">Bloqueado</span>
+                        </template>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-[8px] font-extrabold text-slate-500 uppercase tracking-wider block">Categorias</span>
+                        <div class="flex flex-wrap gap-1">
+                            <template x-if="infoUser.is_membro">
+                                <span class="px-1.5 py-0.2 bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[8px] font-mono rounded font-extrabold uppercase">Membro</span>
+                            </template>
+                            <template x-if="infoUser.is_guardiao">
+                                <span class="px-1.5 py-0.2 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[8px] font-mono rounded font-extrabold uppercase">Guardião</span>
+                            </template>
+                            <template x-if="infoUser.is_pilar">
+                                <span class="px-1.5 py-0.2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-mono rounded font-extrabold uppercase">Pilar</span>
+                            </template>
+                            <template x-if="infoUser.is_forja">
+                                <span class="px-1.5 py-0.2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[8px] font-mono rounded font-extrabold uppercase">Forja</span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalhes de Cadastro -->
+                <div class="space-y-2.5">
+                    <h4 class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block font-mono">Informações de Registro</h4>
+                    <div class="grid grid-cols-2 gap-3 bg-slate-950/20 p-3 border border-slate-800 rounded-xl font-mono text-[10px] text-slate-300">
+                        <div>
+                            <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Criado em</span>
+                            <span x-text="infoUser.created_at || '-'"></span>
+                        </div>
+                        <div>
+                            <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Atualizado em</span>
+                            <span x-text="infoUser.updated_at || '-'"></span>
+                        </div>
+                        <div class="col-span-2">
+                            <span class="text-[8px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">IP de Registro</span>
+                            <span x-text="infoUser.registration_ip || 'Não registrado'"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contatos / Integrações -->
+                <div class="space-y-2.5">
+                    <h4 class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block font-mono">Contato & Redes</h4>
+                    <div class="space-y-2 bg-slate-950/20 p-3 border border-slate-800/40 rounded-xl">
+                        <!-- Email -->
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-slate-500 font-semibold flex items-center gap-1.5">
+                                <span>📧</span> Email
+                            </span>
+                            <template x-if="infoUser.email">
+                                <a :href="'mailto:' + infoUser.email" class="text-sky-400 hover:text-sky-300 font-bold transition" x-text="infoUser.email"></a>
+                            </template>
+                            <template x-if="!infoUser.email">
+                                <span class="text-slate-600 italic">Não informado</span>
+                            </template>
+                        </div>
+                        <!-- Discord -->
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-slate-500 font-semibold flex items-center gap-1.5">
+                                <span>💬</span> Discord
+                            </span>
+                            <template x-if="infoUser.discord">
+                                <span class="text-indigo-400 font-bold" x-text="infoUser.discord"></span>
+                            </template>
+                            <template x-if="!infoUser.discord">
+                                <span class="text-slate-600 italic">Não informado</span>
+                            </template>
+                        </div>
+                        <!-- WhatsApp -->
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-slate-500 font-semibold flex items-center gap-1.5">
+                                <span>📱</span> WhatsApp
+                            </span>
+                            <template x-if="infoUser.whatsapp">
+                                <span class="text-emerald-400 font-bold" x-text="infoUser.whatsapp"></span>
+                            </template>
+                            <template x-if="!infoUser.whatsapp">
+                                <span class="text-slate-600 italic">Não informado</span>
+                            </template>
+                        </div>
+                        <!-- GitHub -->
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-slate-500 font-semibold flex items-center gap-1.5">
+                                <span>💻</span> GitHub
+                            </span>
+                            <template x-if="infoUser.github">
+                                <a :href="'https://github.com/' + infoUser.github" target="_blank" class="text-white hover:text-slate-300 font-bold transition flex items-center gap-0.5" x-text="'@' + infoUser.github"></a>
+                            </template>
+                            <template x-if="!infoUser.github">
+                                <span class="text-slate-600 italic">Não informado</span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privilégios RBAC -->
+                <div class="space-y-2">
+                    <h4 class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block font-mono">Privilégios de Segurança (RBAC)</h4>
+                    <div class="flex flex-wrap gap-1 p-2 border border-slate-800/40 rounded-xl bg-slate-950/20">
+                        <template x-for="perm in infoUser.permissions" :key="perm">
+                            <span class="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-mono rounded-md" x-text="perm"></span>
+                        </template>
+                        <template x-if="!infoUser.permissions || infoUser.permissions.length === 0">
+                            <span class="text-slate-600 font-normal italic text-[10px] p-1">Nenhum privilégio de segurança associado</span>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Rodapé -->
+            <div class="pt-2 flex justify-end select-none">
+                <button type="button" @click="showInfoModal = false" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                    Fechar
+                </button>
+            </div>
         </div>
     </div>
 
