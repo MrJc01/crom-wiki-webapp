@@ -76,3 +76,8 @@ tests/_support/_generated
 
 # Configurações locais e sensíveis de cada módulo
 /modules/*/config.local.json
+# dados de produção (ficam no servidor e no backup, nunca no Git)
+/data/*.db
+/data/*.sqlite
+/data/*.sqlite-*
+.env
